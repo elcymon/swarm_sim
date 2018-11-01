@@ -29,7 +29,7 @@ all_set = sum([copy_wp,copy_rp,copy_wg])
 
 #start up gazebo if all processes are successful
 if(all_set == 0):
-	load_world = subprocess.Popen("gzserver w_sound_modelling.world",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)#w_swarm1.world
+	load_world = subprocess.Popen("gzserver sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster.world",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)#w_swarm1.world
 	
 	if load_world.returncode==None:
 		load_logger = subprocess.Popen("./world_governor",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
