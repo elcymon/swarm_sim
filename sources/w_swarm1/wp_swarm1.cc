@@ -557,9 +557,9 @@ namespace gazebo
 											if(n_status.compare("searching")==0 || false)
 											{
 												rep_neighbours += 1;
-												//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
+												double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
-												double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+												//double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 
 												//add noise
 												repulsion_intensity += this->noise_distro(this->generator);
@@ -576,9 +576,9 @@ namespace gazebo
 											{
 												//cout<<"n_seen_litter:"<<n_seen_litter<<" this->lit_threshold:"<<this->lit_threshold<<endl;
 												att_neighbours += 1;
-												// double attraction_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
+												double attraction_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
-												double attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+												//double attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 
 												//add noise
 												attraction_intensity += this->noise_distro(this->generator);
