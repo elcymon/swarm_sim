@@ -1,0 +1,17 @@
+#ignore some folders
+
+.vscode/
+
+results/*
+#!results/.placeholder
+
+#sources/m_litter/build/*
+#sources/m_nest/build/*
+#sources/mp_swarm1/build/*
+#sources/w_swarm1/build/*
+#sources/world_governor/build/*
+
+sources/*/build/*
+
+!.placeholder
+.~lock*
