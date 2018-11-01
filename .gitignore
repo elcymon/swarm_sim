@@ -3,6 +3,10 @@
 .vscode/
 
 results/*
+.~lock*
+*.simg
+*.img
+
 #!results/.placeholder
 
 #sources/m_litter/build/*
@@ -14,4 +18,4 @@ results/*
 sources/*/build/*
 
 !.placeholder
-.~lock*
+
