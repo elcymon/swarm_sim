@@ -153,8 +153,9 @@ int main(int _argc, char **_argv)
 	ostringstream si1;
 	auto t = std::time(nullptr);
 	auto tm = *std::localtime(&t);
-	si1 << std::put_time(&tm,"%Y-%m-%d");
-	folder_name =  "./results/" + si1.str() + "/";
+	si1 << std::put_time(&tm,"%Y-%m-%d-");
+	
+	folder_name =  "./results/" + si1.str()+ _argv[1] + "/";
 	const char *mk_dir = folder_name.c_str();
 	
 	int a = mkdir("results", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
