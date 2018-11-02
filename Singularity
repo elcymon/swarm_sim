@@ -5,7 +5,7 @@ From: gazebo:libgazebo7
 %post
 	apt-get -y update
 	apt-get install python3
-	apt-get -y install cmake
+	apt-get -y install cmake gcc g++
 
 %environment
 	export LC_ALL=C.UTF-8
