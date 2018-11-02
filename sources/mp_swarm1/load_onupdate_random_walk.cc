@@ -106,7 +106,8 @@ void ModelVel::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	this->hommaterialMsg->set_allocated_diffuse(this->homDiffMsg);
 	
 	//searching
-	gazebo::common::Color srchColor(170.0/255,110.0/255,110.0/255,1.0);
+	// gazebo::common::Color srchColor(170.0/255,110.0/255,110.0/255,1.0);
+	gazebo::common::Color srchColor(0.95,0.95,0.95,1.0);
 	this->srchColMsg = new gazebo::msgs::Color(gazebo::msgs::Convert(srchColor));
 	this->srchDiffMsg = new gazebo::msgs::Color(*(this->srchColMsg));
 	
