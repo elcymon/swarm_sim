@@ -1,6 +1,6 @@
 Bootstrap: docker
 
-From: gazebo:libgazebo9
+From: gazebo:libgazebo7
 
 %post
 	apt-get -y update
