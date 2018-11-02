@@ -7,7 +7,7 @@ def start_simulation(folder_name):
 	copy_np=None
 	copy_wg=None
 	print('compiling world plugin')
-	world_plugin = subprocess.run("cd sources/w_swarm1/build;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	world_plugin = subprocess.run("cd sources/w_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 	if world_plugin.returncode:
 		print('************world plugin compilation failed')
 		print(world_plugin.stderr)
@@ -17,7 +17,7 @@ def start_simulation(folder_name):
 	print()
 
 	print('compiling robot plugin')
-	robot_plugin = subprocess.run("cd sources/mp_swarm1/build;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	robot_plugin = subprocess.run("cd sources/mp_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 	if robot_plugin.returncode:
 		print('************robot plugin compilation failed')
 		print(robot_plugin.stderr)
@@ -27,7 +27,7 @@ def start_simulation(folder_name):
 	print()
 
 	print('compiling nest plugin')
-	nest_plugin = subprocess.run("cd sources/m_nest/build;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	nest_plugin = subprocess.run("cd sources/m_nest/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 	if nest_plugin.returncode:
 		print('************nest plugin compilation failed')
 		print(nest_plugin.stderr)
@@ -37,7 +37,7 @@ def start_simulation(folder_name):
 	print()
 
 	print('compiling world governor')
-	world_governor = subprocess.run("cd sources/world_governor/build;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	world_governor = subprocess.run("cd sources/world_governor/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 	if world_governor.returncode:
 		print('*************world governor compilation failed')
 		print(world_governor.stdout)
@@ -47,7 +47,6 @@ def start_simulation(folder_name):
 		copy_wg = subprocess.run("cp sources/world_governor/build/world_governor .",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 		#print(copy_wg.stderr)
 		
-
 
 	all_set = sum([world_plugin.returncode,copy_wp.returncode,\
 				robot_plugin.returncode,copy_rp.returncode,\

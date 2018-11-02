@@ -1,5 +1,4 @@
 import subprocess
-import os.path
 import sys
 
 def start_simulation(folder_name):
