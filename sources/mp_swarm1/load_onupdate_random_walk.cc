@@ -321,7 +321,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	//Reset litter capacity
 	this->litter_db.clear();
 	this->acTion = "Start Sim";
-	this->Kp = 10*this->rVel;
+	this->Kp = 0*this->rVel;
 	this->no_litter = false;
 	//*****************************************/
 	//******dropping litter handlers***********/

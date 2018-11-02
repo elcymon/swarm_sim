@@ -66,7 +66,7 @@
 					  <length><%=wr%></length><!--2*wr-->
 				  </cylinder>
 			  </geometry>
-			  <surface>
+			  <!--<surface>
 				<contact>
 					<collide_bitmask>0x<%=collide_bitmask%></collide_bitmask>
 				</contact>
@@ -78,7 +78,7 @@
 						<slip2>1</slip2>
 					</ode>
 				</friction>
-			</surface>
+			</surface>-->
 		  </collision>
 		  <sensor name='chassis_contact' type='contact'>
 			  <contact>
@@ -139,7 +139,7 @@
 					  <length><%=wl%></length>
 				  </cylinder>
 			  </geometry>
-			  <surface>
+			  <!--<surface>
 				<contact>
 					<collide_bitmask>0x<%=collide_bitmask%></collide_bitmask>
 				</contact>
@@ -148,10 +148,10 @@
 						<mu><%=mu%></mu>
 						<mu2><%=mu%></mu2>
 						<slip1><%=slip%></slip1>
-						<slip2><%=slip%></slip2><!---->
+						<slip2><%=slip%></slip2>
 					</ode>
 				</friction>
-			</surface>
+			</surface>-->
 		  </collision>
       </link>
       
@@ -217,7 +217,7 @@
 					  <length><%=wl%></length>
 				  </cylinder>
 			  </geometry>
-			  <surface>
+			  <!--<surface>
 				<contact>
 					<collide_bitmask>0x<%=collide_bitmask%></collide_bitmask>
 				</contact>
@@ -226,10 +226,10 @@
 						<mu><%=mu%></mu>
 						<mu2><%=mu%></mu2>
 						<slip1><%=slip%></slip1>
-						<slip2><%=slip%></slip2><!---->
+						<slip2><%=slip%></slip2>
 					</ode>
 				</friction>
-			</surface>
+			</surface>-->
 		  </collision>
       </link>
       <joint type='revolute' name='R_joint'>
@@ -361,7 +361,7 @@
 					  <radius><%=wr%></radius>
 				  </sphere>
 			  </geometry>
-			   <surface>
+			  <!-- <surface>
 				  <contact>
 					<collide_bitmask>0x<%=collide_bitmask%></collide_bitmask>
 				  </contact>
@@ -369,11 +369,11 @@
 					  <ode>
 						  <mu><%=0%></mu>
 						  <mu2><%=0%></mu2>
-						  <!--<slip1><%=slip%></slip1>
-						  <slip2><%=slip%></slip2>-->
+						  <slip1><%=slip%></slip1>
+						  <slip2><%=slip%></slip2>
 					  </ode>
 				  </friction>
-			  </surface>
+			  </surface>-->
 		  </collision>
       </link>
       <joint type='ball' name='B_joint'>
@@ -497,7 +497,7 @@
 					  <radius><%=wr%></radius>
 				  </sphere>
 			  </geometry>
-			  <surface>
+			  <!-- <surface>
 				  <contact>
 					<collide_bitmask>0x<%=collide_bitmask%></collide_bitmask>
 				  </contact>
@@ -505,11 +505,11 @@
 					  <ode>
 						  <mu><%=0%></mu>
 						  <mu2><%=0%></mu2>
-						 <!-- <slip1><%=slip%></slip1>
-						  <slip2><%=slip%></slip2>-->
+						 <slip1><%=slip%></slip1>
+						  <slip2><%=slip%></slip2>
 					  </ode>
 				  </friction>
-			  </surface>
+			  </surface>-->
 		  </collision>
       </link>
       

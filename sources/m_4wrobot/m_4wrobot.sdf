@@ -66,7 +66,7 @@
 					  <length>0.0605</length><!--2*wr-->
 				  </cylinder>
 			  </geometry>
-			  <surface>
+			  <!--<surface>
 				<contact>
 					<collide_bitmask>0x1</collide_bitmask>
 				</contact>
@@ -78,7 +78,7 @@
 						<slip2>1</slip2>
 					</ode>
 				</friction>
-			</surface>
+			</surface>-->
 		  </collision>
 		  <sensor name='chassis_contact' type='contact'>
 			  <contact>
@@ -139,7 +139,7 @@
 					  <length>0.0605</length>
 				  </cylinder>
 			  </geometry>
-			  <surface>
+			 <!-- <surface>
 				<contact>
 					<collide_bitmask>0x1</collide_bitmask>
 				</contact>
@@ -148,10 +148,10 @@
 						<mu>1</mu>
 						<mu2>1</mu2>
 						<slip1>1</slip1>
-						<slip2>1</slip2><!---->
+						<slip2>1</slip2>
 					</ode>
 				</friction>
-			</surface>
+			</surface>-->
 		  </collision>
       </link>
       
@@ -217,7 +217,7 @@
 					  <length>0.0605</length>
 				  </cylinder>
 			  </geometry>
-			  <surface>
+			  <!--<surface>
 				<contact>
 					<collide_bitmask>0x1</collide_bitmask>
 				</contact>
@@ -226,10 +226,10 @@
 						<mu>1</mu>
 						<mu2>1</mu2>
 						<slip1>1</slip1>
-						<slip2>1</slip2><!---->
+						<slip2>1</slip2>
 					</ode>
 				</friction>
-			</surface>
+			</surface>-->
 		  </collision>
       </link>
       <joint type='revolute' name='R_joint'>
@@ -361,7 +361,7 @@
 					  <radius>0.0605</radius>
 				  </sphere>
 			  </geometry>
-			   <surface>
+			   <!--<surface>
 				  <contact>
 					<collide_bitmask>0x1</collide_bitmask>
 				  </contact>
@@ -369,11 +369,11 @@
 					  <ode>
 						  <mu>0</mu>
 						  <mu2>0</mu2>
-						  <!--<slip1>1</slip1>
-						  <slip2>1</slip2>-->
+						  <slip1>1</slip1>
+						  <slip2>1</slip2>
 					  </ode>
 				  </friction>
-			  </surface>
+			  </surface>-->
 		  </collision>
       </link>
       <joint type='ball' name='B_joint'>
@@ -497,7 +497,7 @@
 					  <radius>0.0605</radius>
 				  </sphere>
 			  </geometry>
-			  <surface>
+			  <!--<surface>
 				  <contact>
 					<collide_bitmask>0x1</collide_bitmask>
 				  </contact>
@@ -505,11 +505,11 @@
 					  <ode>
 						  <mu>0</mu>
 						  <mu2>0</mu2>
-						 <!-- <slip1>1</slip1>
-						  <slip2>1</slip2>-->
+						  <slip1>1</slip1>
+						  <slip2>1</slip2>
 					  </ode>
 				  </friction>
-			  </surface>
+			  </surface>-->
 		  </collision>
       </link>
       
