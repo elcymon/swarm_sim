@@ -4,28 +4,53 @@ copy_wp=None
 copy_rp=None
 copy_np=None
 copy_wg=None
-print('Checking control plugins')
-
-if os.path.isfile('compiled_plugins/libwp_swarm1.so'):
-	copy_wp = 0
+print('compiling world plugin')
+world_plugin = subprocess.run("cd sources/w_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+if world_plugin.returncode:
+	print('************world plugin compilation failed')
+	print(world_plugin.stderr)
 else:
-	copy_wp = 1
+	print('world plugin compilation successful')
+	copy_wp = subprocess.run("cp sources/w_swarm1/build/libwp_swarm1.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+print()
 
-if os.path.isfile('compiled_plugins/libmp_swarm1.so'):
-	copy_rp = 0
+print('compiling robot plugin')
+robot_plugin = subprocess.run("cd sources/mp_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+if robot_plugin.returncode:
+	print('************robot plugin compilation failed')
+	print(robot_plugin.stderr)
 else:
-	copy_rp = 1
+	print('robot plugin compilation successful')
+	copy_rp = subprocess.run("cp sources/mp_swarm1/build/libmp_swarm1.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+print()
 
-if os.path.isfile('compiled_plugins/libnest_plugin.so'):
-	copy_np = 0
+print('compiling nest plugin')
+nest_plugin = subprocess.run("cd sources/m_nest/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+if nest_plugin.returncode:
+	print('************nest plugin compilation failed')
+	print(nest_plugin.stderr)
 else:
-	copy_np = 1
+	print('nest plugin compilation successful')
+	copy_np = subprocess.run("cp sources/m_nest/build/libnest_plugin.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+print()
 
-if os.path.isfile('./world_governor'):
-	copy_wg = 0
+print('compiling world governor')
+world_governor = subprocess.run("cd sources/world_governor/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+if world_governor.returncode:
+	print('*************world governor compilation failed')
+	print(world_governor.stdout)
 else:
-	copy_wg = 1
-all_set = sum([copy_wp,copy_rp,copy_wg])
+	print('world governor compilation successful')
+	subprocess.run("rm world_governor",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	copy_wg = subprocess.run("cp sources/world_governor/build/world_governor .",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	#print(copy_wg.stderr)
+	
+
+
+all_set = sum([world_plugin.returncode,copy_wp.returncode,\
+			robot_plugin.returncode,copy_rp.returncode,\
+			nest_plugin.returncode,copy_np.returncode,\
+			world_governor.returncode,copy_wg.returncode])
 
 #start up gazebo if all processes are successful
 if(all_set == 0):
