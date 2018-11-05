@@ -84,6 +84,7 @@ namespace gazebo
 			double max_step_size;
 			double log_rate;
 			
+			std::string com_model;
 			// Sound source modelling parameters
 			math::Vector3 signal_source_pos;
 			double A0; //intensity from source
@@ -322,46 +323,50 @@ namespace gazebo
 					size_t aloc = temp.find(":");
 					std::string param_name = temp.substr(0,aloc);
 					std::string param_value_str = temp.substr(aloc+1);
-					double value  = std::stod(param_value_str);//double value of parameter
+					// double value  = std::stod(param_value_str);//double value of parameter
 					
 					if(param_name.compare("nei_sensing") == 0)
 					{
-						this->nei_sensing = value;
+						this->nei_sensing = std::stod(param_value_str);//double value of parameter;
 						//std::cout<<"nei_sensing = "<<this->nei_sensing<<endl;
 						//break;
 					}
 					else if(param_name.compare("log_rate") == 0)
 					{
-						this->log_rate = value;
+						this->log_rate = std::stod(param_value_str);//double value of parameter;
 					}
 					else if(param_name.compare("max_step_size") == 0)
 					{
-						this->max_step_size = value;
+						this->max_step_size = std::stod(param_value_str);//double value of parameter;
 					}
 					else if(param_name.compare("lit_threshold") == 0)
 					{
-						this->lit_threshold = value;
+						this->lit_threshold = std::stod(param_value_str);//double value of parameter;
 					}
 
 					else if(param_name.compare("A0") == 0)
 					{
-						this->A0 = value;
+						this->A0 = std::stod(param_value_str);//double value of parameter;
 					}
 					else if (param_name.compare("Ae") == 0)
 					{
-						this->Ae = value;
+						this->Ae = std::stod(param_value_str);//double value of parameter;
 					}
 					else if(param_name.compare("alpha") == 0)
 					{
-						this->alpha = value;
+						this->alpha = std::stod(param_value_str);//double value of parameter;
 					}
 					else if(param_name.compare("noise_mean") == 0)
 					{
-						this->noise_mean = value;
+						this->noise_mean = std::stod(param_value_str);//double value of parameter;
 					}
 					else if(param_name.compare("noise_std") == 0)
 					{
-						this->noise_std = value;
+						this->noise_std = std::stod(param_value_str);//double value of parameter;
+					}
+					else if(param_name.compare("com_model") == 0)
+					{
+						this->com_model = param_value_str;//communication model is a string
 					}
 					else
 					{
@@ -557,9 +562,19 @@ namespace gazebo
 											if(n_status.compare("searching")==0 || false)
 											{
 												rep_neighbours += 1;
+												double repulsion_intensity = 0;
+												if(this->com_model.compare("linear") == 0){
+													repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
+												}
+												else if(this->com_model.compare("sound") == 0) {
+													repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+												}
+												else if(this->com_model.compare("vector") == 0) {
+													//TO DO
+												}
 												//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
-												double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+												// double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 
 												//add noise
 												repulsion_intensity += this->noise_distro(this->generator);
@@ -576,9 +591,19 @@ namespace gazebo
 											{
 												//cout<<"n_seen_litter:"<<n_seen_litter<<" this->lit_threshold:"<<this->lit_threshold<<endl;
 												att_neighbours += 1;
+												double attraction_intensity = 0;
+												if(this->com_model.compare("linear") == 0){
+													attraction_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
+												}
+												else if(this->com_model.compare("sound") == 0) {
+													attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+												}
+												else if(this->com_model.compare("vector") == 0) {
+													//TO DO
+												}
 												// double attraction_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
-												double attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+												// double attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 
 												//add noise
 												attraction_intensity += this->noise_distro(this->generator);

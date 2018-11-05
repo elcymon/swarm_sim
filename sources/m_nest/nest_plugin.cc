@@ -66,15 +66,15 @@ namespace gazebo
 				std::size_t aloc = temp.find(":");
 				std::string param_name = temp.substr(0,aloc);
 				std::string param_value_str = temp.substr(aloc+1);
-				double value = std::stod(param_value_str);
+				// double value = std::stod(param_value_str);
 				
 				if(param_name.compare("log_rate") == 0)
 				{
-					this->log_rate = value;
+					this->log_rate = std::stod(param_value_str);;
 				}
 				else if(param_name.compare("max_step_size") == 0)
 				{
-					this->max_step_size = value;
+					this->max_step_size = std::stod(param_value_str);;
 				}
 				else
 				{

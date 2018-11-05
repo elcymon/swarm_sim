@@ -106,7 +106,8 @@ void ModelVel::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	this->hommaterialMsg->set_allocated_diffuse(this->homDiffMsg);
 	
 	//searching
-	gazebo::common::Color srchColor(170.0/255,110.0/255,110.0/255,1.0);
+	// gazebo::common::Color srchColor(170.0/255,110.0/255,110.0/255,1.0);
+	gazebo::common::Color srchColor(0.95,0.95,0.95,1.0);
 	this->srchColMsg = new gazebo::msgs::Color(gazebo::msgs::Convert(srchColor));
 	this->srchDiffMsg = new gazebo::msgs::Color(*(this->srchColMsg));
 	
@@ -195,99 +196,99 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		std::size_t aloc = temp.find(":");
 		std::string param_name = temp.substr(0,aloc);
 		std::string param_value_str = temp.substr(aloc+1);
-		double value = std::stod(param_value_str);//change string to double
+		// double value = std::stod(param_value_str);//change string to double
 		
 		if(param_name.compare("nei_sensing")==0)
 		{
-			this->nei_sensing = value;
+			this->nei_sensing = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("lit_sensing")==0)
 		{
-			this->lit_sensing = value;
+			this->lit_sensing = std::stod(param_value_str);;
 		}
 		else if (param_name.compare("FoV") == 0)
 		{
-			this->halffov = value/2.0;
+			this->halffov = std::stod(param_value_str)/2.0;
 		}
 		else if(param_name.compare("rVel")==0)
 		{
-			this->rVel = value;
+			this->rVel = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("turn_prob")==0)
 		{
-			this->turn_prob = value;
+			this->turn_prob = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("abandon_prob")==0)
 		{
-			this->abandon_prob = value;
+			this->abandon_prob = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("capacity")==0)
 		{
-			this->capacity = value;
+			this->capacity = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("umin")==0)
 		{
-			this->umin = value;
+			this->umin = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("umax")==0)
 		{
-			this->umax = value;
+			this->umax = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("n_stddev")==0)
 		{
-			this->n_stddev = value;
+			this->n_stddev = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("n_mean")==0)
 		{
-			this->n_mean = value;
+			this->n_mean = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("escape_dist")==0)
 		{
-			this->escape_dist = value;
+			this->escape_dist = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("call_scale_mult") == 0)
 		{
-			this->call_scale_mult = value;
+			this->call_scale_mult = std::stod(param_value_str);;
 		}else if(param_name.compare("call_scale_div") == 0)
 		{
-			this->call_scale_div = value;
+			this->call_scale_div = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("repel_scale_mult") == 0)
 		{
-			this->repel_scale_mult = value;
+			this->repel_scale_mult = std::stod(param_value_str);;
 		}
 		
 		else if(param_name.compare("repel_scale_div") == 0)
 		{
-			this->repel_scale_div = value;
+			this->repel_scale_div = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("turn_prob_max") == 0)
 		{
-			this->turn_prob_max = value;
+			this->turn_prob_max = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("turn_prob_min") == 0)
 		{
-			this->turn_prob_min = value;
+			this->turn_prob_min = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("max_step_size") == 0)
 		{
-			this->max_step_size = value;
+			this->max_step_size = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("log_rate") == 0)
 		{
-			this->log_rate = value;
+			this->log_rate = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("picking_lit_dur") == 0)
 		{
-			this->picking_lit_dur = value;
+			this->picking_lit_dur = std::stod(param_value_str);;
 		}
 		else if(param_name.compare("queue_size") == 0)
 		{
-			this->queue_size = value;
+			this->queue_size = std::stod(param_value_str);;
 		}
 		else if(param_name.compare(this->model->GetName()) == 0)
 		{
-			seed = value;
+			seed = std::stod(param_value_str);;
 		}
 		else
 		{
@@ -429,11 +430,11 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				if(this->prev_repel_signal > this->repel_signal)
 				{
 					//this->turn_prob -= this->repel_scale;
-					this->turn_prob = this->turn_prob_min / this->repel_scale_mult;
+					this->turn_prob = this->turn_prob_min / this->repel_scale_div;
 				}
 				else if (this->prev_repel_signal < this->repel_signal)
 				{
-					this->turn_prob = this->turn_prob_min * this->repel_scale_div;
+					this->turn_prob = this->turn_prob_min * this->repel_scale_mult;
 				}
 				else
 				{

@@ -1,0 +1,22 @@
+Bootstrap: docker
+
+From: ubuntu:16.04
+
+%post
+	apt-get -y update
+	apt-get -y install python3
+	apt-get -y install cmake
+	apt-get -y install lsb-release
+	apt-get -y install wget
+	sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+	wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
+	apt-get -y update
+	apt-get -y install gazebo7
+	apt-get -y install libgazebo7-dev
+
+%environment
+	export LC_ALL=C.UTF-8
+	export GAZEBO_RESOURCE_PATH=$PWD/sources
+    export GAZEBO_PLUGIN_PATH=$PWD/compiled_plugins
+    export GAZEBO_MODEL_PATH=$PWD/sources
+    export LD_LIBRARY_PATH=$PWD/sources
