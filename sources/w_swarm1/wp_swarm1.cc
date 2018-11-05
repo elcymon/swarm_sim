@@ -84,7 +84,7 @@ namespace gazebo
 			double max_step_size;
 			double log_rate;
 			
-			std:string com_model;
+			std::string com_model;
 			// Sound source modelling parameters
 			math::Vector3 signal_source_pos;
 			double A0; //intensity from source
