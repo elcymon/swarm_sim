@@ -36,10 +36,13 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+#include <vector>
+
 std::mutex mutex1;
 //#include <gazebo/Server.hh>
 
 using namespace std;
+
 
 
 std::string folder_name = "";//initialize directory to save results
@@ -47,6 +50,7 @@ std::string start_time = "";
 std::string end_time = "";
 std::string prefix = "";
 std::string prefix1,prefix2;
+std::string sim_data; //used to store simulation parameters
 double sim_time = 1000000;
 //bool prefix_set = false;
 bool start_sim;
@@ -79,7 +83,7 @@ void topic_model_log_cb(ConstAnyPtr &any)
 		
 		std::size_t pos = log.find(":");
 		std::string robot_name = log.substr(0,pos);
-		ofstream myfile(folder_name + prefix + robot_name+".txt",std::ios::app|std::ios::ate);
+		ofstream myfile(folder_name + prefix +"_"+ robot_name+".txt",std::ios::app|std::ios::ate);
 		myfile << log<<std::endl;
 		myfile.close();
 	
@@ -96,7 +100,7 @@ void litter_in_nest_cb(ConstAnyPtr &any)
 		double curr_time = std::stod(time_string);
 
 		sim_time = curr_time;
-		ofstream myfile2(folder_name + prefix + "litter_count.txt",std::ios::app|std::ios::ate);
+		ofstream myfile2(folder_name + prefix + "_litter_count.txt",std::ios::app|std::ios::ate);
 		myfile2 <<lit_count<<std::endl;
 		myfile2.close();
 	}
@@ -107,7 +111,7 @@ void start_sim_cb(ConstAnyPtr &any)
 	start_sim = any->bool_value();
 	if(!start_sim)
 	{//when world plugin wants experiments to stop set world control to false
-		world_gov_control_bool = false;
+		// world_gov_control_bool = false;
 		// ostringstream si1;
 		// auto t = std::time(nullptr);
 		// auto tm = *std::localtime(&t);
@@ -134,21 +138,74 @@ void experiment_control_cb(ConstAnyPtr &any)
 	if(data.compare("end") !=0)
 	{
 		ostringstream si1;
-		si1 << std::put_time(&ttm,"%Y-%m-%d--%H-%M-%S_");
+		si1 << std::put_time(&ttm,"%Y-%m-%d--%H-%M-%S");
 		prefix = si1.str();
-		myfile2 <<std::put_time(&ttm,"end_time:%Y-%m-%d--%H-%M-%S\n")<<data
-				<<std::put_time(&ttm,",start_time:%Y-%m-%d--%H-%M-%S,");
+		sim_data = data;
+		
+		// myfile2 //<<std::put_time(&ttm,"end_time:%Y-%m-%d--%H-%M-%S\n")
+		// 		<<data
+		// 		<<std::put_time(&ttm,",start_time:%Y-%m-%d--%H-%M-%S,");
 	}
 	if(data.compare("end")==0)
 	{
+		world_gov_control_bool = false;
 		
-		myfile2 <<std::put_time(&ttm,"end_time:%Y-%m-%d--%H-%M-%S\n");
+		myfile2 <<sim_data
+				<<prefix
+				<<std::put_time(&ttm,"end_time:%Y-%m-%d--%H-%M-%S\n");
 	}
 	myfile2.close();
 }
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
+	//Read params.csv file:
+	//All params to be simulated are stored in a vector
+	vector<string> my_params;
+	std::vector<string>::iterator param_it;
+	
+	ifstream myfile;//for loading file
+	string line, header;//which row in file and row 1 is header
+	myfile.open("params/params.csv");
+	if(myfile.is_open()){
+		getline(myfile,header);
+		int paramLine = std::stoi(_argv[2]);
+		int paramCounter = 0;
+		while(getline(myfile,line)){
+			paramCounter++;
+			if(paramCounter == paramLine){
+				size_t hsep1 = 0, hsep2 = 0, psep1 = 0, psep2 = 0;
+				string hparam, param_value;
+				string param_line = "";
+				while(header.find(",",hsep1) != string::npos and
+						line.find(",",psep1) != string::npos)
+				{
+					hsep2 = header.find(",",hsep1);
+					hparam = header.substr(hsep1,hsep2-hsep1);
+					psep2 = line.find(",",psep1);
+					param_value = line.substr(psep1,psep2-psep1);
+					
+					param_line = param_line + hparam + ":" + param_value + ",";
+					hsep1 = hsep2 + 1;
+					psep1 = psep2 + 1;
+				}
+				my_params.push_back(param_line);
+				if(paramLine > 0){//if param line is 0, read everything if it is greater than 0 seek desired line
+					break;//exit loop if parameter line is found.
+				}
+			}
+		}
+		//iterator set to first parameter list
+		param_it = my_params.begin();
+		myfile.close();
+	}
+	else
+	{
+		//cout<<"unable to load file"<<endl;
+		exit(5);
+	}
+
+
 	//set up folder name to save results
 	ostringstream si1;
 	auto t = std::time(nullptr);
@@ -172,11 +229,11 @@ int main(int _argc, char **_argv)
 				exit(errno);
 			}
 		}
-		ofstream myfilex(folder_name + "readme.md",std::ios::app|std::ios::ate);
-		myfilex <<"\n**************\n"
-				  <<"New Experiment"
-				<<"\n**************\n";
-		myfilex.close();
+		// ofstream myfilex(folder_name + "readme.md",std::ios::app|std::ios::ate);
+		// myfilex <<"\n**************\n"
+		// 		  <<"New Experiment"
+		// 		<<"\n**************\n";
+		// myfilex.close();
 	}
 	else
 	{
@@ -230,7 +287,7 @@ int main(int _argc, char **_argv)
 	//for advertising simulation parameters
 	//gazebo::transport::NodePtr node2(new gazebo::transport::Node());
 	//node2->Init();
-	//gazebo::transport::PublisherPtr pub_params = node->Advertise<gazebo::msgs::Any>("/params_topic");
+	gazebo::transport::PublisherPtr pub_params = node->Advertise<gazebo::msgs::Any>("/params_topic");
 	//pub_params->WaitForConnection();
 	//pub_params = node->Advertise<msgs::Any>("/communication_signal");
 	//gazebo::msgs::Any any;
@@ -239,6 +296,12 @@ int main(int _argc, char **_argv)
 	//any.set_string_value(pars);
 	gazebo::msgs::Any any;
 	any.set_type(gazebo::msgs::Any::BOOLEAN);
+
+	//Set step size of world
+	// gazebo::msgs::Physics physicsMsg;
+	// physicsMsg.set_type(gazebo::msgs::Physics::ODE);
+	// double max_step_size_value = 0.025;
+	// gazebo::transport::PublisherPtr physicsPub = node->Advertise<gazebo::msgs::Physics>("~/physics");
 
 	while(true){//busy wait
 		gazebo::common::Time::MSleep(100);
@@ -250,6 +313,24 @@ int main(int _argc, char **_argv)
 		if(world_loaded){
 			if (time_duration > 10.0 and !world_gov_control_bool){
 				//if world is idle for 10 seconds and world gov control value is false
+				gazebo::msgs::Any exp_params;
+				exp_params.set_type(gazebo::msgs::Any::STRING);
+				if(param_it != my_params.end()){
+					//If params iterator is not at the end, publish simulation parameters
+					std::string sim_params = *param_it;
+					param_it++;//increment iterator to next parameter
+					// std::cout<<sim_params<<std::endl;
+
+					exp_params.set_string_value(sim_params);
+					pub_params->Publish(exp_params);
+				}
+				else if(param_it == my_params.end()){
+					//We are at the end of the simulation parameters vector. Exit simulation
+					// std::cout<<"end simulation"<<std::endl;
+					exp_params.set_string_value("end_simulation");
+					pub_params->Publish(exp_params);
+
+				}
 				world_gov_control_bool = true;
 				tt = std::time(nullptr);
 				ttm = *std::localtime(&tt);
@@ -269,8 +350,8 @@ int main(int _argc, char **_argv)
 				any.set_bool_value(world_gov_control_bool);
 				pub_world_gov_experiment_control->Publish(any);
 
-				any.set_bool_value(world_gov_control_bool);
-				pub_world_gov_experiment_control->Publish(any);
+				// any.set_bool_value(world_gov_control_bool);
+				// pub_world_gov_experiment_control->Publish(any);
 
 				// control_msg.set_pause(true);
 				// reset_msg.set_all(true);
@@ -280,6 +361,9 @@ int main(int _argc, char **_argv)
 				// pub_world_control->Publish(control_msg);
 			}
 			
+		}
+		else{
+			// physicsPub->Publish(physicsMsg);
 		}
 	}
 	

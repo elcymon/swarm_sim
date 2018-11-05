@@ -60,6 +60,9 @@ namespace gazebo
 			gazebo::transport::PublisherPtr pub_start_sim;
 			gazebo::transport::PublisherPtr pub_my_Init;
 			gazebo::transport::PublisherPtr pub_model_log_control;
+			transport::PublisherPtr physicsPub;
+			bool set_max_step_size;
+			std::string params_str;
 
 			int litter_tot;//total litter in world
 			int litter_in_nest;//total litter deposited at the nest
@@ -106,56 +109,64 @@ namespace gazebo
 
 				this->world_gov_experiment_control = false;//default value is false. Set to true from subscribed topic
 				this->sub_world_gov_experiment_control = this->node->Subscribe("/world_gov_experiment_control",&WP_Swarm1::world_gov_experiment_control_cb,this);
+
+				this->physicsPub = node->Advertise<msgs::Physics>("~/physics");
+				msgs::Physics physicsMsg;
+				physicsMsg.set_type(msgs::Physics::ODE);
+				physicsMsg.set_max_step_size(0.025);//manually increase the step size
+				this->physicsPub->Publish(physicsMsg);
+
+				this->set_max_step_size = true;
 				//this->psec = 0;
 				//exit(5);
 				//load simulation paramters
-				ifstream myfile;
-				string line, header;
-				myfile.open("params/params.csv");
-				if(myfile.is_open())
-				{
-					getline(myfile,header);
-					while(getline(myfile,line))
-					{
-						size_t hsep1=0,hsep2=0,psep1=0,psep2=0;
-						string hparam,param_value;
-						string param_line = "";
-						while(header.find(",",hsep1) != string::npos and
-								line.find(",",psep1) != string::npos)
-						{
-							hsep2 = header.find(",",hsep1);
-							hparam = header.substr(hsep1,hsep2-hsep1);
-							psep2 = line.find(",",psep1);
-							param_value = line.substr(psep1,psep2-psep1);
+				// ifstream myfile;
+				// string line, header;
+				// myfile.open("params/params.csv");
+				// if(myfile.is_open())
+				// {
+				// 	getline(myfile,header);
+				// 	while(getline(myfile,line))
+				// 	{
+				// 		size_t hsep1=0,hsep2=0,psep1=0,psep2=0;
+				// 		string hparam,param_value;
+				// 		string param_line = "";
+				// 		while(header.find(",",hsep1) != string::npos and
+				// 				line.find(",",psep1) != string::npos)
+				// 		{
+				// 			hsep2 = header.find(",",hsep1);
+				// 			hparam = header.substr(hsep1,hsep2-hsep1);
+				// 			psep2 = line.find(",",psep1);
+				// 			param_value = line.substr(psep1,psep2-psep1);
 							
-							param_line = param_line + hparam + ":" + param_value + ",";
-							hsep1 = hsep2 + 1;
-							psep1 = psep2 + 1;
-							if(hparam.compare("max_step_size") == 0)
-							{
-								transport::PublisherPtr physicsPub = 
-								node->Advertise<msgs::Physics>("~/physics");
-								msgs::Physics physicsMsg;
-								physicsMsg.set_type(msgs::Physics::ODE);
+				// 			param_line = param_line + hparam + ":" + param_value + ",";
+				// 			hsep1 = hsep2 + 1;
+				// 			psep1 = psep2 + 1;
+				// 			if(hparam.compare("max_step_size") == 0)
+				// 			{
+				// 				transport::PublisherPtr physicsPub = 
+				// 				node->Advertise<msgs::Physics>("~/physics");
+				// 				msgs::Physics physicsMsg;
+				// 				physicsMsg.set_type(msgs::Physics::ODE);
 								
-								double value = std::stod(param_value);
-								//this->max_step_size = value;
-								//value = 1.0/value;
-								physicsMsg.set_max_step_size(value);
-								physicsPub->Publish(physicsMsg);
-							}
-						}
-						this->my_params.push_back(param_line);
-					}
-					//iterator set to first parameter list
-					this->param_it = this->my_params.begin();
-					myfile.close();
-				}
-				else
-				{
-					//cout<<"unable to load file"<<endl;
-					//exit(5);
-				}
+				// 				double value = std::stod(param_value);
+				// 				//this->max_step_size = value;
+				// 				//value = 1.0/value;
+				// 				physicsMsg.set_max_step_size(value);
+				// 				physicsPub->Publish(physicsMsg);
+				// 			}
+				// 		}
+				// 		this->my_params.push_back(param_line);
+				// 	}
+				// 	//iterator set to first parameter list
+				// 	this->param_it = this->my_params.begin();
+				// 	myfile.close();
+				// }
+				// else
+				// {
+				// 	//cout<<"unable to load file"<<endl;
+				// 	//exit(5);
+				// }
 				
 				
 				
@@ -214,7 +225,7 @@ namespace gazebo
 				this->pub_experiment_control = this->node->Advertise<msgs::Any>("/experiment_control");
 				this->end_experiment = false;
 				//my_Init();
-				this->param_set = true;
+				this->param_set = false;//Initially params_str is null. so we know it has not been set.
 				//Handling communication among robots section
 				/*for (int i = 1; i <= 10;i++)
 				{
@@ -262,13 +273,16 @@ namespace gazebo
 			
 			void my_Init()
 			{
+				// std::cout<<"Init called"<<std::endl;
 				msgs::Any exp_control;
 				exp_control.set_type(msgs::Any::STRING);
 				std::string sim_params = "param:value pairs";
 				
-				if(this->param_it != this->my_params.end())
+				if(this->params_str.compare("end_simulation") != 0)
 				{
-					sim_params = *(this->param_it);
+					// sim_params = *(this->param_it);
+					sim_params = this->params_str;
+
 					int area = (int)(this->world_size)*(this->world_size);
 					std::string x = sim_params;
 					x = x + 
@@ -279,7 +293,7 @@ namespace gazebo
 					exp_control.set_string_value(x);
 					this->pub_experiment_control->Publish(exp_control);
 				}
-				if(this->param_it == this->my_params.end())
+				if(this->params_str.compare("end_simulation") == 0)
 				{
 					exp_control.set_string_value("end");
 					this->pub_experiment_control->Publish(exp_control);
@@ -368,6 +382,18 @@ namespace gazebo
 					{
 						this->com_model = param_value_str;//communication model is a string
 					}
+					else if(param_name.compare("max_step_size") == 0 and this->set_max_step_size)
+					{
+						msgs::Physics physicsMsg;
+						physicsMsg.set_type(msgs::Physics::ODE);
+						
+						double value = std::stod(param_value_str);
+						//this->max_step_size = value;
+						//value = 1.0/value;
+						physicsMsg.set_max_step_size(value);
+						this->physicsPub->Publish(physicsMsg);
+						this->set_max_step_size = false;
+					}
 					else
 					{
 						//cout<<temp<<endl;
@@ -391,7 +417,7 @@ namespace gazebo
 				this->noise_distro = std::normal_distribution<double>(this->noise_mean,this->noise_std);
 				
 				
-				(this->param_it)++;//increment iterator to next parameter set;
+				// (this->param_it)++;//increment iterator to next parameter set;
 				
 				//this->param_set = false;
 				this->world_info_string = "";
@@ -400,34 +426,16 @@ namespace gazebo
 				this->no_litter = false;//assume there is litter;
 				
 				this->log_timer = 0;//reset log timer.
+				std::cout<<"Init exited"<<std::endl;
 				
 			}
 			
 			void Params_cb(ConstAnyPtr &a)
 			{//set all parameters and set param_set = true when done.
 				std::lock_guard<std::mutex> lock(this->mutex);
-				if(!this->param_set)
-				{
-					std::string all_params = a->string_value();
-					//all_params = all_params + " ";
-					while(all_params.find(" ") != std::string::npos)
-					{//loop through all parameters and assign to appropriate variable in plugin.
-						int ploc = all_params.find(" ");
-						std::string temp = all_params.substr(0,ploc);
-						
-						int aloc = temp.find(":");
-						std::string param_name = temp.substr(0,aloc);
-						if(param_name.compare("nei_sensing") == 0)
-						{
-							std::string param_value_str = temp.substr(aloc+1);
-							double value = std::stod(param_value_str);//double value of parameter
-							this->nei_sensing = value;
-						}	//this->param_set = true;
-						
-						
-					}
-					
-				}
+				this->params_str = a->string_value();
+				// std::cout<<this->params_str<<std::endl;
+				this->param_set = true;
 			}
 			
 			void world_gov_experiment_control_cb(ConstAnyPtr &a){
@@ -442,6 +450,17 @@ namespace gazebo
 			void OnUpdate(const common::UpdateInfo &_info)
 			{
 				std::lock_guard<std::mutex> lock(this->mutex);
+				if(this->param_set)
+				{//check if parameters have been initialized.
+					
+					this->my_Init();
+					this->param_set = false;
+				}
+				if(this->end_experiment)
+				{//Publish this->begin_experiment
+					//std::cout<<"Simulations Ended"<<endl;
+					exit(0); 
+				}
 				if(this->world_info_bool){
 					//At start of simulation, this informs the world governor that the world has been loaded and ready to go
 					msgs::Any any;
@@ -456,9 +475,9 @@ namespace gazebo
 					//needed to prevent simulation from counting while world-gov-control is set to false
 					this->world->Reset();
 				}
-				if(this->world_gov_experiment_control) {
+				if(this->world_gov_experiment_control and !(this->param_set)) {
 						//world governor controls when simulation starts by setting the value of world_gov_experiment_control to true
-
+						//Also, if simulation parameters have been set
 					//std::cout<<_info.simTime.Double()<<std::endl;
 					if(this->start_sim2)
 					{
@@ -477,18 +496,14 @@ namespace gazebo
 					}
 					this->log_timer += this->max_step_size;
 					
-					if(this->end_experiment)
-					{//Publish this->begin_experiment
-						//std::cout<<"Simulations Ended"<<endl;
-						exit(0); 
-					}
 					
-					if(this->param_set)
-					{
+					
+					// if(this->param_set)
+					// {
 						
-						this->my_Init();
-						this->param_set = false;
-					}
+					// 	this->my_Init();
+					// 	this->param_set = false;
+					// }
 					//std::cout<<this->world->GetModelCount()<<endl;
 					gazebo::common::Time st = _info.simTime;
 				/*
@@ -511,7 +526,7 @@ namespace gazebo
 					if(this->litter_in_nest >= this->litter_tot)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 					{
 						this->litter_in_nest = 0;
-						this->param_set = true;
+						// this->param_set = true;
 						msgs::Any s_sim;
 						s_sim.set_type(msgs::Any::BOOLEAN);
 						this->start_sim = false;//to be double sure that simulation does not start
@@ -519,6 +534,12 @@ namespace gazebo
 						this->pub_start_sim->Publish(s_sim);
 						this->world_gov_experiment_control = false;//set to false since a simulation iteration is ended
 						this->world->Reset();
+						
+						//All litter collected. Alert Governor that you have ended current simulation
+						msgs::Any exp_control;
+						exp_control.set_string_value("end");
+						this->pub_experiment_control->Publish(exp_control);
+					
 						
 				
 					}
