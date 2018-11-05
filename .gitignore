@@ -6,7 +6,8 @@ results/*
 .~lock*
 *.simg
 *.img
-
+compiled_plugins/*
+world_governor
 #!results/.placeholder
 
 #sources/m_litter/build/*
