@@ -16,7 +16,7 @@
 #$ -l h_vmem=2G
 
 #no of cores
-#$ -pe smp 8
+##$ -pe smp 8
 
 # Request Wallclock time of hh:mm:ss
 #$ -l h_rt=01:00:00
@@ -25,7 +25,7 @@
 #$ -t 1-120
 
 #Iterations in batch of
-#$ -tc 8
+##$ -tc 8
 
 
 #e-mail
@@ -39,4 +39,4 @@
 module load singularity
 
 #execute simulation
-singularity exec -B /nobackup/scsoo/results:$PWD/results /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID
+singularity exec -B /nobackup/scsoo/results:$PWD/results /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID &
