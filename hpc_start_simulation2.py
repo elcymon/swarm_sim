@@ -4,6 +4,7 @@ import os.path
 
 def start_simulation(folder_name, line_number,port_number):
 	port_number = int(port_number) + 11345
+	print('folder_name: {}\nline_number: {}\nport_number: {}'.format(folder_name,line_number,port_number))
 	copy_wp=None
 	copy_rp=None
 	copy_np=None
