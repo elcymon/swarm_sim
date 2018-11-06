@@ -336,6 +336,13 @@ int main(int _argc, char **_argv)
 		if(world_loaded){
 			if (time_duration > 10.0 and !world_gov_control_bool){
 				//if world is idle for 10 seconds and world gov control value is false
+
+				world_gov_control_bool = true;
+				tt = std::time(nullptr);
+				ttm = *std::localtime(&tt);
+				
+				any.set_bool_value(world_gov_control_bool);
+				pub_world_gov_experiment_control->Publish(any);
 				gazebo::msgs::Any exp_params;
 				exp_params.set_type(gazebo::msgs::Any::STRING);
 				if(param_it != my_params.end()){
@@ -355,14 +362,8 @@ int main(int _argc, char **_argv)
 					// std::cout<<"end simulation"<<std::endl;
 					exp_params.set_string_value("end_simulation");
 					pub_params->Publish(exp_params);
-
+					break;
 				}
-				world_gov_control_bool = true;
-				tt = std::time(nullptr);
-				ttm = *std::localtime(&tt);
-				
-				any.set_bool_value(world_gov_control_bool);
-				pub_world_gov_experiment_control->Publish(any);
 				// control_msg.set_pause(false);
 
 				// reset_msg.set_all(true);

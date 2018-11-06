@@ -13,3 +13,6 @@ From: gazebo:libgazebo7
     export GAZEBO_PLUGIN_PATH=$PWD/compiled_plugins
     export GAZEBO_MODEL_PATH=$PWD/sources
     export LD_LIBRARY_PATH=$PWD/sources
+
+%runscript
+	exec "$@"
