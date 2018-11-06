@@ -3,6 +3,7 @@ import sys
 import os.path
 
 def start_simulation(folder_name, line_number,port_number):
+	port_number = int(port_number) + 11345
 	copy_wp=None
 	copy_rp=None
 	copy_np=None
@@ -32,7 +33,7 @@ def start_simulation(folder_name, line_number,port_number):
 
 	#start up gazebo if all processes are successful
 	if(all_set == 0):
-		load_world = subprocess.Popen("export GAZEBO_MASTER_URI=http://localhost:{};gzserver sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster.world".format(port_number),stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)#w_swarm1.world
+		load_world = subprocess.Popen("export GAZEBO_MASTER_URI=http://localhost:{};gzserver sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world".format(port_number),stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)#w_swarm1.world
 		
 		if load_world.returncode==None:
 			load_logger = subprocess.Popen("export GAZEBO_MASTER_URI=http://localhost:{};./world_governor {} {}".format(port_number,folder_name,line_number),stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
@@ -66,4 +67,6 @@ def start_simulation(folder_name, line_number,port_number):
 		print(all_set)
 
 if __name__=='__main__':
+	# line_number and port_number vary based on $SGE_TASK_ID value
+	# start_simulation(folder_name, line_number, port_number)
 	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3])
