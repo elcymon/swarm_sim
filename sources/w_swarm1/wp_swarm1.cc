@@ -295,8 +295,8 @@ namespace gazebo
 				}
 				if(this->params_str.compare("end_simulation") == 0)
 				{
-					exp_control.set_string_value("end");
-					this->pub_experiment_control->Publish(exp_control);
+					// exp_control.set_string_value("end");
+					// this->pub_experiment_control->Publish(exp_control);
 					this->end_experiment = true;
 					return;
 				}
@@ -426,7 +426,7 @@ namespace gazebo
 				this->no_litter = false;//assume there is litter;
 				
 				this->log_timer = 0;//reset log timer.
-				std::cout<<"Init exited"<<std::endl;
+				// std::cout<<"Init exited"<<std::endl;
 				
 			}
 			
@@ -475,6 +475,28 @@ namespace gazebo
 					//needed to prevent simulation from counting while world-gov-control is set to false
 					this->world->Reset();
 				}
+				if(this->litter_in_nest >= this->litter_tot)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
+				{
+					// this->litter_in_nest = 0;
+					// // this->param_set =  true;
+					// msgs::Any s_sim;
+					// s_sim.set_type(msgs::Any::BOOLEAN);
+					// this->start_sim = false;//to be double sure that simulation does not start
+					// s_sim.set_bool_value(this->start_sim);
+					// this->pub_start_sim->Publish(s_sim);
+					// this->world_gov_experiment_control = false;//set to false since a simulation iteration is ended
+					
+					//All litter collected. Alert Governor that you have ended current simulation
+					msgs::Any exp_control;
+					exp_control.set_type(msgs::Any::STRING);
+					std::string end_sim_str = "end";
+					exp_control.set_string_value(end_sim_str);
+					this->pub_experiment_control->Publish(exp_control);
+					// std::cout<<"End Published"<<std::endl;
+					// return;
+					// this->world->Reset();
+				}
+
 				if(this->world_gov_experiment_control and !(this->param_set)) {
 						//world governor controls when simulation starts by setting the value of world_gov_experiment_control to true
 						//Also, if simulation parameters have been set
@@ -533,13 +555,13 @@ namespace gazebo
 						s_sim.set_bool_value(this->start_sim);
 						this->pub_start_sim->Publish(s_sim);
 						this->world_gov_experiment_control = false;//set to false since a simulation iteration is ended
-						this->world->Reset();
 						
 						//All litter collected. Alert Governor that you have ended current simulation
-						msgs::Any exp_control;
-						exp_control.set_string_value("end");
-						this->pub_experiment_control->Publish(exp_control);
-					
+						// msgs::Any exp_control;
+						// exp_control.set_string_value("end");
+						// this->pub_experiment_control->Publish(exp_control);
+						this->world->Reset();
+							
 						
 				
 					}

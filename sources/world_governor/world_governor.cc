@@ -51,6 +51,9 @@ std::string end_time = "";
 std::string prefix = "";
 std::string prefix1,prefix2;
 std::string sim_data; //used to store simulation parameters
+std::string algorithmID = "";
+int algorithm_index = 0;
+int paramLine = 0;//index entered by the user from terminal
 double sim_time = 1000000;
 //bool prefix_set = false;
 bool start_sim;
@@ -133,14 +136,19 @@ void experiment_control_cb(ConstAnyPtr &any)
 	std::string data = any->string_value();
 	
 	
-		
+	
+	tt = std::time(nullptr);	
 	ofstream myfile2(folder_name + "readme.md",std::ios::app|std::ios::ate);
 	if(data.compare("end") !=0)
 	{
+		ttm = *std::localtime(&tt);
 		ostringstream si1;
-		si1 << std::put_time(&ttm,"%Y-%m-%d--%H-%M-%S");
+		si1 <<algorithm_index<<"-"<<algorithmID<< std::put_time(&ttm,"-%Y-%m-%d--%H-%M-%S");
 		prefix = si1.str();
-		sim_data = data;
+		si1.str("");
+		si1.clear();
+		si1 << data << std::put_time(&ttm,",start_time:%Y-%m-%d--%H-%M-%S");
+		sim_data = si1.str();//data ;
 		
 		// myfile2 //<<std::put_time(&ttm,"end_time:%Y-%m-%d--%H-%M-%S\n")
 		// 		<<data
@@ -149,10 +157,9 @@ void experiment_control_cb(ConstAnyPtr &any)
 	if(data.compare("end")==0)
 	{
 		world_gov_control_bool = false;
-		
-		myfile2 <<sim_data
-				<<prefix
-				<<std::put_time(&ttm,"end_time:%Y-%m-%d--%H-%M-%S\n");
+		ttm = *std::localtime(&tt);
+		myfile2 <<"prefix:"<<prefix<<","<<sim_data
+				<<std::put_time(&ttm,",end_time:%Y-%m-%d--%H-%M-%S\n");
 	}
 	myfile2.close();
 }
@@ -166,10 +173,11 @@ int main(int _argc, char **_argv)
 	
 	ifstream myfile;//for loading file
 	string line, header;//which row in file and row 1 is header
+	int param_it_loc = 0;//keep track of which location in my_params vector we are at
 	myfile.open("params/params.csv");
 	if(myfile.is_open()){
 		getline(myfile,header);
-		int paramLine = std::stoi(_argv[2]);
+		paramLine = std::stoi(_argv[2]);
 		int paramCounter = 0;
 		while(getline(myfile,line)){
 			paramCounter++;
@@ -188,15 +196,30 @@ int main(int _argc, char **_argv)
 					param_line = param_line + hparam + ":" + param_value + ",";
 					hsep1 = hsep2 + 1;
 					psep1 = psep2 + 1;
+
+					if(hparam.compare("ID") == 0){
+						algorithmID = param_value;
+					}
 				}
 				my_params.push_back(param_line);
 				if(paramLine > 0){//if param line is 0, read everything if it is greater than 0 seek desired line
 					break;//exit loop if parameter line is found.
 				}
+				else if(paramLine < 0){
+					exit(5);
+
+				}
 			}
 		}
 		//iterator set to first parameter list
 		param_it = my_params.begin();
+		if (paramLine > 0){
+			param_it_loc = 0;
+		}
+		else{
+			param_it_loc = 1;
+		}
+		
 		myfile.close();
 	}
 	else
@@ -302,7 +325,7 @@ int main(int _argc, char **_argv)
 	// physicsMsg.set_type(gazebo::msgs::Physics::ODE);
 	// double max_step_size_value = 0.025;
 	// gazebo::transport::PublisherPtr physicsPub = node->Advertise<gazebo::msgs::Physics>("~/physics");
-
+	
 	while(true){//busy wait
 		gazebo::common::Time::MSleep(100);
 		time_t now = time(nullptr);
@@ -318,7 +341,10 @@ int main(int _argc, char **_argv)
 				if(param_it != my_params.end()){
 					//If params iterator is not at the end, publish simulation parameters
 					std::string sim_params = *param_it;
+					
+					algorithm_index = paramLine + param_it_loc;
 					param_it++;//increment iterator to next parameter
+					param_it_loc++;
 					// std::cout<<sim_params<<std::endl;
 
 					exp_params.set_string_value(sim_params);
