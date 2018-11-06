@@ -13,7 +13,7 @@
 # -pe smp x -l h_vmem=yG
 
 #memory?
-#$ -l h_vmem=2G
+#$ -l h_vmem=12G
 
 #no of cores
 ##$ -pe smp 8
@@ -25,7 +25,7 @@
 #$ -t 1-120
 
 #Iterations in batch of
-##$ -tc 8
+#$ -tc 8
 
 
 #e-mail
