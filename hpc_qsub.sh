@@ -22,7 +22,7 @@
 #$ -l h_rt=01:00:00
 
 #Iterations
-#$ -t 1-160
+#$ -t 1-120
 
 #Iterations in batch of
 #$ -tc 8
