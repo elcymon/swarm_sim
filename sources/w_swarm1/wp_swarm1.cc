@@ -237,6 +237,7 @@ namespace gazebo
 				//////////////////////////////////////////////////////////
 				this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 							boost::bind(&WP_Swarm1::OnUpdate,this,_1));
+				std::cout<<"world loaded"<<std::endl;
 			}
 			void litter_in_nest_cb(ConstAnyPtr &any)
 			{
@@ -450,6 +451,7 @@ namespace gazebo
 			void OnUpdate(const common::UpdateInfo &_info)
 			{
 				std::lock_guard<std::mutex> lock(this->mutex);
+				std::cout<<_info.simTime<<std::endl;
 				if(this->param_set)
 				{//check if parameters have been initialized.
 					
