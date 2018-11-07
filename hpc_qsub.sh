@@ -36,11 +36,16 @@
 #You can add cd to program directory to be sure
 # environment variable SGE_TASK_ID varies based on range in -t option
 #load singularity
-module load singularity
+#module load singularity
+
+folder=/nobackup/scsoo
+# folder=/tmp/nobackup/scsoo
+# JOB_ID=123
+# SGE_TASK_ID=11
 
 #execute simulation
-LOCAL_LOC=/nobackup/scsoo/local/$JOB_ID.1.24core-128G.q
+LOCAL_LOC=$folder/local
 
-mkdir -p $LOCAL_LOC
+mkdir -p $LOCAL_LOC/$JOB_ID.1.24core-128.q $folder/results
 
-singularity exec --bind /nobackup/scsoo/results:$PWD/results,$LOCAL_LOC:/local/$JOB_ID.1.24core-128.q /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID
+singularity exec --bind $folder/results:$PWD/results,$LOCAL_LOC:/local $folder/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID

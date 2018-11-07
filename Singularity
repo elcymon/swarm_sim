@@ -7,6 +7,8 @@ From: gazebo:libgazebo7
 	apt-get install python3
 	apt-get -y install cmake gcc g++
 
+	mkdir /local
+
 %environment
 	export LC_ALL=C.UTF-8
 	export GAZEBO_RESOURCE_PATH=$PWD/sources
