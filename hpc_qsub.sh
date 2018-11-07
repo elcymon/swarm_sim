@@ -13,19 +13,19 @@
 # -pe smp x -l h_vmem=yG
 
 #memory?
-#$ -l h_vmem=12G
+#$ -l h_vmem=2G
 
 #no of cores
-##$ -pe smp 8
+#$ -pe smp 8
 
 # Request Wallclock time of hh:mm:ss
 #$ -l h_rt=1:0:0
 
 #Iterations
-#$ -t 1-1
+#$ -t 1-120
 
 #Iterations in batch of
-#$ -tc 1
+#$ -tc 8
 
 
 #e-mail
@@ -36,7 +36,7 @@
 #You can add cd to program directory to be sure
 # environment variable SGE_TASK_ID varies based on range in -t option
 #load singularity
-#module load singularity
+module load singularity
 
 folder=/nobackup/scsoo
 # folder=/tmp/nobackup/scsoo
@@ -46,6 +46,6 @@ folder=/nobackup/scsoo
 #execute simulation
 LOCAL_LOC=$folder/local
 
-mkdir -p $LOCAL_LOC/$JOB_ID.1.24core-128.q $folder/results
+mkdir -p $LOCAL_LOC/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 
 singularity exec --bind $folder/results:$PWD/results,$LOCAL_LOC:/local $folder/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID
