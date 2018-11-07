@@ -19,13 +19,13 @@
 ##$ -pe smp 8
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=01:00:00
+#$ -l h_rt=1:0:0
 
 #Iterations
-#$ -t 1-120
+#$ -t 1-1
 
 #Iterations in batch of
-#$ -tc 8
+#$ -tc 1
 
 
 #e-mail
