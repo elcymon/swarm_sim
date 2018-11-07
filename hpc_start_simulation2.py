@@ -34,10 +34,10 @@ def start_simulation(folder_name, line_number,port_number):
 
 	#start up gazebo if all processes are successful
 	if(all_set == 0):
-		load_world = subprocess.Popen("export GAZEBO_MASTER_URI=http://localhost:{};gzserver sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world".format(port_number),stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)#w_swarm1.world
+		load_world = subprocess.Popen("export GAZEBO_MASTER_URI=http://localhost:{};gzserver sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world".format(port_number),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
-			load_logger = subprocess.Popen("export GAZEBO_MASTER_URI=http://localhost:{};./world_governor {} {}".format(port_number,folder_name,line_number),stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+			load_logger = subprocess.Popen("export GAZEBO_MASTER_URI=http://localhost:{};./world_governor {} {}".format(port_number,folder_name,line_number),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 			if load_logger.returncode==None:
 				print('''
 				\n\n
