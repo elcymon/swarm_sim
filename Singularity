@@ -15,4 +15,4 @@ From: gazebo:libgazebo7
     export LD_LIBRARY_PATH=$PWD/sources
 
 %runscript
-	exec "$@"
+	"$@"

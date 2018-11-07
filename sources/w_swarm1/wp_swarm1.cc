@@ -100,6 +100,7 @@ namespace gazebo
 		public:
 			void Load(physics::WorldPtr _parent, sdf::ElementPtr /*_sdf*/)
 			{
+				std::cout<<"world loading"<<std::endl;
 				this->node = transport::NodePtr(new transport::Node());
 				this->node->Init();
 				this->world = _parent;
