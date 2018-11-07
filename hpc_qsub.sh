@@ -39,4 +39,4 @@
 module load singularity
 
 #execute simulation
-singularity exec -B /nobackup/scsoo/results:$PWD/results /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID &
+singularity exec -B /nobackup/scsoo/results:$PWD/results /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID
