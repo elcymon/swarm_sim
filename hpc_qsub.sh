@@ -39,5 +39,8 @@
 module load singularity
 
 #execute simulation
-mkdir -p /nobackup/scsoo/local
-singularity exec --bind /nobackup/scsoo/results:$PWD/results,/nobackup/scsoo/local /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID
+LOCAL_LOC=/nobackup/scsoo/local/$JOB_ID.1.24core-128G.q
+
+mkdir -p $LOCAL_LOC
+
+singularity exec --bind /nobackup/scsoo/results:$PWD/results,$LOCAL_LOC:/local/$JOB_ID.1.24core-128.q /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID

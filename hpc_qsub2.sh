@@ -39,7 +39,8 @@
 module load singularity
 
 #execute simulation
-singularity exec /nobackup/scsoo/gazebo-libgazebo7-xenial.simg gzserver --verbose $PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world &
-singularity exec -B /nobackup/scsoo/results:$PWD/results /nobackup/scsoo/gazebo-libgazebo7-xenial.simg ./world_governor Uniform-180FoV 1 &
+cd /nobackup/scsoo/
+ ./g2.simg gzserver --verbose ~/swarm_sim/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world
+#singularity exec -B /nobackup/scsoo/results:$PWD/results /nobackup/scsoo/gazebo-libgazebo7-xenial.simg ./world_governor Uniform-180FoV 1 &
 
 #singularity exec -B /nobackup/scsoo/results:$PWD/results /nobackup/scsoo/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID
