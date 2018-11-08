@@ -1,3 +1,7 @@
+#USAGE
+#./hpc_qsub world_name experiment row_shift prev_ID_end
+#WHERE
+#world_name is Uniform, OneCluster, TwoClusters, FourClusters, or HalfCluster
 
 # Use current working directory and current modules
 #$ -cwd -V
@@ -22,7 +26,7 @@
 #$ -l h_rt=1:0:0
 
 #Iterations
-#$ -t 1-120
+#$ -t 61-120
 
 #Iterations in batch of
 #$ -tc 8
@@ -36,16 +40,29 @@
 #You can add cd to program directory to be sure
 # environment variable SGE_TASK_ID varies based on range in -t option
 #load singularity
-module load singularity
+# module load singularity
 
 folder=/nobackup/scsoo
-# folder=/tmp/nobackup/scsoo
+# folder=.
 # JOB_ID=123
-# SGE_TASK_ID=11
+# SGE_TASK_ID=1
 
 #execute simulation
-LOCAL_LOC=$folder/local
+local_loc=$folder/local
 
-mkdir -p $LOCAL_LOC/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
+#set python script input arguments
+#name of the world to simulate on
+world_name=$1
+#experiment is used to know which parameter you are investigating
+experiment=$2
+#how many rows of parameters should be ignored us 0 if none
+row_shift=$3
+#the previous SGE_TASK_ID maximum value
+prev_ID_end=$4
+line_number=$(($SGE_TASK_ID + $row_shift))
+#there should be no repetition of server port or else they will overwrite each other. Adding 1 just to be safe
+port_number=$(($SGE_TASK_ID + $prev_ID_end + 1))
+echo world_name: $world_name, experiment: $experiment, row_shift: $row_shift, prev_ID_end: $prev_ID_end, line_number: $line_number, port_number: $port_number
+mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 
-singularity exec --bind $folder/results:$PWD/results,$LOCAL_LOC:/local $folder/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py Uniform-180FoV $SGE_TASK_ID $SGE_TASK_ID
+singularity exec --bind $folder/results:$PWD/results,$local_loc:/local $folder/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $line_number $port_number
