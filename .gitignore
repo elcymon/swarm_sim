@@ -1,7 +1,7 @@
 #ignore some folders
 
 .vscode/
-
+core.*
 results/*
 .~lock*
 *.simg
