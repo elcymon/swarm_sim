@@ -614,6 +614,9 @@ namespace gazebo
 												}
 												else if(this->com_model.compare("sound") == 0) {
 													repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+													//add noise
+													repulsion_intensity += this->noise_distro(this->generator);
+												
 												}
 												else if(this->com_model.compare("vector") == 0) {
 													//TO DO
@@ -622,8 +625,6 @@ namespace gazebo
 												/*******************************************************/
 												// double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 
-												//add noise
-												repulsion_intensity += this->noise_distro(this->generator);
 												
 												if(repulsion_intensity < 0)
 													repulsion_intensity = 0;
@@ -643,6 +644,8 @@ namespace gazebo
 												}
 												else if(this->com_model.compare("sound") == 0) {
 													attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+													//add noise
+													attraction_intensity += this->noise_distro(this->generator);
 												}
 												else if(this->com_model.compare("vector") == 0) {
 													//TO DO
@@ -651,8 +654,6 @@ namespace gazebo
 												/*******************************************************/
 												// double attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 
-												//add noise
-												attraction_intensity += this->noise_distro(this->generator);
 												
 												if(attraction_intensity < 0)
 													attraction_intensity = 0;
