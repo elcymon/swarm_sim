@@ -3,10 +3,10 @@ import sys
 import os.path
 
 world_db = {
-	'OneCluster':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster',
-	'TwoClusters':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster',
-	'FourClusters':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters',
-	'HalfCluster':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform',
+	'OneCluster':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster.world',
+	'TwoClusters':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster.world',
+	'FourClusters':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters.world',
+	'HalfCluster':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform.world',
 	'Uniform':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world'
 }
 
