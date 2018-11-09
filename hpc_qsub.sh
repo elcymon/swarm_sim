@@ -23,17 +23,17 @@
 #$ -pe smp 8
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=10:0:0
+#$ -l h_rt=2:0:0
 
 #Iterations
-#$ -t 1-120
+#$ -t 1-480
 
 #Iterations in batch of
 ##$ -tc 8
 
 
 #e-mail
-#$ -m be
+#$ -m abe
 #$ -M scsoo@leeds.ac.uk
 
 #Run the job
@@ -65,4 +65,4 @@ port_number=$(($SGE_TASK_ID + $prev_ID_end + 1))
 echo world_name: $world_name, experiment: $experiment, row_shift: $row_shift, prev_ID_end: $prev_ID_end, line_number: $line_number, port_number: $port_number
 mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 
-singularity exec --bind $folder/results:$PWD/results,$local_loc:/local $folder/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $line_number $port_number
+singularity exec --bind $folder/results:$PWD/results,$folder/results:$folder/swarm_sim*/results,$local_loc:/local $folder/gazebo-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $line_number $port_number
