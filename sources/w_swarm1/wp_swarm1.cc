@@ -88,6 +88,7 @@ namespace gazebo
 			double log_rate;
 			
 			std::string com_model;
+			int cap_com;
 			// Sound source modelling parameters
 			math::Vector3 signal_source_pos;
 			double A0; //intensity from source
@@ -384,6 +385,10 @@ namespace gazebo
 					{
 						this->com_model = param_value_str;//communication model is a string
 					}
+					else if(param_name.compare("cap_com") == 0)
+					{
+						this->cap_com = std::stoi(param_value_str);//double value of parameter;
+					}
 					else if(param_name.compare("max_step_size") == 0 and this->set_max_step_size)
 					{
 						msgs::Physics physicsMsg;
@@ -624,7 +629,10 @@ namespace gazebo
 												//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
 												// double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
-
+												if(dist > this->nei_sensing and this->cap_com == 1)
+												{//If outside comm range and cap_com is set
+													repulsion_intensity = 0;
+												}
 												
 												if(repulsion_intensity < 0)
 													repulsion_intensity = 0;
@@ -654,7 +662,11 @@ namespace gazebo
 												/*******************************************************/
 												// double attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 
-												
+												if(dist > this->nei_sensing and this->cap_com == 1)
+												{//If outside comm range and cap_com is set
+													attraction_intensity = 0;
+												}
+
 												if(attraction_intensity < 0)
 													attraction_intensity = 0;
 												/*******************************************************/
