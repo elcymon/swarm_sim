@@ -623,6 +623,24 @@ namespace gazebo
 													repulsion_intensity += this->noise_distro(this->generator);
 												
 												}
+												else if(this->com_model.compare("soundv2") == 0){
+													//noise_mean is average of fitError/signalStrength and noise_std is the deviation across experiments
+													std::normal_distribution<double> noise_distro_std(this->noise_mean,this->noise_std);
+													
+													//intensity of pure signal
+													repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+													
+													//noise is proportional to intensity
+													double signal_std = repulsion_intensity * noise_distro_std(this->generator);
+
+													//use proportional value computed as standard deviation
+													std::normal_distribution<double> noise_distro_signal(repulsion_intensity,signal_std);
+
+													//noisy repulsion intenisity of communicated signal
+													repulsion_intensity = noise_distro_signal(this->generator);
+													
+													
+												}
 												else if(this->com_model.compare("vector") == 0) {
 													//TO DO
 												}
@@ -654,6 +672,24 @@ namespace gazebo
 													attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 													//add noise
 													attraction_intensity += this->noise_distro(this->generator);
+												}
+												else if(this->com_model.compare("soundv2") == 0){
+													//noise_mean is average of fitError/signalStrength and noise_std is the deviation across experiments
+													std::normal_distribution<double> noise_distro_std1(this->noise_mean,this->noise_std);
+													
+													//intensity of pure signal
+													attraction_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+													
+													//noise is proportional to intensity
+													double signal_std1 = attraction_intensity * noise_distro_std1(this->generator);
+
+													//use proportional value computed as standard deviation
+													std::normal_distribution<double> noise_distro_signal1(attraction_intensity,signal_std1);
+
+													//noisy repulsion intenisity of communicated signal
+													attraction_intensity = noise_distro_signal1(this->generator);
+													
+													
 												}
 												else if(this->com_model.compare("vector") == 0) {
 													//TO DO
