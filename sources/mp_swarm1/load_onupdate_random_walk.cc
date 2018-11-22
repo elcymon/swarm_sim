@@ -184,6 +184,7 @@ void ModelVel::start_sim_cb(ConstAnyPtr &any)
 void ModelVel::my_Init(ConstAnyPtr &any)
 {
 	std::lock_guard<std::mutex> lock(this->mutex);
+	this->new_comm_signal = false;//At start, there is no communicated information
 	//this->model->Reset();
 	//*****************START: PARAMTERS THAT VARY BETWEEN ITERATIONS*************************
 	std::string sim_params_mine = any->string_value();
@@ -423,8 +424,12 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 	{
 		//start: modify turn probability based on comm signal
 		//this section handles repulsion signals
-		if(this->turn_complete)
-		{
+		if(this->turn_complete and this->new_comm_signal)
+		{//change turning probability and update communication signal only when not turning i.e. only when moving straight
+			//also, do this only when there is new communcated information from neighbours
+
+			this->new_comm_signal = false;//turn to false and wait till there is new signal.
+			
 			if (this->rep_neighbours > 0)
 			{
 				if(this->prev_repel_signal > this->repel_signal)
@@ -445,7 +450,6 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			{
 				this->turn_prob = this->turn_prob_min;
 			}
-			
 			
 			//This section handles attraction signals
 			if (this->call_neighbours > 0)
@@ -468,17 +472,19 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			{
 				this->turn_prob = this->turn_prob;
 			}
+			if(this->turn_prob >= this->turn_prob_max)
+			{
+				this->turn_prob = this->turn_prob_max;
+			}
+			this->prev_repel_signal = this->repel_signal;
+			this->prev_call_signal = this->call_signal;
 		}
-		if(this->turn_prob >= this->turn_prob_max)
-		{
-			this->turn_prob = this->turn_prob_max;
-		}
+		
 		/*if(this->turn_prob <= this->turn_prob_min)
 		{
 			this->turn_prob = this->turn_prob_min;
 		}*/
-		this->prev_repel_signal = this->repel_signal;
-		this->prev_call_signal = this->call_signal;
+		
 		//end: modify turn probability based on comm signal
 		
 		//msgs::Color *homColMsg;

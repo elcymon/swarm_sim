@@ -56,6 +56,11 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 		this->call_signal = call_queue_tot / ((int)this->call_queue.size());
 		this->call_queue.clear();
 	}
+
+	if(this->call_queue.size() == 0 and this->repel_queue.size() == 0){
+		//queue limit reached and the queue was cleared. So a new communication signal is available to use
+		this->new_comm_signal = true;
+	}
 	// this->call_signal = std::stod(s.substr(div_loc+1));
 	
 	/*std::string nei_name = s.substr(0,div_loc);

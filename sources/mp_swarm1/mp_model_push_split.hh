@@ -186,6 +186,7 @@ namespace gazebo
 			//transport::PublisherPtr pub_comm_signal;
 			double repel_signal;
 			double prev_repel_signal;
+			bool new_comm_signal;
 			double call_signal;
 			double prev_call_signal;
 			double call_scale_mult;
