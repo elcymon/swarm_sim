@@ -23,10 +23,10 @@
 #$ -pe smp 8
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=3:0:0
+#$ -l h_rt=5:0:0
 
 #Iterations
-#$ -t 1-720
+#$ -t 1-330
 
 #Iterations in batch of
 ##$ -tc 8
