@@ -1,2 +1,2 @@
 ID,com_model,cap_com,nei_sensing,lit_sensing,FoV,rVel,turn_prob,turn_prob_max,turn_prob_min,abandon_prob,picking_lit_dur,capacity,umin,umax,n_stddev,n_mean,A0,Ae,alpha,noise_mean,noise_std,queue_size,escape_dist,call_scale_mult,call_scale_div,lit_threshold,repel_scale_mult,repel_scale_div,log_rate,max_step_size,x
-RW-0p00875P,linear,0,15,3,6.2831853072,10,0.00875,1,0.0025,0.5,5,1,0,1,1.5707963268,3.1415926536,299.1795,48.1824,0.1039,0,0,1,1,1,1,5,1,1,0.5,0.025,x
+RW-0p0025P,linear,0,15,3,6.2831853072,10,0.0025,1,0.0025,0.5,5,1,0,1,1.5707963268,3.1415926536,299.1795,48.1824,0.1039,0,0,1,1,1,1,5,1,1,0.5,0.025,x
