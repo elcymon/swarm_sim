@@ -129,6 +129,7 @@ namespace gazebo
 			gazebo::math::Pose my_pose;
 			math::Angle turn_amt;
 			double d_heading;
+			double rnd_heading;
 			
 			double escape;
 			double escape_dist;

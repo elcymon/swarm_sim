@@ -40,12 +40,12 @@
 #You can add cd to program directory to be sure
 # environment variable SGE_TASK_ID varies based on range in -t option
 #load singularity
-module load singularity
-folder=/nobackup/scsoo
+# module load singularity
+# folder=/nobackup/scsoo
 
-# folder=.
-# JOB_ID=123
-# SGE_TASK_ID=1
+folder=.
+JOB_ID=123
+SGE_TASK_ID=1
 
 #execute simulation
 local_loc=$folder/local

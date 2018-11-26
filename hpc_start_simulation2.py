@@ -7,7 +7,8 @@ world_db = {
 	'TwoClusters':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster.world',
 	'FourClusters':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters.world',
 	'HalfCluster':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform.world',
-	'Uniform':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world'
+	'Uniform':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world',
+	'NoLitter':'$PWD/sources/w_swarm1/world_db/w_swarm1_no_litter.world'
 }
 
 def start_simulation(world_name,experiment, line_number,port_number):
@@ -44,7 +45,7 @@ def start_simulation(world_name,experiment, line_number,port_number):
 
 	#start up gazebo if all processes are successful
 	if(all_set == 0):
-		load_world = subprocess.Popen("export GAZEBO_MASTER_URI=http://127.0.0.1:{};gzserver --verbose {}".format(port_number,world_db[world_name]),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
+		load_world = subprocess.Popen("export GAZEBO_MASTER_URI=http://127.0.0.1:{};gzserver -u --verbose {}".format(port_number,world_db[world_name]),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
 			load_logger = subprocess.Popen("export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {}".format(port_number,folder_name,line_number),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
