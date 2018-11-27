@@ -285,7 +285,11 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		}
 		else if(param_name.compare("queue_size") == 0)
 		{
-			this->queue_size = std::stod(param_value_str);;
+			this->queue_size = std::stod(param_value_str);
+		}
+		else if(param_name.compare("correction_mtd") == 0)
+		{
+			this->correction_mtd = param_value_str;
 		}
 		else if(param_name.compare(this->model->GetName()) == 0)
 		{
@@ -479,7 +483,10 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->prev_repel_signal = this->repel_signal;
 			this->prev_call_signal = this->call_signal;
 		}
-		
+		if(this->correction_mtd.compare("prob_reset") == 0 and (!this->new_comm_signal) and this->acTion.compare("turning"))
+		{//Robot does not have new communication signal and correction method is prob_reset. Reset probability if robot action is turning.
+			this->turn_prob = this->turn_prob_min;
+		}
 		/*if(this->turn_prob <= this->turn_prob_min)
 		{
 			this->turn_prob = this->turn_prob_min;

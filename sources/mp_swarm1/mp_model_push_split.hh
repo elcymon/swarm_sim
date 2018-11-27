@@ -197,6 +197,7 @@ namespace gazebo
 			std::deque<double> repel_queue;
 			std::deque<double> call_queue;
 			double queue_size;
+			std::string correction_mtd;
 			
 			double rslt_theta;
 			
