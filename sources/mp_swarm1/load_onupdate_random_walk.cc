@@ -426,6 +426,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 	
 	if(this->start_sim)
 	{
+		
 		//start: modify turn probability based on comm signal
 		//this section handles repulsion signals
 		if(this->turn_complete and this->new_comm_signal)
@@ -483,10 +484,13 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->prev_repel_signal = this->repel_signal;
 			this->prev_call_signal = this->call_signal;
 		}
-		if(this->correction_mtd.compare("prob_reset") == 0 and (!this->new_comm_signal) and this->acTion.compare("turning"))
-		{//Robot does not have new communication signal and correction method is prob_reset. Reset probability if robot action is turning.
-			this->turn_prob = this->turn_prob_min;
+		else{
+			if(this->correction_mtd.compare("prob_reset") == 0 and this->acTion.compare("turning") == 0)
+			{//Robot does not have new communication signal and correction method is prob_reset. Reset probability if robot action is turning.
+				this->turn_prob = this->turn_prob_min;
+			}
 		}
+		
 		/*if(this->turn_prob <= this->turn_prob_min)
 		{
 			this->turn_prob = this->turn_prob_min;
