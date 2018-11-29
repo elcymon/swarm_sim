@@ -1,0 +1,1 @@
+echo $@ > myArgs$1.csv
