@@ -94,6 +94,8 @@ namespace gazebo
 			bool crashed;
 			double x_crash;
 			double y_crash;
+			int wall_bounces; //keep count of number of times robot hits a wall
+			int neighbour_bounces;//keep count of number of times you hit another robot
 			
 			transport::PublisherPtr pub_robot_status;
 			transport::PublisherPtr lit_nei_pub;
@@ -114,6 +116,8 @@ namespace gazebo
 			double pick_lit_time;
 			int capacity;
 			int litter_count;
+			int litter_collected;// all litter a robot has collected so far
+			int litter_deposited;// all litter dropped by robot at the nest
 			std::set<std::string> litter_db;
 			gazebo::math::Pose litter_dump_site;
 			bool no_litter;
@@ -210,6 +214,17 @@ namespace gazebo
 			double prev_yaw;
 			double linear_dist;
 			double rot_dist;
+
+
+			//logging activity times variables
+			double t_obstacle_avoidance;
+			double t_litter_processing;
+			double t_go4litter;
+			double t_oa_go4litter;
+			double t_searching;
+			double t_oa_searching;
+			double t_homing;
+			double t_oa_homing;
 			
 			event::ConnectionPtr updateConnection;//pointer to the update event connection
 

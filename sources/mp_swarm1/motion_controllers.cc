@@ -242,6 +242,7 @@ bool ModelVel::try_pick(std::string litter_name)
 		
 		if(result.second)
 		{//insertion successful
+			this->litter_collected += 1;
 			this->litter_count += 1;// litter_cost;
 			//this->litter_db.insert(litter_name);
 			
@@ -278,5 +279,6 @@ void ModelVel::deposit_litter()
 		any.set_string_value(litter_name);
 		this->pub_litter->Publish(any);
 		this->litter_db.erase(it);
+		this->litter_deposited += 1;
 		//cout<<" 370 deposit "<<litter_name<<" count "<<this->litter_db.size()<<endl;
 	}

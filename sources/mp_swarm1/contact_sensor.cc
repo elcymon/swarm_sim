@@ -32,6 +32,12 @@ void ModelVel::ContactInfo(ConstContactsPtr &c)
 							if(abs(this->turn_amt.Radian()) > 0)
 							{
 								this->crashed = true;
+								if(collision.find("boundary") != std::string::npos){
+									this->wall_bounces += 1;
+								}
+								if(collision.find("m_4wrobot") != std::string::npos){
+									this->neighbour_bounces += 1;
+								}
 							}
 							/*if(_litter and this->litter_db.size() < this->capacity)
 							{//If collision is with litter and I have space and litter not behind me. pick it up.

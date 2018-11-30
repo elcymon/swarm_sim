@@ -389,6 +389,24 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->prev_yaw = this->my_pose.rot.GetYaw();
 	this->linear_dist = 0.0;
 	this->rot_dist = 0.0;
+
+	//reset litter collected and deposited data
+	this->litter_collected = 0;
+	this->litter_deposited = 0;
+
+	//reset wall bounces
+	this->wall_bounces = 0;
+	this->neighbour_bounces = 0;//reset collision with other robots
+
+	//reset activity times used for logging
+	this->t_obstacle_avoidance = 0;
+	this->t_litter_processing = 0;
+	this->t_go4litter = 0;
+	this->t_oa_go4litter = 0;
+	this->t_searching = 0;
+	this->t_oa_searching = 0;
+	this->t_homing = 0;
+	this->t_oa_homing = 0;
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)
@@ -794,7 +812,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		
 		
 		if(this->picking_lit_wait and (_info.simTime.Double() - this->pick_lit_time) < this->picking_lit_dur)
-		{
+		{// robot is processing litter. So stop
+			this->t_litter_processing += this->max_step_size;
 			this->stop();
 		}
 		else
@@ -802,7 +821,34 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->picking_lit_wait = false;
 		}
 		
-		//comput linear and rotation distance travelled cummulatively.
+		//Process activity times needed for logging
+		// this->escape
+		if(this->escape >= 0){
+			//robot is in obstacle avoidance mode
+			this->t_obstacle_avoidance += this->max_step_size;
+		}
+		if(this->state.compare("searching") == 0){
+			//robot in searching state
+			this->t_searching += this->max_step_size;
+			if(this->escape >= 0){//avoiding obstacle in current state
+				this->t_oa_searching += this->max_step_size;
+			}
+		}
+		if(this->state.compare("go4litter") == 0){
+			//robot in go4litter state
+			this->t_go4litter += this->max_step_size;
+			if(this->escape >= 0){//avoiding obstacle in current state
+				this->t_oa_go4litter += this->max_step_size;
+			}
+		}
+		if(this->state.compare("homing") == 0){
+			//robot in homing state
+			this->t_homing += this->max_step_size;
+			if(this->escape >= 0){//avoiding obstacle in current state
+				this->t_oa_homing += this->max_step_size;
+			}
+		}
+		//compute linear and rotation distance travelled cummulatively.
 		this->linear_dist += this->dxy(this->prev_loc,this->my_pose.pos);
 		this->prev_loc = this->my_pose.pos;
 		
@@ -852,7 +898,20 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 							to_string(cll_signal) + "," +
 							to_string(this->litter_db.size()) + "," + 
 							to_string(this->linear_dist) + "," + 
-							to_string(this->rot_dist) + ":" + 
+							to_string(this->rot_dist) + "," + 
+							to_string(this->litter_collected) + "," +
+							to_string(this->litter_deposited) + "," +
+							to_string(this->wall_bounces) + "," +
+							to_string(this->neighbour_bounces) + "," +
+							to_string(this->t_obstacle_avoidance) + "," +
+							to_string(this->t_searching) + "," +
+							to_string(this->t_oa_searching) + "," +
+							to_string(this->t_go4litter) + "," +
+							to_string(this->t_oa_go4litter) + "," +
+							to_string(this->t_litter_processing) + "," +
+							to_string(this->t_homing) + "," +
+							to_string(this->t_oa_homing) + "," +
+							this->acTion + ":" + 
 							this->state;
 			
 			msgs::Any b;
