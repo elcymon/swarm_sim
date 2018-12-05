@@ -553,8 +553,10 @@ namespace gazebo
 					}
 					std::cout<<s<<std::endl;
 					/End :: Test seen litter messages*/
-					if(this->litter_in_nest >= this->litter_tot or st.sec >= 100)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
+					
+					if(this->litter_in_nest >= this->litter_tot or st.sec >= 1000)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 					{
+						this->end_experiment = true;
 						this->litter_in_nest = 0;
 						// this->param_set = true;
 						msgs::Any s_sim;
@@ -587,14 +589,17 @@ namespace gazebo
 							std::string att_data = "";
 							
 							double rslt_x=0.0,rslt_y=0.0;
+
+							//used to make neighbour a stationary beacon
+							std::string n_name = "Beacon";
+							math::Vector3 n_pos = math::Vector3(-15,-15,0);
 							
-							for(auto n : this->robot_ptr)
-							{//Loop through neighbours
-								std::string n_name = n->GetName();
-								math::Vector3 n_pos = n->GetWorldPose().pos;
+							std::string n_status = "go4litter";
+							int n_seen_litter = 700;
 								
-								std::string n_status = this->robot_status_map[n_name];
-								int n_seen_litter = this->seen_litter_map[n_name];
+							
+							if(n_name.compare("Beacon") == 0)
+							{//Loop through neighbours
 								
 								
 								//std::cout<<n_name<<" "<<n_status<<std::endl;

@@ -855,6 +855,10 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		this->rot_dist += abs((this->prev_yaw - this->my_pose.rot.GetYaw())/2.0 * this->chassis_diameter);
 		this->prev_yaw = this->my_pose.rot.GetYaw();
 		
+		//Compute robot distance from beacon
+		math::Vector3 n_pos = math::Vector3(-15,-15,0);
+		double beacon_distance = this->dxy(this->my_pose.pos,n_pos);
+
 		if(_info.simTime.nsec==0 or (this->log_timer >= this->log_rate))//rate of 100Hz
 		{
 			this->log_timer = 0;
@@ -891,26 +895,15 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 							to_string(xc) + "," + to_string(yc) + "," +
 							to_string(theta) + "," +
 							to_string(this->turn_prob) + "," + 
-							to_string(this->seen_litter) + "," +
+							to_string(beacon_distance) + "," +
 							to_string(rep_neigh) + "," + 
 							to_string(rep_signal) + "," +
 							to_string(cll_neigh) + "," + 
 							to_string(cll_signal) + "," +
-							to_string(this->litter_db.size()) + "," + 
 							to_string(this->linear_dist) + "," + 
 							to_string(this->rot_dist) + "," + 
-							to_string(this->litter_collected) + "," +
-							to_string(this->litter_deposited) + "," +
 							to_string(this->wall_bounces) + "," +
-							to_string(this->neighbour_bounces) + "," +
 							to_string(this->t_obstacle_avoidance) + "," +
-							to_string(this->t_searching) + "," +
-							to_string(this->t_oa_searching) + "," +
-							to_string(this->t_go4litter) + "," +
-							to_string(this->t_oa_go4litter) + "," +
-							to_string(this->t_litter_processing) + "," +
-							to_string(this->t_homing) + "," +
-							to_string(this->t_oa_homing) + "," +
 							this->acTion + ":" + 
 							this->state;
 			

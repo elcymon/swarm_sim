@@ -18,6 +18,7 @@
 	</include>
 	<!--start: insert nest model-->
 	<include>
+	<pose>1000 1000 0.025 0 0 0</pose>
 		<uri>model://m_nest</uri>
 	</include>
 	<!--end: insert home model-->
