@@ -553,7 +553,7 @@ namespace gazebo
 					}
 					std::cout<<s<<std::endl;
 					/End :: Test seen litter messages*/
-					if(this->litter_in_nest >= this->litter_tot)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
+					if(this->litter_in_nest >= this->litter_tot or st.sec >= 100)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 					{
 						this->litter_in_nest = 0;
 						// this->param_set = true;
