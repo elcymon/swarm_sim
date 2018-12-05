@@ -20,7 +20,7 @@
 #$ -l h_vmem=1G
 
 #no of cores
-##$ -pe smp 8
+#$ -pe smp 3
 
 # Request Wallclock time of hh:mm:ss
 #$ -l h_rt=5:0:0
