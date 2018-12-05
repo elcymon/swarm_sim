@@ -458,11 +458,11 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				if(this->prev_repel_signal > this->repel_signal)
 				{
 					//this->turn_prob -= this->repel_scale;
-					this->turn_prob = this->turn_prob_min / this->repel_scale_div;
+					this->turn_prob = this->turn_prob_min;
 				}
 				else if (this->prev_repel_signal < this->repel_signal)
 				{
-					this->turn_prob = this->turn_prob_min * this->repel_scale_mult;
+					this->turn_prob = this->turn_prob_max;
 				}
 				else
 				{
@@ -479,11 +479,11 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			{
 				if(this->prev_call_signal > this->call_signal)
 				{
-					this->turn_prob = this->turn_prob * this->call_scale_mult;
+					this->turn_prob = this->turn_prob_max;
 				}
 				else if(this->prev_call_signal < this->call_signal)
 				{
-					this->turn_prob = this->turn_prob / this->call_scale_div;
+					this->turn_prob = this->turn_prob_min;
 				}
 				
 				else
