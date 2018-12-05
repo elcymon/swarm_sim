@@ -17,16 +17,16 @@
 # -pe smp x -l h_vmem=yG
 
 #memory?
-#$ -l h_vmem=2G
+#$ -l h_vmem=1G
 
 #no of cores
-#$ -pe smp 8
+##$ -pe smp 8
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=3:0:0
+#$ -l h_rt=5:0:0
 
 #Iterations
-#$ -t 1-600
+#$ -t 1-120
 
 #Iterations in batch of
 ##$ -tc 8
