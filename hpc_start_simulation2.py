@@ -8,7 +8,12 @@ world_db = {
 	'FourClusters':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters.world',
 	'HalfCluster':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform.world',
 	'Uniform':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world',
-	'TwoClusters100m':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster_100m.world'
+	'OneCluster100m':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster_100m.world',
+	'TwoClusters100m':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster_100m.world',
+	'FourClusters100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters_100m.world',
+	'HalfCluster100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform_100m.world',
+	'Uniform100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter_100m.world',
+	
 }
 
 def start_simulation(world_name,experiment, line_number,port_number):

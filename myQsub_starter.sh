@@ -1,5 +1,22 @@
+# # RepAtt TESTS 100m World 2018-12-07
+taskSize=120
+lastPort=0
+qsub hpc_qsub.sh Uniform100m RepAtt-vs-RW-100m 0 $lastPort
+
+lastPort=$(($lastPort + $taskSize))
+qsub hpc_qsub.sh HalfCluster100m RepAtt-vs-RW-100m 0 $lastPort
+
+lastPort=$(($lastPort + $taskSize))
+qsub hpc_qsub.sh OneCluster100m RepAtt-vs-RW-100m 0 $lastPort
+
+# lastPort=$(($lastPort + $taskSize))
+# qsub hpc_qsub.sh TwoClusters100m RepAtt-vs-RW-100m 0 $lastPort
+
+lastPort=$(($lastPort + $taskSize))
+qsub hpc_qsub.sh FourClusters100m RepAtt-vs-RW-100m 0 $lastPort
+
 # # REPATT VS RANDOM WALK 100M WORLD 2018-12-05
-qsub hpc_qsub.sh TwoClusters100m RepAtt-vs-RW-100m 0 0
+# qsub hpc_qsub.sh TwoClusters100m RepAtt-vs-RW-100m 0 0
 
 # # RepAtt TESTS 2018-11-30
 # taskSize=600
