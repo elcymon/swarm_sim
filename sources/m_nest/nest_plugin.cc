@@ -121,7 +121,7 @@ namespace gazebo
 			
 			gazebo::common::Time st = _info.simTime;
 			
-			if(st.nsec==0 and this->start_sim)//or (this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
+			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
 			{
 				this->log_timer = 0;
 				std::string log_litter_count(to_string(_info.simTime.Double()));
