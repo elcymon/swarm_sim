@@ -33,7 +33,7 @@
 
 
 #e-mail
-#$ -m abe
+#$ -m ae
 #$ -M scsoo@leeds.ac.uk
 
 #Run the job
