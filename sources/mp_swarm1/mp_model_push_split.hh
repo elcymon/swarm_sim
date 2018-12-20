@@ -226,6 +226,12 @@ namespace gazebo
 			double t_homing;
 			double t_oa_homing;
 			
+			//beacon location and pos
+			double nx;
+			double ny;
+			math::Vector3 beacon_pos;
+
+			
 			event::ConnectionPtr updateConnection;//pointer to the update event connection
 
 		

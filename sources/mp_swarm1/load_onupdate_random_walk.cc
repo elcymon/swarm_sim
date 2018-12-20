@@ -287,6 +287,14 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			this->queue_size = std::stod(param_value_str);
 		}
+		else if (param_name.compare("nx") == 0)
+		{
+			this->nx = std::stod(param_value_str);
+		}
+		else if (param_name.compare("ny") == 0)
+		{
+			this->ny = std::stod(param_value_str);
+		}
 		else if(param_name.compare("correction_mtd") == 0)
 		{
 			this->correction_mtd = param_value_str;
@@ -301,6 +309,9 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		}
 		sim_params_mine = sim_params_mine.substr(ploc+1);
 	}
+	//set beacon pos
+	this->beacon_pos = math::Vector3(this->nx,this->ny,0);
+
 	//litter processing variables
 	this->picking_lit_wait = false;
 	this->pick_lit_time = 0;
@@ -856,8 +867,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		this->prev_yaw = this->my_pose.rot.GetYaw();
 		
 		//Compute robot distance from beacon
-		math::Vector3 n_pos = math::Vector3(-15,-15,0);
-		double beacon_distance = this->dxy(this->my_pose.pos,n_pos);
+		// math::Vector3 n_pos = math::Vector3(-15,-15,0);
+		double beacon_distance = this->dxy(this->my_pose.pos,this->beacon_pos);
 
 		if(_info.simTime.nsec==0 or (this->log_timer >= this->log_rate))//rate of 100Hz
 		{
