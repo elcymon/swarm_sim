@@ -1,5 +1,6 @@
-# # REPATT VS RANDOM WALK 100M WORLD 2018-12-05
-qsub hpc_qsub.sh OneCluster RepAtt-vs-RW-attraction2sound 0 0
+# # REPATT VS RANDOM WALK SOUND ATTRACTION 2018-12-20
+# qsub hpc_qsub.sh 50_by_50 RepAtt-vs-RW-attraction2sound 0 0
+qsub hpc_qsub.sh rectangle RepAtt-vs-RW-attraction2sound 0 0
 
 # # RepAtt TESTS 2018-11-30
 # taskSize=600

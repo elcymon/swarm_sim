@@ -98,6 +98,12 @@ namespace gazebo
 			double noise_std;//standard deviation of the noise
 			std::normal_distribution<double> noise_distro;//distribution for making sound noisy
 			std::default_random_engine generator;
+
+			//beacon location and pos
+			double nx;
+			double ny;
+			math::Vector3 beacon_pos;
+			
 		public:
 			void Load(physics::WorldPtr _parent, sdf::ElementPtr /*_sdf*/)
 			{
@@ -389,6 +395,14 @@ namespace gazebo
 					{
 						this->cap_com = std::stoi(param_value_str);//double value of parameter;
 					}
+					else if (param_name.compare("nx") == 0)
+					{
+						this->nx = std::stod(param_value_str);
+					}
+					else if (param_name.compare("ny") == 0)
+					{
+						this->ny = std::stod(param_value_str);
+					}
 					else if(param_name.compare("max_step_size") == 0 and this->set_max_step_size)
 					{
 						msgs::Physics physicsMsg;
@@ -410,6 +424,7 @@ namespace gazebo
 					
 						
 				}
+				this->beacon_pos = math::Vector3(this->nx,this->ny,0);
 				//cout<<"params set"<<endl;
 				//this->nei_sensing = 5.0;
 				
@@ -592,7 +607,7 @@ namespace gazebo
 
 							//used to make neighbour a stationary beacon
 							std::string n_name = "Beacon";
-							math::Vector3 n_pos = math::Vector3(-15,-15,0);
+							math::Vector3 n_pos = this->beacon_pos;
 							
 							std::string n_status = "go4litter";
 							int n_seen_litter = 700;

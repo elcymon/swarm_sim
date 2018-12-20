@@ -3,6 +3,8 @@ import sys
 import os.path
 
 world_db = {
+	'50_by_50':'$PWD/sources/w_swarm1/world_db/20181220_50_by_50.world',
+	'rectangle':'$PWD/sources/w_swarm1/world_db/20181220_rectangle.world',
 	'OneCluster':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster.world',
 	'TwoClusters':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster.world',
 	'FourClusters':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters.world',
