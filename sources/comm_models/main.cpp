@@ -17,14 +17,13 @@ int main() {
         //print values
         if(i % q == 0){
             std::cout<<i<<" "
-                        <<"[call: "<<averageFilter.get_value("delta_call_signal")<<" = "
-                        <<averageFilter.get_value("prev_call_signal")<<","
-                        <<averageFilter.get_value("curr_call_signal")<<"],"
-                        <<"[rep: "<<averageFilter.get_value("delta_repel_signal")<<" = "
-                        <<averageFilter.get_value("prev_repel_signal")<<","
-                        <<averageFilter.get_value("curr_repel_signal")<<"]"
-                        
-                        <<std::endl;
+                    <<"[call: "<<averageFilter.get_value("delta_call_signal")<<" = "
+                    <<averageFilter.get_value("prev_call_signal")<<","
+                    <<averageFilter.get_value("curr_call_signal")<<"],"
+                    <<"[rep: "<<averageFilter.get_value("delta_repel_signal")<<" = "
+                    <<averageFilter.get_value("prev_repel_signal")<<","
+                    <<averageFilter.get_value("curr_repel_signal")<<"]"
+                    <<std::endl;
         }
     }
 
