@@ -51,7 +51,26 @@
 			</include>
 		 
 	<!--end: generate litter locations-->
-	
+	<model name='beacon'>
+		<static>1</static>
+		<pose>-1.5 0 0.5 0 0 0</pose>
+		<link name='link'>
+			<visual name='visual'>
+				<geometry>
+					<box>
+						<size>0.2 0.35 1</size>
+					</box>
+				</geometry>
+			</visual>
+			<collision name='collision'>
+				<geometry>
+					<box>
+						<size>0.2 0.35 1</size>
+					</box>
+				</geometry>
+			</collision>
+		</link>
+	</model>
 	<!--start: create boundary-->
 	<model name='boundary1'>
 		<static>1</static>
