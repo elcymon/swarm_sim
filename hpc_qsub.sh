@@ -26,7 +26,7 @@
 #$ -l h_rt=1:0:0
 
 #Iterations
-#$ -t 1-180
+#$ -t 1-90
 
 #Iterations in batch of
 #$ -tc 30
