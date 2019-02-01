@@ -44,7 +44,7 @@ module load singularity
 folder=/nobackup/scsoo
 
 # folder=.
-# JOB_ID=123
+# JOB_ID=1
 # SGE_TASK_ID=1
 
 #execute simulation

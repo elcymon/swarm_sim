@@ -103,11 +103,14 @@ namespace gazebo
 			double nx;
 			double ny;
 			math::Vector3 beacon_pos;
+
+			int iteration;
 			
 		public:
 			void Load(physics::WorldPtr _parent, sdf::ElementPtr /*_sdf*/)
 			{
 				// std::cout<<"world loading"<<std::endl;
+				this->iteration = 0;
 				this->node = transport::NodePtr(new transport::Node());
 				this->node->Init();
 				this->world = _parent;
@@ -456,7 +459,7 @@ namespace gazebo
 			{//set all parameters and set param_set = true when done.
 				std::lock_guard<std::mutex> lock(this->mutex);
 				this->params_str = a->string_value();
-				// std::cout<<this->params_str<<std::endl;
+				std::cout<<this->params_str<<std::endl;
 				this->param_set = true;
 			}
 			
@@ -472,7 +475,8 @@ namespace gazebo
 			void OnUpdate(const common::UpdateInfo &_info)
 			{
 				std::lock_guard<std::mutex> lock(this->mutex);
-				// std::cout<<_info.simTime<<std::endl;
+				this->iteration += 1;
+				// std::cout<<_info.simTime.sec<<"iteration: "<<this->iteration<<std::endl;
 				if(this->param_set)
 				{//check if parameters have been initialized.
 					
