@@ -1,12 +1,49 @@
 # testing simulation on local machine
-lastPort=0
-skipRows=0
-hpc=false
-./hpc_qsub.sh hpc Uniform100m SR-Noise0-100pct-Q1-40-100m $skipRows $lastPort
+# if set hpc to 1 if using hpc, 0 if not
+hpc=$1
 
+if ((! hpc)); then
+    skipRows=0
+    resultFolder=SA-N0-M1-1000-D1-1000
+    lastPort=0
+    worldName=Uniform
+    ./hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
 
+else
 
+# investigating effect of using home signal to form boundary for swarm
+    taskSize=150
+    skipRows=0
+    resultFolder=SA-N0-M1-1000-D1-1000
 
+    lastPort=0
+    worldName=Uniform
+    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+
+    lastPort=$(($lastPort + $taskSize))
+    worldName=Uniform100m
+    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+
+    lastPort=$(($lastPort + $taskSize))
+    worldName=OneCluster
+    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+
+    lastPort=$(($lastPort + $taskSize))
+    worldName=OneCluster100m
+    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+
+#unbounded test only for homing signal as boundary
+    taskSize=90
+    skipRows=60
+    lastPort=$(($lastPort + $taskSize))
+    worldName=OneClusterUnbounded
+    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+
+    lastPort=$(($lastPort + $taskSize))
+    worldName=UniformUnbounded
+    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+
+fi
 
 # # # SR and SA TESTS 100m World 2018-12-11
 # ##SR

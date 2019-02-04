@@ -291,6 +291,10 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			this->correction_mtd = param_value_str;
 		}
+		else if(param_name.compare("att_threshold") == 0)
+		{
+			this->att_threshold = std::stod(param_value_str);
+		}
 		else if(param_name.compare(this->model->GetName()) == 0)
 		{
 			seed = std::stod(param_value_str);;
@@ -453,7 +457,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 
 			this->new_comm_signal = false;//turn to false and wait till there is new signal.
 			
-			if (this->rep_neighbours > 0)
+			if(this->rep_neighbours > 0)
 			{
 				if(this->prev_repel_signal > this->repel_signal)
 				{
@@ -475,7 +479,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			}
 			
 			//This section handles attraction signals
-			if (this->call_neighbours > 0)
+			if (this->call_signal <= this->att_threshold)
 			{
 				if(this->prev_call_signal > this->call_signal)
 				{

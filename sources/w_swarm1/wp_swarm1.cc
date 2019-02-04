@@ -53,6 +53,7 @@ namespace gazebo
 			gazebo::physics::Model_V litter_ptr;
 			double lit_threshold;
 			
+			
 			//*********************START: TO HANDLE PARAMTER UPDATING AND SIMULATION RESETS
 			bool start_sim;
 			bool start_sim2;
@@ -62,11 +63,17 @@ namespace gazebo
 			gazebo::transport::PublisherPtr pub_model_log_control;
 			transport::PublisherPtr physicsPub;
 			bool set_max_step_size;
+			double exp_dur; //maximum duration of experiment before activating  homing behaviour
 			std::string params_str;
+
+			
+			//*******nest model pointer *********//
+			gazebo::physics::ModelPtr m_nest;
 
 			int litter_tot;//total litter in world
 			int litter_in_nest;//total litter deposited at the nest
 			gazebo::transport::SubscriberPtr sub_litter_in_nest;//subscriber to litter in nest topic
+			//---------------end nest model pointer--------//
 			
 			//All params to be simulated are stored in a vector
 			vector<string> my_params;
@@ -171,9 +178,15 @@ namespace gazebo
 				// }
 				
 				
-				
-				math::Box boundary = this->world->GetModel("boundary1")->GetBoundingBox();
-				this->world_size = boundary.GetXLength();
+				if(this->world->GetModel("boundary1"))
+				{
+					math::Box boundary = this->world->GetModel("boundary1")->GetBoundingBox();
+					this->world_size = boundary.GetXLength();
+				}
+				else
+				{
+					this->world_size = 9999999;
+				}
 				//std::cout<<boundary.GetXLength()<<":"<<boundary.GetYLength()<<":"<<boundary.GetZLength()<<std::endl;
 				
 				this->sub_params = this->node->Subscribe("/params_topic",&WP_Swarm1::Params_cb,this);
@@ -182,6 +195,8 @@ namespace gazebo
 				this->pub_litter_pose = this->node->Advertise<msgs::Any>("/topic_litter_pose");
 				std::string all_litter_pos = "";
 				//////////////////////////////////////////////////////////////
+				this->m_nest = this->world->GetModel("m_nest");
+				
 				gazebo::physics::Model_V all_models = this->world->GetModels();
 				this->sub_litter_in_nest = this->node->Subscribe("/litter_in_nest",&WP_Swarm1::litter_in_nest_cb,this);
 				this->litter_in_nest = 0;
@@ -401,6 +416,10 @@ namespace gazebo
 						this->physicsPub->Publish(physicsMsg);
 						this->set_max_step_size = false;
 					}
+					else if(param_name.compare("exp_dur") == 0)
+					{//initialize foraging length
+						this->exp_dur = std::stod(param_value_str);
+					}
 					else
 					{
 						//cout<<temp<<endl;
@@ -575,15 +594,12 @@ namespace gazebo
 					}
 					else
 					{
-						for(auto m : this->robot_ptr)
-						{//Get current robot.
-							std::string r_name = m->GetName();
-							math::Vector3 r_pos = m->GetWorldPose().pos;
-							int rep_neighbours = 0;
-							int att_neighbours = 0;
-							double rep_signal = 0;
-							double att_signal = 0;
-							std::string rep_data = "";
+						// for(auto m : this->robot_ptr)
+						// {//Get current robot.
+							// std::string r_name = m->GetName();
+							math::Vector3 nest_pos = this->m_nest->GetWorldPose().pos;
+							// int rep_neighbours = 0;
+							// std::string rep_data = "";
 							std::string att_data = "";
 							
 							double rslt_x=0.0,rslt_y=0.0;
@@ -592,76 +608,80 @@ namespace gazebo
 							{//Loop through neighbours
 								std::string n_name = n->GetName();
 								math::Vector3 n_pos = n->GetWorldPose().pos;
+								int att_neighbours = 0;//initialize attraction neighbours to 0
+								// double rep_signal = 0;
+								double att_signal = 0; //initialize attraction signal to 0
 								
-								std::string n_status = this->robot_status_map[n_name];
-								int n_seen_litter = this->seen_litter_map[n_name];
+								
+								// std::string n_status = this->robot_status_map[n_name];
+								// int n_seen_litter = this->seen_litter_map[n_name];
 								
 								
 								//std::cout<<n_name<<" "<<n_status<<std::endl;
 								
 								
-								if(n_name.compare(r_name) !=0)
-								{//If not the current robot do this section
-									r_pos.z = 0;
+								// if(n_name.compare(r_name) !=0)
+								// {//If not the current robot do this section
+									nest_pos.z = 0;
 									n_pos.z = 0;
 									// if(abs(r_pos.x - n_pos.x) < this->nei_sensing and
 									// 		abs(r_pos.y - n_pos.y) < this->nei_sensing)
 									// {
-										double dist = r_pos.Distance(n_pos);
+										double dist = nest_pos.Distance(n_pos);
 										// if(dist <= this->nei_sensing)//neighbour sensing distance... Consider setting parameter at startup
 										// {
-											if(n_status.compare("searching")==0 || false)
-											{
-												rep_neighbours += 1;
-												double repulsion_intensity = 0;
-												if(this->com_model.compare("linear") == 0){
-													repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
-												}
-												else if(this->com_model.compare("sound") == 0) {
-													repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
-													//add noise
-													repulsion_intensity += this->noise_distro(this->generator);
+											// if(n_status.compare("searching")==0 || false)
+											// {
+											// 	rep_neighbours += 1;
+											// 	double repulsion_intensity = 0;
+											// 	if(this->com_model.compare("linear") == 0){
+											// 		repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
+											// 	}
+											// 	else if(this->com_model.compare("sound") == 0) {
+											// 		repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+											// 		//add noise
+											// 		repulsion_intensity += this->noise_distro(this->generator);
 												
-												}
-												else if(this->com_model.compare("soundv2") == 0){
-													//noise_mean is average of fitError/signalStrength and noise_std is the deviation across experiments
-													std::normal_distribution<double> noise_distro_std(this->noise_mean,this->noise_std);
+											// 	}
+											// 	else if(this->com_model.compare("soundv2") == 0){
+											// 		//noise_mean is average of fitError/signalStrength and noise_std is the deviation across experiments
+											// 		std::normal_distribution<double> noise_distro_std(this->noise_mean,this->noise_std);
 													
-													//intensity of pure signal
-													repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+											// 		//intensity of pure signal
+											// 		repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
 													
-													//noise is proportional to intensity
-													double signal_std = repulsion_intensity * noise_distro_std(this->generator);
+											// 		//noise is proportional to intensity
+											// 		double signal_std = repulsion_intensity * noise_distro_std(this->generator);
 
-													//use proportional value computed as standard deviation
-													std::normal_distribution<double> noise_distro_signal(repulsion_intensity,signal_std);
+											// 		//use proportional value computed as standard deviation
+											// 		std::normal_distribution<double> noise_distro_signal(repulsion_intensity,signal_std);
 
-													//noisy repulsion intenisity of communicated signal
-													repulsion_intensity = noise_distro_signal(this->generator);
+											// 		//noisy repulsion intenisity of communicated signal
+											// 		repulsion_intensity = noise_distro_signal(this->generator);
 													
 													
-												}
-												else if(this->com_model.compare("vector") == 0) {
-													//TO DO
-												}
-												//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
-												/*******************************************************/
-												// double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
-												if(dist > this->nei_sensing and this->cap_com == 1)
-												{//If outside comm range and cap_com is set
-													repulsion_intensity = 0;
-												}
+											// 	}
+											// 	else if(this->com_model.compare("vector") == 0) {
+											// 		//TO DO
+											// 	}
+											// 	//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
+											// 	/*******************************************************/
+											// 	// double repulsion_intensity = this->A0 * exp(-dist*(this->alpha)) + this->Ae;
+											// 	if(dist > this->nei_sensing and this->cap_com == 1)
+											// 	{//If outside comm range and cap_com is set
+											// 		repulsion_intensity = 0;
+											// 	}
 												
-												if(repulsion_intensity < 0)
-													repulsion_intensity = 0;
-												/*******************************************************/
+											// 	if(repulsion_intensity < 0)
+											// 		repulsion_intensity = 0;
+											// 	/*******************************************************/
 
-												rep_signal += repulsion_intensity;
-												rep_data = rep_data + "," + to_string(dist);
-											}
+											// 	rep_signal += repulsion_intensity;
+											// 	rep_data = rep_data + "," + to_string(dist);
+											// }
 											
-											if(n_seen_litter >= this->lit_threshold)//If seen litter is greater than 5, send an attraction signal
-											{
+											// if(n_seen_litter >= this->lit_threshold)//If seen litter is greater than 5, send an attraction signal
+											// {
 												//cout<<"n_seen_litter:"<<n_seen_litter<<" this->lit_threshold:"<<this->lit_threshold<<endl;
 												att_neighbours += 1;
 												double attraction_intensity = 0;
@@ -708,50 +728,55 @@ namespace gazebo
 												/*******************************************************/
 												att_signal += attraction_intensity;
 												att_data = att_data + "," + to_string(dist);
-											}
+											// }
 											//Computing Resultant Vector
 											double vec_x,vec_y;
-											vec_x = (r_pos.x - n_pos.x)/dist;
-											vec_y = (r_pos.y - n_pos.y)/dist;
+											vec_x = (nest_pos.x - n_pos.x)/dist;
+											vec_y = (nest_pos.y - n_pos.y)/dist;
 											rslt_x += vec_x;
 											rslt_y += vec_y;
 									// 	}
 									// }
-								}
+								// }
+											double rslt_theta = atan2(rslt_y,rslt_x);
+							
+											msgs::Any any;
+											any.set_type(msgs::Any::STRING);
+											any.set_string_value(to_string(0) + ":" + to_string(0)
+																	+ ":" + to_string(rslt_theta) + ":" + 
+																	to_string(att_neighbours) + ":" + to_string(att_signal));
+											this->pub_commSignal[n_name]->Publish(any);//publish attraction info to the specific robot
+											
 							}
 							
-							double rslt_theta = atan2(rslt_y,rslt_x);
 							
-							msgs::Any any;
-							any.set_type(msgs::Any::STRING);
-							any.set_string_value(to_string(rep_neighbours) + ":" + to_string(rep_signal)
-													+ ":" + to_string(rslt_theta) + ":" + 
-													to_string(att_neighbours) + ":" + to_string(att_signal));
-							this->pub_commSignal[r_name]->Publish(any);
+						// 	//any.set_string_value(to_string(att_neighbours) + ":" + to_string(att_signal));
+						// 	//this->pub_attraction[r_name]->Publish(any);
 							
-							//any.set_string_value(to_string(att_neighbours) + ":" + to_string(att_signal));
-							//this->pub_attraction[r_name]->Publish(any);
-							
-							if(st.nsec==0){//record repulsion once per second.	
-								rep_data = r_name + "," + to_string(rep_signal) + "," + to_string(rep_neighbours) + rep_data;
-								msgs::Any any2;
-								any2.set_type(msgs::Any::STRING);
-								any2.set_string_value(rep_data);
-								this->pub_repel_signal->Publish(any2);
+						// 	if(st.nsec==0){//record repulsion once per second.	
+						// 		rep_data = r_name + "," + to_string(rep_signal) + "," + to_string(rep_neighbours) + rep_data;
+						// 		msgs::Any any2;
+						// 		any2.set_type(msgs::Any::STRING);
+						// 		any2.set_string_value(rep_data);
+						// 		this->pub_repel_signal->Publish(any2);
 								
-								att_data = r_name + "," + to_string(att_signal) + "," + to_string(att_neighbours) + att_data;
-								any2.set_string_value(att_data);
-								this->pub_attract_signal->Publish(any2);
-							}
-						}
+						// 		att_data = r_name + "," + to_string(att_signal) + "," + to_string(att_neighbours) + att_data;
+						// 		any2.set_string_value(att_data);
+						// 		this->pub_attract_signal->Publish(any2);
+						// 	}
+						// // }
 						
 						//std::cout <<this->log_timer << this->log_rate << this->start_sim <<std::endl;
-						if( st.nsec==0 or (this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
+						if( (st.nsec==0 or (this->log_timer >= this->log_rate and this->start_sim)) and
+								st.sec <= this->exp_dur)//rate of 100Hz
 						{
 							this->log_timer = 0;
 							this->no_litter = true;//Assume there is no litter within world
 							//std::cout<<this->psec<<endl;
 							std::string all_litter_pos = "";
+							
+							double picked_litter = 0;
+
 							for(auto m: this->litter_ptr)
 							{//Get current pose of all litter in world
 								gazebo::math::Vector3 lit_loc = m->GetWorldPose().pos;
@@ -759,6 +784,10 @@ namespace gazebo
 								if(abs(lit_loc.x) < 500 && abs(lit_loc.y) < 500)
 								{
 									this->no_litter = false;
+								}
+								else
+								{
+									picked_litter += 1;
 								}
 								all_litter_pos = all_litter_pos + to_string(lit_loc.x) + ","
 																+ to_string(lit_loc.y) + ":";
@@ -771,6 +800,11 @@ namespace gazebo
 											+ ":" + all_litter_pos;
 							all_litter_pos_msg.set_string_value(all_litter_pos);
 							this->pub_litter_pose->Publish(all_litter_pos_msg);//publish current pos of all litter
+							if(st.sec >= this->exp_dur)
+							{ //set number of litter to picked litter, so that robots will activate homing state
+								this->no_litter = true;
+								this->litter_tot = picked_litter;
+							}
 						}
 						//this->psec = st.nsec;
 					}

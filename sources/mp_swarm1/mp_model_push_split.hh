@@ -204,6 +204,8 @@ namespace gazebo
 			std::string correction_mtd;
 			
 			double rslt_theta;
+
+			double att_threshold; //if sound is below this value, activate attraction behaviour
 			
 			transport::PublisherPtr pub_log;
 			double log_timer;

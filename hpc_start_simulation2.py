@@ -8,11 +8,19 @@ world_db = {
 	'FourClusters':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters.world',
 	'HalfCluster':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform.world',
 	'Uniform':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world',
+	
 	'OneCluster100m':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster_100m.world',
 	'TwoClusters100m':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster_100m.world',
 	'FourClusters100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters_100m.world',
 	'HalfCluster100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform_100m.world',
 	'Uniform100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter_100m.world',
+	
+	'OneClusterUnbounded':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster_unbounded.world',
+	'TwoClustersUnbounded':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster_unbounded.world',
+	'FourClustersUnbounded':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters_unbounded.world',
+	'HalfClusterUnbounded':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform_unbounded.world',
+	'UniformUnbounded':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter_unbounded.world',
+	
 	
 }
 
