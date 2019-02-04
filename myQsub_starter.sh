@@ -7,7 +7,7 @@ if ((! hpc)); then
     resultFolder=SA-N0-M1-1000-D1-1000
     lastPort=0
     worldName=Uniform
-    ./hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+    ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 else
 
@@ -18,30 +18,30 @@ else
 
     lastPort=0
     worldName=Uniform
-    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     lastPort=$(($lastPort + $taskSize))
     worldName=Uniform100m
-    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     lastPort=$(($lastPort + $taskSize))
     worldName=OneCluster
-    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     lastPort=$(($lastPort + $taskSize))
     worldName=OneCluster100m
-    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 #unbounded test only for homing signal as boundary
     taskSize=90
     skipRows=60
     lastPort=$(($lastPort + $taskSize))
     worldName=OneClusterUnbounded
-    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     lastPort=$(($lastPort + $taskSize))
     worldName=UniformUnbounded
-    qsub hpc_qsub.sh hpc $worldName $resultFolder $skipRows $lastPort
+    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 fi
 
