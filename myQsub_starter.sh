@@ -4,7 +4,7 @@ hpc=$1
 
 if ((! hpc)); then
     skipRows=0
-    resultFolder=SA-N0-M1-1000-D1-1000
+    resultFolder=SA-N0-M1-1000-D1-1000-unltd
     lastPort=0
     worldName=Uniform
     ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
@@ -14,7 +14,7 @@ else
 # investigating effect of using home signal to form boundary for swarm
     taskSize=150
     skipRows=0
-    resultFolder=SA-N0-M1-1000-D1-1000
+    resultFolder=SA-N0-M1-1000-D1-1000-unltd
 
     lastPort=0
     worldName=Uniform

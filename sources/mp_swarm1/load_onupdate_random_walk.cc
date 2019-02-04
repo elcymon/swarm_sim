@@ -745,7 +745,10 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				//l->SetWorldPose(this->litter_dump_site);
 				
 				l->SetWorldPose(dump_site);
-				//this->deposit_litter();
+
+		//**************************************************************************************************//
+				this->deposit_litter();//essentially empties what has been picked up, making robot capacity unlimited if activated
+		//**************************************************************************************************//
 				//l->Fini();
 				//this->world->RemoveModel(this->LitterName);
 				this->LitterName = "";
