@@ -40,25 +40,28 @@
 #You can add cd to program directory to be sure
 # environment variable SGE_TASK_ID varies based on range in -t option
 #load singularity
-module load singularity
-folder=/nobackup/scsoo
-
-# folder=.
-# JOB_ID=123
-# SGE_TASK_ID=1
+hpc=$1 # true if working on hpc false otherwise
+if hpc; then
+    module load singularity
+    folder=/nobackup/scsoo
+else
+    folder=.
+    JOB_ID=123
+    SGE_TASK_ID=1
+fi
 
 #execute simulation
 local_loc=$folder/local
 
 #set python script input arguments
 #name of the world to simulate on
-world_name=$1
+world_name=$2
 #experiment is used to know which parameter you are investigating
-experiment=$2
+experiment=$3
 #how many rows of parameters should be ignored us 0 if none
-row_shift=$3
+row_shift=$4
 #the previous SGE_TASK_ID maximum value
-prev_ID_end=$4
+prev_ID_end=$5
 line_number=$(($SGE_TASK_ID + $row_shift))
 #there should be no repetition of server port or else they will overwrite each other. Adding 1 just to be safe
 port_number=$(($SGE_TASK_ID + $prev_ID_end + 1))
