@@ -16,7 +16,7 @@ else
     skipRows=0
     resultFolder=SA-N0-M1-1000-D1-1000-unltd
 
-    lastPort=0
+    lastPort=1000
     worldName=Uniform
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
