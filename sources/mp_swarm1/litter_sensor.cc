@@ -14,27 +14,22 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 	std::lock_guard<std::mutex> lock(this->mutex);
 	std::string s = a->string_value();
 	double repel_queue_tot = 0, call_queue_tot = 0;
+	double call_sig,repel_sig;//call and repel signals gotten in the new message
+	int call_neigh,repel_neigh;//call and repel neighbours gotten in the new message
+
+
 
 	size_t div_loc = s.find(":");
 	//Extract repulsion neighbours
-	this->rep_neighbours = std::stoi(s.substr(0,div_loc));
+	repel_neigh = std::stoi(s.substr(0,div_loc));
+	this->rep_neighbours = repel_neigh;
 	
 	//Extract repulsion_signal
 	s = s.substr(div_loc+1);
 	div_loc = s.find(":");
-	this->repel_queue.push_back(std::stod(s.substr(0,div_loc)));
-	if(this->repel_queue.size() >= this->queue_size)
-	{
-		for(auto it = this->repel_queue.cbegin(); it != this->repel_queue.cend(); ++it)
-		{
-			repel_queue_tot += (*it);
-		}
-		this->repel_signal = repel_queue_tot / ((int)this->repel_queue.size());
-		this->repel_queue.clear();
-	}
-	// this->repel_signal =  std::stod(s.substr(0,div_loc));
-	
-	
+	repel_sig = std::stod(s.substr(0,div_loc));
+	this->repel_queue.push_back(repel_sig);
+
 	//Extract resultant theta
 	s = s.substr(div_loc+1);
 	div_loc = s.find(":");
@@ -43,24 +38,43 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 	//Extract attraction neighbours
 	s = s.substr(div_loc+1);
 	div_loc = s.find(":");
-	this->call_neighbours = std::stoi(s.substr(0,div_loc));
+	call_neigh = std::stoi(s.substr(0,div_loc));
+	this->call_neighbours = call_neigh;
 	
 	//Extract attraction signal
-	this->call_queue.push_back(std::stod(s.substr(div_loc+1)));
-	if(this->call_queue.size() >= this->queue_size)
-	{
-		for(auto it = this->call_queue.cbegin(); it != this->call_queue.cend(); ++it)
-		{
-			call_queue_tot += (*it);
-		}
-		this->call_signal = call_queue_tot / ((int)this->call_queue.size());
-		this->call_queue.clear();
-	}
+	call_sig = std::stod(s.substr(div_loc+1));
+	this->call_queue.push_back(call_sig);
+	
+	//using proposed communication update method
+	this->commModel.update_comm_signals(call_sig,repel_sig,this->timeStamp);
 
-	if(this->call_queue.size() == 0 and this->repel_queue.size() == 0){
-		//queue limit reached and the queue was cleared. So a new communication signal is available to use
-		this->new_comm_signal = true;
-	}
+	
+	// if(this->repel_queue.size() >= this->queue_size)
+	// {
+	// 	for(auto it = this->repel_queue.cbegin(); it != this->repel_queue.cend(); ++it)
+	// 	{
+	// 		repel_queue_tot += (*it);
+	// 	}
+	// 	this->repel_signal = repel_queue_tot / ((int)this->repel_queue.size());
+	// 	this->repel_queue.clear();
+	// }
+	// // this->repel_signal =  std::stod(s.substr(0,div_loc));
+	
+	
+	// if(this->call_queue.size() >= this->queue_size)
+	// {
+	// 	for(auto it = this->call_queue.cbegin(); it != this->call_queue.cend(); ++it)
+	// 	{
+	// 		call_queue_tot += (*it);
+	// 	}
+	// 	this->call_signal = call_queue_tot / ((int)this->call_queue.size());
+	// 	this->call_queue.clear();
+	// }
+
+	// if(this->call_queue.size() == 0 and this->repel_queue.size() == 0){
+	// 	//queue limit reached and the queue was cleared. So a new communication signal is available to use
+	// 	this->new_comm_signal = true;
+	// }
 	// this->call_signal = std::stod(s.substr(div_loc+1));
 	
 	/*std::string nei_name = s.substr(0,div_loc);

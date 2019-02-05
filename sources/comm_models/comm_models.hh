@@ -1,7 +1,9 @@
-#include <iostream>
-#include <string>
-#include <deque>
-
+#ifndef H_COMMHEADERS
+#define H_COMMHEADERS
+    #include <iostream>
+    #include <string>
+    #include <deque>
+#endif
 
 class CommModels {
     private:
@@ -46,6 +48,7 @@ class CommModels {
        void linear_regression_eqn(std::deque<double> *signal,std::deque<double> *tStamp,
                                     double *prev, double *curr);
     public:
+        CommModels();
         CommModels(int qSize, std::string filterType);
 
         double get_value(std::string desired_value);//used to access signals and gradients

@@ -21,6 +21,10 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 
+#ifndef H_COMM_MODELS
+#define H_COMM_MODELS
+    #include "../comm_models/comm_models.hh"
+#endif
 
 using namespace std;
 //using namespace cv;
@@ -188,19 +192,26 @@ namespace gazebo
 			//double cummulative_sig;
 			transport::SubscriberPtr sub_comm_signal;
 			//transport::PublisherPtr pub_comm_signal;
-			double repel_signal;
-			double prev_repel_signal;
-			bool new_comm_signal;
-			double call_signal;
-			double prev_call_signal;
 			double call_scale_mult;
 			double call_scale_div;
 			double repel_scale_mult;
 			double repel_scale_div;
 			
+		//**************to be replaced by CommModels?*************************//
+			double repel_signal;
+			double prev_repel_signal;
+			bool new_comm_signal;
+			double call_signal;
+			double prev_call_signal;
 			std::deque<double> repel_queue;
 			std::deque<double> call_queue;
 			double queue_size;
+		//***********************CommModels********************************//
+			CommModels commModel;//a communication handler that also has inbuild filter processing
+			std::string filter_type;
+			//get time stamp of simulation
+			double timeStamp;
+		//*****************************************************************//
 			std::string correction_mtd;
 			
 			double rslt_theta;
@@ -225,6 +236,7 @@ namespace gazebo
 			double t_oa_searching;
 			double t_homing;
 			double t_oa_homing;
+
 			
 			event::ConnectionPtr updateConnection;//pointer to the update event connection
 

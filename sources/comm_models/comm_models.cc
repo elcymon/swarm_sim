@@ -1,5 +1,22 @@
-#include "comm_models.hh"
+#ifndef H_COMM_MODELS
+#define H_COMM_MODELS
+    #include "comm_models.hh"
+#endif 
 
+CommModels::CommModels() {
+    this->queue_size = 1;
+    this->filter_type = "average_filter";
+
+    //initialize signal values to 0
+    this->prev_call_signal = 0;
+    this->curr_call_signal = 0;
+    
+    this->prev_repel_signal = 0;
+    this->curr_repel_signal = 0;
+
+    this->delta_call_signal = 0;
+    this->delta_repel_signal = 0;
+}
 CommModels::CommModels(int qSize, std::string filterType) {
 //:queue_size(qSize), filter_type(filterType) {
     //do stuff if needed

@@ -1,11 +1,15 @@
-#include "comm_models.hh"
+#ifndef H_COMM_MODELS
+#define H_COMM_MODELS
+    #include "comm_models.hh"
+#endif
 
 using namespace std;
 
 int main() {
     //needed for testing the features of CommModels Class
     int q = 40;
-    CommModels averageFilter = CommModels(q, "average_filter");
+    CommModels averageFilter;
+    averageFilter = CommModels(q, "average_filter");
     
 
     for (int i = 1; i <= q * 10; i++) {

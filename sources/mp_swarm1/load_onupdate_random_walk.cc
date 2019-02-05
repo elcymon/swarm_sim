@@ -295,6 +295,10 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			seed = std::stod(param_value_str);;
 		}
+		else if(param_name.compare("filter_type") == 0)
+		{
+			this->filter_type = param_value_str;
+		}
 		else
 		{
 			//std::cout<<temp<<"::"<<value<<std::endl;
@@ -359,12 +363,16 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->escape = -1.0;//escape is needed to break out of traps due to interference when going home or picking litter
 	this->escape_start = gazebo::math::Vector3(-1.0,-1.0,-1.0);
 	
-	this->repel_signal = 0.0;//cummulative sum of the communication signals received
+	//********************commModel to replace this?****************//
+	//reset cummulative sum of the communication signals received
+	this->repel_signal = 0.0;
 	this->prev_repel_signal = this->repel_signal;
 	
 	this->call_signal = 0.0;
 	this->prev_call_signal = this->call_signal;
-	
+	//************create commModel*************************************
+	this->commModel = CommModels(this->queue_size,this->filter_type);
+	//*****************************************************************
 	this->rslt_theta = 0.0;
 	
 	
@@ -407,6 +415,8 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->t_oa_searching = 0;
 	this->t_homing = 0;
 	this->t_oa_homing = 0;
+
+	this->timeStamp = 0;//initialize time stamp to zero
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)
@@ -414,7 +424,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 	
 	std::lock_guard<std::mutex> lock(this->mutex);
 	//std::cout<<_info.simTime.Double()<<":"<<_info.simTime.sec<<","<<_info.simTime.nsec<<std::endl;
-	
+	this->timeStamp = _info.simTime.Double();//update timeStamp
+
 	this->log_timer += this->max_step_size;
 	
 	if(this->state.compare(this->prev_state) != 0)
@@ -444,14 +455,20 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 	
 	if(this->start_sim)
 	{
-		
+		//update repulsion and attraction signals
+		this->repel_signal = this->commModel.get_value("curr_repel_signal");
+		this->prev_repel_signal = this->commModel.get_value("prev_repel_signal");
+		this->call_signal = this->commModel.get_value("curr_call_signal");
+		this->prev_call_signal = this->commModel.get_value("prev_call_signal");
+
+
 		//start: modify turn probability based on comm signal
 		//this section handles repulsion signals
-		if(this->turn_complete and this->new_comm_signal)
+		if(this->turn_complete)// and this->new_comm_signal)
 		{//change turning probability and update communication signal only when not turning i.e. only when moving straight
 			//also, do this only when there is new communcated information from neighbours
 
-			this->new_comm_signal = false;//turn to false and wait till there is new signal.
+			// this->new_comm_signal = false;//turn to false and wait till there is new signal.
 			
 			if (this->rep_neighbours > 0)
 			{
@@ -499,8 +516,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			{
 				this->turn_prob = this->turn_prob_max;
 			}
-			this->prev_repel_signal = this->repel_signal;
-			this->prev_call_signal = this->call_signal;
+			// this->prev_repel_signal = this->repel_signal;
+			// this->prev_call_signal = this->call_signal;
 		}
 		else{
 			if(this->correction_mtd.compare("prob_reset") == 0 and this->acTion.compare("turning") == 0)

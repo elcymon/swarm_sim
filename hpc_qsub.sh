@@ -23,10 +23,10 @@
 #$ -pe smp 3
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=5:0:0
+#$ -l h_rt=2:0:0
 
 #Iterations
-#$ -t 1-120
+#$ -t 1-60
 
 #Iterations in batch of
 #$ -tc 10
@@ -41,7 +41,7 @@
 # environment variable SGE_TASK_ID varies based on range in -t option
 #load singularity
 hpc=$1 # true if working on hpc false otherwise
-if hpc; then
+if ((hpc)); then
     module load singularity
     folder=/nobackup/scsoo
 else
