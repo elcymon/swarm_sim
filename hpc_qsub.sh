@@ -26,15 +26,15 @@
 #$ -l h_rt=2:0:0
 
 #Iterations
-#$ -t 1-60
+#$ -t 1-720
 
 #Iterations in batch of
-#$ -tc 10
+#$ -tc 20
 
 
 #e-mail
-#$ -m ae
-#$ -M scsoo@leeds.ac.uk
+##$ -m ae
+##$ -M scsoo@leeds.ac.uk
 
 #Run the job
 #You can add cd to program directory to be sure

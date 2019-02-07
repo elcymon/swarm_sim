@@ -63,15 +63,15 @@ else
     # qsub hpc_qsub.sh $hpc TwoClusters100m RepAtt-vs-RW-100m 0 0
 
     # # RepAtt TESTS 2019-02-05
-    taskSize=60
+    taskSize=720
     lastPort=0
-    qsub hpc_qsub.sh $hpc Uniform RepAtt-N100-Q40-M2-D100 0 $lastPort
+    qsub hpc_qsub.sh $hpc Uniform RepAtt-N0-100-Q1-40-M2-5-D10-100 0 $lastPort
 
     # lastPort=$(($lastPort + $taskSize))
     # qsub hpc_qsub.sh $hpc HalfCluster RepAtt-Noise0-100pct-Q1-40-xtlog 0 $lastPort
 
     lastPort=$(($lastPort + $taskSize))
-    qsub hpc_qsub.sh $hpc OneCluster RepAtt-N100-Q40-M2-D100 0 $lastPort
+    qsub hpc_qsub.sh $hpc OneCluster RepAtt-N0-100-Q1-40-M2-5-D10-100 0 $lastPort
 
     # lastPort=$(($lastPort + $taskSize))
     # qsub hpc_qsub.sh $hpc TwoClusters RepAtt-Noise0-100pct-Q1-40-xtlog 0 $lastPort
