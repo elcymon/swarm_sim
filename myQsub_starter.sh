@@ -4,9 +4,9 @@ hpc=$1
 
 if ((! hpc)); then
     skipRows=0
-    resultFolder=SA-N0-M1-1000-D1-1000-unltd
+    resultFolder=NA-N0-100-M1-4-D1-100
     lastPort=0
-    worldName=Uniform
+    worldName=NoBound
     ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 else
@@ -14,22 +14,18 @@ else
 # investigating effect of using home signal to form boundary for swarm
     taskSize=150
     skipRows=0
-    resultFolder=SA-N0-M1-1000-D1-1000-unltd
+    resultFolder=NA-N0-100-M1-4-D1-100
 
     lastPort=1000
-    worldName=Uniform
+    worldName=CircleBound
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     lastPort=$(($lastPort + $taskSize))
-    worldName=Uniform100m
+    worldName=SquareBound
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     lastPort=$(($lastPort + $taskSize))
-    worldName=OneCluster
-    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
-
-    lastPort=$(($lastPort + $taskSize))
-    worldName=OneCluster100m
+    worldName=NoBound
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 #unbounded test only for homing signal as boundary

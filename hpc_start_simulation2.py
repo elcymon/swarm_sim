@@ -20,6 +20,10 @@ world_db = {
 	'FourClustersUnbounded':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters_unbounded.world',
 	'HalfClusterUnbounded':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform_unbounded.world',
 	'UniformUnbounded':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter_unbounded.world',
+
+	'CircleBound': '$PWD/sources/w_swarm1/world_db/20190208_circle_bound.world',
+	'SquareBound': '$PWD/sources/w_swarm1/world_db/20190208_square_bound.world',
+	'NoBound':'$PWD/sources/w_swarm1/world_db/20190208_no_bound.world'
 	
 	
 }
