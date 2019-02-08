@@ -28,16 +28,6 @@ else
     worldName=NoBound
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
-#unbounded test only for homing signal as boundary
-    taskSize=90
-    skipRows=60
-    lastPort=$(($lastPort + $taskSize))
-    worldName=OneClusterUnbounded
-    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
-
-    lastPort=$(($lastPort + $taskSize))
-    worldName=UniformUnbounded
-    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 fi
 
