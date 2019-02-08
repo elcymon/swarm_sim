@@ -1,13 +1,15 @@
-<%radius=10
+<%world=true# 1 if this should be world
+radius=10
 thickness=0.1
 height=0.5
-delTheta=22.0/(7*20)
+delTheta=22.0/(7*100)
 theta = Array((0..(44.0/7-delTheta)).step(delTheta))
 theta.push(0.0)%>
 
 <?xml version='1.0'?>
 <sdf version='1.6'>
-<world name='default'>
+<%if world%>
+  <world name='default'>
     <include>
     <uri>model://ground_plane</uri>
     </include>
@@ -23,6 +25,7 @@ theta.push(0.0)%>
         <projection_type>orthographic</projection_type>
       </camera>
     </gui>
+<%end%>
   <model name='circular-boundary'>
     <link name='link_1'>
       <pose frame=''>-0 0 0 0 -0 0</pose>
@@ -41,7 +44,7 @@ theta.push(0.0)%>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <geometry>
           <polyline>
-            <height>1</height>
+            <height><%=height%></height>
             <%theta.each do |i|
                 x = (Math.cos(i)) * radius
                 y = Math.sin(i) * radius%>
@@ -50,7 +53,7 @@ theta.push(0.0)%>
             <%end%>
           </polyline>
           <polyline>
-            <height>1</height>
+            <height><%=height%></height>
             <%theta.each do |i|
                 x = (Math.cos(i)) * (radius+thickness)
                 y = Math.sin(i) * (radius + thickness)%>
@@ -80,7 +83,7 @@ theta.push(0.0)%>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <polyline>
-              <height>1</height>
+              <height><%=height%></height>
               <%theta.each do |i|
                 x = (Math.cos(i)) * radius
                 y = Math.sin(i) * radius%>
@@ -89,7 +92,7 @@ theta.push(0.0)%>
             <%end%>
             </polyline>
             <polyline>
-              <height>1</height>
+              <height><%=height%></height>
               <%theta.each do |i|
                 x = (Math.cos(i)) * (radius + thickness)
                 y = Math.sin(i) * (radius + thickness)%>
@@ -148,6 +151,8 @@ theta.push(0.0)%>
     <static>1</static>
     <allow_auto_disable>1</allow_auto_disable>
     </model>
+<%if world%>
 </world>
+<%end%>
 </sdf>
     
