@@ -24,6 +24,15 @@ namespace gazebo
 			transport::SubscriberPtr sub_start_sim;
 			std::mutex mutex;
 			
+			physics::ModelPtr nest_model;
+			physics::JointPtr rwheel;
+			physics::JointPtr lwheel;
+			double nVel;
+			double wheel_separation;
+			int mvStop;//delete
+			double desired_heading;
+			double nest_diameter;
+
 			double log_timer;
 			double max_step_size;
 			double log_rate;
@@ -44,7 +53,16 @@ namespace gazebo
 			this->sub = this->node->Subscribe("/litter_deposits",&Nest_Plugin::Collect_Litter,this);
 			this->pub = this->node->Advertise<msgs::Any>("/litter_in_nest");
 			this->start_sim = false;
+
+			this->nest_model = _parent;
+			this->rwheel = this->nest_model->GetJoint("R_joint");
+			this->lwheel = this->nest_model->GetJoint("L_joint");
+			this->wheel_separation = this->rwheel->GetAnchor(0)
+								.Distance(this->lwheel->GetAnchor(0));
+			math::Box chassis = this->nest_model->GetLink("chassis")->GetBoundingBox();
+			this->nest_diameter = chassis.GetXLength();
 			
+
 			this->sub_my_Init = this->node->Subscribe("/my_Init",&Nest_Plugin::my_Init,this);
 			this->sub_start_sim = this->node->Subscribe("/start_sim",&Nest_Plugin::start_sim_cb,this);
 			// Listen to the update event. This event is broadcast every
@@ -52,7 +70,77 @@ namespace gazebo
 			this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Nest_Plugin::OnUpdate, this, _1));
 		}
-		
+
+		public: void stop() {
+			this->lwheel->SetVelocity(0,0);
+			this->rwheel->SetVelocity(0,0);
+		}
+		public: void headingControl(double dxn_eror)
+		{/*
+			Takes in error in heading and adjust wheel velocities to minimize the error
+		*/
+			double va = dxn_eror * 100 * this->nVel;
+			double r = this->nVel + va * this->wheel_separation/2;
+			double l = this->nVel - va * this->wheel_separation/2;
+
+			if (r > this->nVel)
+				r = this->nVel;
+			if (r < 0)
+				r = 0;
+
+			if (l > this->nVel)
+				l = this->nVel;
+			if (l < 0)
+				l = 0;
+			
+			//set robot velocities
+			this->rwheel->SetVelocity(0,r);
+			this->lwheel->SetVelocity(0,l);
+		}
+		public: double normalize(double angle)
+		{//normalize angle
+			math::Angle D_angle(angle);
+			D_angle.Normalize();
+			return D_angle.Radian();
+		}
+		public: bool checkNestFrontestFront() {
+			bool frontClear = true;
+			gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
+			double nest_heading = myPose.rot.GetYaw();
+
+			math::Vector3 nest_pos = myPose.pos;
+			nest_pos.z = 0;//We are interested only in x,y distance from the nest
+
+			gazebo::physics::Model_V all_models = this->nest_model->GetWorld()->GetModels();
+			for (auto m : all_models) {
+				std::string model_name = m->GetName();
+				if(model_name.find("m_4wrobot") != std::string::npos) {
+					//compute distance
+					math::Vector3 rob_pos = m->GetWorldPose().pos;
+					rob_pos.z = 0;
+					
+					double distance = nest_pos.Distance(rob_pos);
+
+					//compute orientation of robot to nest
+					double obstruction_orientation = atan2(rob_pos.y - nest_pos.y,
+														rob_pos.x - nest_pos.x);
+					double relative_orientation = nest_heading - obstruction_orientation;
+					relative_orientation = this->normalize(relative_orientation);
+
+					if(abs(relative_orientation) < M_PI/2.0 and
+									distance < (this->nest_diameter))
+					{//if obstruction is in front and less than nest diameter.
+						frontClear = false;
+
+					}
+
+
+				}
+			}
+
+			return frontClear;
+		}
+
 		public: void my_Init(ConstAnyPtr &any)
 		{//used to initialize/reset simulation parameters
 			std::lock_guard<std::mutex> lock(this->mutex);
@@ -72,6 +160,9 @@ namespace gazebo
 				{
 					this->log_rate = std::stod(param_value_str);;
 				}
+				else if(param_name.compare("nVel") == 0) {
+					this->nVel = std::stod(param_value_str);
+				}
 				else if(param_name.compare("max_step_size") == 0)
 				{
 					this->max_step_size = std::stod(param_value_str);;
@@ -81,7 +172,10 @@ namespace gazebo
 				}
 				sim_params_mine = sim_params_mine.substr(ploc+1);
 			}
-			
+
+			this->mvStop = -1;
+			this->desired_heading = 0;//move in positive x direction
+
 			this->log_timer = 0;//reset timer
 		}
 		
@@ -118,8 +212,39 @@ namespace gazebo
 		{
 			std::lock_guard<std::mutex> lock(this->mutex);
 			this->log_timer += this->max_step_size;
+			//compute the heading error of the nest
+			gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
+			double heading_error = this->desired_heading - 
+									myPose.rot.GetYaw();
+			heading_error = this->normalize(heading_error);
 			
+			//keep moving straight unless about to hit a robot.
+			//check if there are robots obstructing nest's path
+			bool frontClear = checkNestFrontestFront();
+			if(frontClear) {
+				this->headingControl(heading_error);
+			}
+			else { //if front is not clear, stop
+				this->stop();
+			}
+
+
+
 			gazebo::common::Time st = _info.simTime;
+			// if(_info.simTime.sec % 10 == 0 and _info.simTime.nsec==0){
+			// 	this->mvStop *= -1;
+			// }
+
+			// if(this->mvStop > 0) {
+			// 	this->stop();
+			// }
+			// else {
+			// 	gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
+			// 	double heading_error = this->desired_heading - 
+			// 							myPose.rot.GetYaw();
+			// 	heading_error = this->normalize(heading_error);
+			// 	this->headingControl(heading_error);
+			// }
 			
 			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
 			{
