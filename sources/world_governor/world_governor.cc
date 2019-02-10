@@ -154,7 +154,7 @@ void experiment_control_cb(ConstAnyPtr &any)
 		// 		<<data
 		// 		<<std::put_time(&ttm,",start_time:%Y-%m-%d--%H-%M-%S,");
 	}
-	if(data.compare("end")==0)
+	if(data.substr(0,3).compare("end")==0 and world_gov_control_bool)
 	{
 		world_gov_control_bool = false;
 		ttm = *std::localtime(&tt);

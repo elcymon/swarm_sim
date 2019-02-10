@@ -73,6 +73,8 @@ namespace gazebo
 			int litter_tot;//total litter in world
 			int litter_in_nest;//total litter deposited at the nest
 			gazebo::transport::SubscriberPtr sub_litter_in_nest;//subscriber to litter in nest topic
+			double nest_distance_travelled;
+			double max_nest_travel;
 			//---------------end nest model pointer--------//
 			
 			//All params to be simulated are stored in a vector
@@ -243,6 +245,9 @@ namespace gazebo
 				this->end_experiment = false;
 				//my_Init();
 				this->param_set = false;//Initially params_str is null. so we know it has not been set.
+
+				//set to invalid value to prevent premature end to simulation
+				this->nest_distance_travelled = -900;
 				//Handling communication among robots section
 				/*for (int i = 1; i <= 10;i++)
 				{
@@ -259,9 +264,25 @@ namespace gazebo
 			void litter_in_nest_cb(ConstAnyPtr &any)
 			{
 				std::lock_guard<std::mutex> lock(this->mutex);
-				std::string litter_in_nest_str = any->string_value();
-				size_t n_loc = litter_in_nest_str.find(",");
-				int l = std::stoi(litter_in_nest_str.substr(n_loc+1));
+				std::string nest_msg_str = any->string_value();
+				std::istringstream stream(nest_msg_str);
+				
+				std::string t;
+				std::getline(stream,t,',');
+				
+				std::string litter_in_nest_str;
+				std::getline(stream,litter_in_nest_str,',');
+
+				std::string x,y,theta,nest_dst_travelled;
+				std::getline(stream,x,',');
+				std::getline(stream,y,',');
+				std::getline(stream,theta,',');
+				std::getline(stream,nest_dst_travelled,',');
+
+				//distance travelled by nest
+				this->nest_distance_travelled = std::stod(nest_dst_travelled);
+
+				int l = std::stoi(litter_in_nest_str);
 				this->litter_in_nest = l;
 			}
 			void seen_litter_cb(ConstAnyPtr &any)
@@ -420,12 +441,17 @@ namespace gazebo
 					{//initialize foraging length
 						this->exp_dur = std::stod(param_value_str);
 					}
+					else if(param_name.compare("max_nest_travel") == 0)
+					{
+						this->max_nest_travel = std::stod(param_value_str);
+					}
 					else
 					{
 						//cout<<temp<<endl;
 					}
 					//cout<<temp<<endl;
 					sim_params_mine = sim_params_mine.substr(ploc+1);
+
 					
 						
 				}
@@ -453,6 +479,8 @@ namespace gazebo
 				
 				this->log_timer = 0;//reset log timer.
 				// std::cout<<"Init exited"<<std::endl;
+				this->nest_distance_travelled = 0;
+					
 				
 			}
 			
@@ -488,6 +516,11 @@ namespace gazebo
 					//std::cout<<"Simulations Ended"<<endl;
 					exit(0); 
 				}
+				// if(_info.simTime.sec >= this->exp_dur)
+				// { //set number of litter to picked litter, so that robots will activate homing state
+				// 	this->no_litter = true;
+				// 	this->litter_tot = this->litter_in_nest;
+				// }
 				if(this->world_info_bool){
 					//At start of simulation, this informs the world governor that the world has been loaded and ready to go
 					msgs::Any any;
@@ -501,8 +534,10 @@ namespace gazebo
 				if(!this->world_gov_experiment_control){
 					//needed to prevent simulation from counting while world-gov-control is set to false
 					this->world->Reset();
+					// this->end_experiment = this->world_gov_experiment_control;
 				}
-				if(this->litter_in_nest >= this->litter_tot)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
+				if(/*this->litter_in_nest >= this->litter_tot */ 
+					this->nest_distance_travelled >= this->max_nest_travel)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 				{
 					// this->litter_in_nest = 0;
 					// // this->param_set =  true;
@@ -516,12 +551,14 @@ namespace gazebo
 					//All litter collected. Alert Governor that you have ended current simulation
 					msgs::Any exp_control;
 					exp_control.set_type(msgs::Any::STRING);
-					std::string end_sim_str = "end";
+					std::string end_sim_str = "end"/* + to_string(this->nest_distance_travelled) +
+												"," + to_string(this->max_nest_travel)*/;
 					exp_control.set_string_value(end_sim_str);
 					this->pub_experiment_control->Publish(exp_control);
 					// std::cout<<"End Published"<<std::endl;
 					// return;
 					// this->world->Reset();
+					// exit(0); 
 				}
 
 				if(this->world_gov_experiment_control and !(this->param_set)) {
@@ -572,7 +609,7 @@ namespace gazebo
 					}
 					std::cout<<s<<std::endl;
 					/End :: Test seen litter messages*/
-					if(this->litter_in_nest >= this->litter_tot)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
+					if(this->litter_in_nest >= this->litter_tot or this->nest_distance_travelled >= this->max_nest_travel)// or st.sec >= this->exp_dur)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 					{
 						this->litter_in_nest = 0;
 						// this->param_set = true;
@@ -587,7 +624,7 @@ namespace gazebo
 						// msgs::Any exp_control;
 						// exp_control.set_string_value("end");
 						// this->pub_experiment_control->Publish(exp_control);
-						this->world->Reset();
+						// this->world->Reset();
 							
 						
 				
@@ -767,8 +804,7 @@ namespace gazebo
 						// // }
 						
 						//std::cout <<this->log_timer << this->log_rate << this->start_sim <<std::endl;
-						if( (st.nsec==0 or (this->log_timer >= this->log_rate and this->start_sim)) and
-								st.sec <= this->exp_dur)//rate of 100Hz
+						if( (st.nsec==0 or (this->log_timer >= this->log_rate and this->start_sim)))//rate of 100Hz
 						{
 							this->log_timer = 0;
 							this->no_litter = true;//Assume there is no litter within world
@@ -800,11 +836,7 @@ namespace gazebo
 											+ ":" + all_litter_pos;
 							all_litter_pos_msg.set_string_value(all_litter_pos);
 							this->pub_litter_pose->Publish(all_litter_pos_msg);//publish current pos of all litter
-							if(st.sec >= this->exp_dur)
-							{ //set number of litter to picked litter, so that robots will activate homing state
-								this->no_litter = true;
-								this->litter_tot = picked_litter;
-							}
+							
 						}
 						//this->psec = st.nsec;
 					}

@@ -32,7 +32,7 @@ namespace gazebo
 			int mvStop;//delete
 			double desired_heading;
 			double nest_diameter;
-
+			gazebo::math::Pose startPose;//robot start location
 			double log_timer;
 			double max_step_size;
 			double log_rate;
@@ -177,6 +177,8 @@ namespace gazebo
 			this->desired_heading = 0;//move in positive x direction
 
 			this->log_timer = 0;//reset timer
+			this->startPose = this->nest_model->GetWorldPose();
+			this->startPose.pos.z = 0;//only interested in xy distance
 		}
 		
 		public: void start_sim_cb(ConstAnyPtr &any)
@@ -248,9 +250,14 @@ namespace gazebo
 			
 			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
 			{
+				//compute nest distance travelled
+				myPose.pos.z=0;
+				double distance = round(myPose.pos.Distance(this->startPose.pos)*100)/100.0;
 				this->log_timer = 0;
 				std::string log_litter_count(to_string(_info.simTime.Double()));
-				log_litter_count += "," + to_string(this->litter_count.size());
+				log_litter_count += "," + to_string(this->litter_count.size()) +
+									"," + to_string(myPose.pos.x) + "," + to_string(myPose.pos.y) +
+									"," + to_string(myPose.rot.GetYaw()) + "," + to_string(distance);
 				msgs::Any b;
 				b.set_type(msgs::Any::STRING);
 				b.set_string_value(log_litter_count);
