@@ -100,9 +100,9 @@ void litter_in_nest_cb(ConstAnyPtr &any)
 		std::string lit_count = any->string_value();
 		std::size_t pos = lit_count.find(",");
 		std::string time_string = lit_count.substr(0,pos);
-		double curr_time = std::stod(time_string);
+		// double curr_time = std::stod(time_string);
 
-		sim_time = curr_time;
+		// sim_time = curr_time;
 		ofstream myfile2(folder_name + prefix + "_litter_count.txt",std::ios::app|std::ios::ate);
 		myfile2 <<lit_count<<std::endl;
 		myfile2.close();

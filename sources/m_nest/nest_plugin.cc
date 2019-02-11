@@ -37,6 +37,9 @@ namespace gazebo
 			double max_step_size;
 			double log_rate;
 			bool start_sim;
+			bool initialized;//nest initialized
+
+			gazebo::physics::Model_V robots;
 			
 			// Pointer to the update event connection
 			 event::ConnectionPtr updateConnection;
@@ -65,6 +68,16 @@ namespace gazebo
 
 			this->sub_my_Init = this->node->Subscribe("/my_Init",&Nest_Plugin::my_Init,this);
 			this->sub_start_sim = this->node->Subscribe("/start_sim",&Nest_Plugin::start_sim_cb,this);
+
+			this->initialized = false;
+			//get pointer to robots in the swarm
+			gazebo::physics::Model_V all_models = this->nest_model->GetWorld()->GetModels();
+			for (auto m : all_models) {
+				std::string model_name = m->GetName();
+				if(model_name.find("m_4wrobot") != std::string::npos) {
+					this->robots.push_back(m);
+				}
+			}
 			// Listen to the update event. This event is broadcast every
 			// simulation iteration.
 			this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -104,6 +117,7 @@ namespace gazebo
 			return D_angle.Radian();
 		}
 		public: bool checkNestFrontestFront() {
+		
 			bool frontClear = true;
 			gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
 			double nest_heading = myPose.rot.GetYaw();
@@ -179,6 +193,20 @@ namespace gazebo
 			this->log_timer = 0;//reset timer
 			this->startPose = this->nest_model->GetWorldPose();
 			this->startPose.pos.z = 0;//only interested in xy distance
+
+			//log data header
+			std::stringstream swarm_data;
+			swarm_data << "t,litter_count,nest_x,nest_y,nest_yaw,nest_dst";
+			for (auto robot : this->robots) {
+				std::string rName = robot->GetName();
+				swarm_data << "," << rName <<"_x," << rName << "_y," << rName << "_dst";
+			}
+
+			msgs::Any b;
+			b.set_type(msgs::Any::STRING);
+			b.set_string_value(swarm_data.str());
+			this->pub->Publish(b);
+			this->initialized = true;
 		}
 		
 		public: void start_sim_cb(ConstAnyPtr &any)
@@ -214,54 +242,83 @@ namespace gazebo
 		{
 			std::lock_guard<std::mutex> lock(this->mutex);
 			this->log_timer += this->max_step_size;
-			//compute the heading error of the nest
-			gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
-			double heading_error = this->desired_heading - 
-									myPose.rot.GetYaw();
-			heading_error = this->normalize(heading_error);
-			
-			//keep moving straight unless about to hit a robot.
-			//check if there are robots obstructing nest's path
-			bool frontClear = checkNestFrontestFront();
-			if(frontClear) {
-				this->headingControl(heading_error);
-			}
-			else { //if front is not clear, stop
-				this->stop();
-			}
+			if(this->start_sim and this->initialized){
+				//compute the heading error of the nest
+				gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
+				myPose.pos.z = 0;
+				double heading_error = this->desired_heading - 
+										myPose.rot.GetYaw();
+				heading_error = this->normalize(heading_error);
+				
+				//keep moving straight unless about to hit a robot.
+				//check if there are robots obstructing nest's path
+				bool frontClear = true;//checkNestFrontestFront();//compute frontclear inline
+
+				std::stringstream swarm_data;
+				for (auto robot : this->robots) {
+					gazebo::math::Pose robPose = robot->GetWorldPose();
+					robPose.pos.z = 0;
+					
+					//compute distance
+					double robDist = myPose.pos.Distance(robPose.pos);
+
+					//log robot data
+					swarm_data << "," << robPose.pos.x << "," <<robPose.pos.y << "," <<robDist;
+
+					//compute orientation of robot to nest
+					double obstruct_orientation = atan2(robPose.pos.y - myPose.pos.y,
+														robPose.pos.x - myPose.pos.x);
+
+					double relative_orientation = myPose.rot.GetYaw() - obstruct_orientation;
+					relative_orientation = this->normalize(relative_orientation);
+
+					if(abs(relative_orientation) < M_PI / 2.0 and
+							robDist < (this->nest_diameter)) {
+						//if obstruction is in front and less than nest diameter.
+						frontClear = false;
+					}
+				}
+				if(frontClear) {
+					this->headingControl(heading_error);
+				}
+				else { //if front is not clear, stop
+					this->stop();
+				}
 
 
 
-			gazebo::common::Time st = _info.simTime;
-			// if(_info.simTime.sec % 10 == 0 and _info.simTime.nsec==0){
-			// 	this->mvStop *= -1;
-			// }
+				gazebo::common::Time st = _info.simTime;
+				// if(_info.simTime.sec % 10 == 0 and _info.simTime.nsec==0){
+				// 	this->mvStop *= -1;
+				// }
 
-			// if(this->mvStop > 0) {
-			// 	this->stop();
-			// }
-			// else {
-			// 	gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
-			// 	double heading_error = this->desired_heading - 
-			// 							myPose.rot.GetYaw();
-			// 	heading_error = this->normalize(heading_error);
-			// 	this->headingControl(heading_error);
-			// }
-			
-			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
-			{
-				//compute nest distance travelled
-				myPose.pos.z=0;
-				double distance = round(myPose.pos.Distance(this->startPose.pos)*100)/100.0;
-				this->log_timer = 0;
-				std::string log_litter_count(to_string(_info.simTime.Double()));
-				log_litter_count += "," + to_string(this->litter_count.size()) +
-									"," + to_string(myPose.pos.x) + "," + to_string(myPose.pos.y) +
-									"," + to_string(myPose.rot.GetYaw()) + "," + to_string(distance);
-				msgs::Any b;
-				b.set_type(msgs::Any::STRING);
-				b.set_string_value(log_litter_count);
-				this->pub->Publish(b);
+				// if(this->mvStop > 0) {
+				// 	this->stop();
+				// }
+				// else {
+				// 	gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
+				// 	double heading_error = this->desired_heading - 
+				// 							myPose.rot.GetYaw();
+				// 	heading_error = this->normalize(heading_error);
+				// 	this->headingControl(heading_error);
+				// }
+				
+				if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate ))//rate of 100Hz
+				{
+					//compute nest distance travelled
+					myPose.pos.z=0;
+					double distance = round(myPose.pos.Distance(this->startPose.pos)*100)/100.0;
+					this->log_timer = 0;
+					std::string log_litter_count(to_string(_info.simTime.Double()));
+					log_litter_count += "," + to_string(this->litter_count.size()) +
+										"," + to_string(myPose.pos.x) + "," + to_string(myPose.pos.y) +
+										"," + to_string(myPose.rot.GetYaw()) + "," + to_string(distance)
+										+ swarm_data.str();
+					msgs::Any b;
+					b.set_type(msgs::Any::STRING);
+					b.set_string_value(log_litter_count);
+					this->pub->Publish(b);
+				}
 			}
 			
 			if(this->log_timer > this->log_rate)

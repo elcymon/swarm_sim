@@ -265,25 +265,27 @@ namespace gazebo
 			{
 				std::lock_guard<std::mutex> lock(this->mutex);
 				std::string nest_msg_str = any->string_value();
-				std::istringstream stream(nest_msg_str);
-				
-				std::string t;
-				std::getline(stream,t,',');
-				
-				std::string litter_in_nest_str;
-				std::getline(stream,litter_in_nest_str,',');
+				if(nest_msg_str.find("t,") == std::string::npos){
+					std::istringstream stream(nest_msg_str);
+					
+					std::string t;
+					std::getline(stream,t,',');
+					
+					std::string litter_in_nest_str;
+					std::getline(stream,litter_in_nest_str,',');
 
-				std::string x,y,theta,nest_dst_travelled;
-				std::getline(stream,x,',');
-				std::getline(stream,y,',');
-				std::getline(stream,theta,',');
-				std::getline(stream,nest_dst_travelled,',');
+					std::string x,y,theta,nest_dst_travelled;
+					std::getline(stream,x,',');
+					std::getline(stream,y,',');
+					std::getline(stream,theta,',');
+					std::getline(stream,nest_dst_travelled,',');
 
-				//distance travelled by nest
-				this->nest_distance_travelled = std::stod(nest_dst_travelled);
+					//distance travelled by nest
+					this->nest_distance_travelled = std::stod(nest_dst_travelled);
 
-				int l = std::stoi(litter_in_nest_str);
-				this->litter_in_nest = l;
+					int l = std::stoi(litter_in_nest_str);
+					this->litter_in_nest = l;
+				}
 			}
 			void seen_litter_cb(ConstAnyPtr &any)
 			{
