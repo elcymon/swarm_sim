@@ -23,18 +23,18 @@
 #$ -pe smp 3
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=2:0:0
+#$ -l h_rt=1:30:0
 
 #Iterations
-#$ -t 1-600
+#$ -t 1-150
 
 #Iterations in batch of
 #$ -tc 10
 
 
 #e-mail
-#$ -m ae
-#$ -M scsoo@leeds.ac.uk
+##$ -m ae
+##$ -M scsoo@leeds.ac.uk
 
 #Run the job
 #You can add cd to program directory to be sure
