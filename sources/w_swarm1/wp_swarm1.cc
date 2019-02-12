@@ -248,6 +248,7 @@ namespace gazebo
 
 				//set to invalid value to prevent premature end to simulation
 				this->nest_distance_travelled = -900;
+				this->exp_dur = 1800; //default experimemnt duration is 1800 except changed from params file
 				//Handling communication among robots section
 				/*for (int i = 1; i <= 10;i++)
 				{
@@ -539,7 +540,8 @@ namespace gazebo
 					// this->end_experiment = this->world_gov_experiment_control;
 				}
 				if(/*this->litter_in_nest >= this->litter_tot */ 
-					this->nest_distance_travelled >= this->max_nest_travel)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
+					this->nest_distance_travelled >= this->max_nest_travel
+					or _info.simTime.sec >= this->exp_dur)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 				{
 					// this->litter_in_nest = 0;
 					// // this->param_set =  true;
@@ -611,7 +613,9 @@ namespace gazebo
 					}
 					std::cout<<s<<std::endl;
 					/End :: Test seen litter messages*/
-					if(this->litter_in_nest >= this->litter_tot or this->nest_distance_travelled >= this->max_nest_travel)// or st.sec >= this->exp_dur)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
+					if(/*this->litter_in_nest >= this->litter_tot or */
+						this->nest_distance_travelled >= this->max_nest_travel
+						or st.sec >= this->exp_dur)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 					{
 						this->litter_in_nest = 0;
 						// this->param_set = true;

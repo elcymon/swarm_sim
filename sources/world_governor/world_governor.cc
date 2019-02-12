@@ -87,7 +87,7 @@ void topic_model_log_cb(ConstAnyPtr &any)
 		std::size_t pos = log.find(":");
 		std::string robot_name = log.substr(0,pos);
 		ofstream myfile(folder_name + prefix +"_"+ robot_name+".txt",std::ios::app|std::ios::ate);
-		myfile << log<<std::endl;
+		myfile << log.substr(pos+1) << std::endl;
 		myfile.close();
 	
 }

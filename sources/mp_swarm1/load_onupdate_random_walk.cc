@@ -411,6 +411,20 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->t_oa_searching = 0;
 	this->t_homing = 0;
 	this->t_oa_homing = 0;
+
+	//logged data header
+	std::string myHeader = this->model->GetName() + ":";
+	myHeader = myHeader + "name:t,xc,yc,theta,turn_prob,seen_litter," +
+					"rep_neigh,rep_signal,call_neigh,call_signal," +
+					"litter_db,linear_dist,rot_dist,litter_collected," +
+					"litter_deposited,wall_bounces,neighbour_bounces," +
+					"t_obstacle_avoidance,t_searching,t_oa_searching,t_go4litter," +
+					"t_oa_go4litter,t_litter_processing,t_homing," +
+					"t_oa_homing,action:state";
+	msgs::Any b;
+	b.set_type(msgs::Any::STRING);
+	b.set_string_value(myHeader);
+	this->pub_log->Publish(b);
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)
@@ -894,6 +908,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			}
 			
 			my_log_data = this->model->GetName() + ":" + 
+							this->model->GetName() + ":" + 
 							to_string(_info.simTime.Double()) + "," +
 							to_string(xc) + "," + to_string(yc) + "," +
 							to_string(theta) + "," +
@@ -920,7 +935,14 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 							to_string(this->t_oa_homing) + "," +
 							this->acTion + ":" + 
 							this->state;
-			
+			// std::string myHeader = this->model->GetName() + ":";
+			// myHeader = myHeader + "name:t,xc,yc,theta,turn_prob,seen_litter," +
+			// 				"rep_neigh,rep_signal,call_neigh,call_signal," +
+			// 				"litter_db,linear_dist,rot_dist,litter_collected," +
+			// 				"litter_deposited,wall_bounces,neighbour_bounces," +
+			// 				"t_obstacle_avoidance,t_searching,t_oa_searching,t_go4litter," +
+			// 				"t_oa_go4litter,t_litter_processing,t_homing," +
+			// 				"t_oa_homing,action:state";
 			msgs::Any b;
 			b.set_type(msgs::Any::STRING);
 			b.set_string_value(my_log_data);

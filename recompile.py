@@ -16,15 +16,15 @@ def compile_plugins():
 		copy_wp = subprocess.run("cp sources/w_swarm1/build/libwp_swarm1.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 	print()
 
-	# print('compiling robot plugin')
-	# robot_plugin = subprocess.run("cd sources/mp_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
-	# if robot_plugin.returncode:
-	# 	print('************robot plugin compilation failed')
-	# 	print(robot_plugin.stderr)
-	# else:
-	# 	print('robot plugin compilation successful')
-	# 	copy_rp = subprocess.run("cp sources/mp_swarm1/build/libmp_swarm1.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
-	# print()
+	print('compiling robot plugin')
+	robot_plugin = subprocess.run("cd sources/mp_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	if robot_plugin.returncode:
+		print('************robot plugin compilation failed')
+		print(robot_plugin.stderr)
+	else:
+		print('robot plugin compilation successful')
+		copy_rp = subprocess.run("cp sources/mp_swarm1/build/libmp_swarm1.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	print()
 
 	print('compiling nest plugin')
 	nest_plugin = subprocess.run("cd sources/m_nest/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
