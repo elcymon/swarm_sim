@@ -112,7 +112,7 @@
 					<uri>model://m_4wrobot</uri>
 				</include>
 				
-			
+<!-- 			
 				
 				<include>
 					<name>m_4wrobot11</name>
@@ -190,7 +190,7 @@
 					<name>m_4wrobot20</name>
 					<pose>-0.9698778476675296 -0.8656425131679938 0.005 0 0 3.870263850215709</pose>
 					<uri>model://m_4wrobot</uri>
-				</include>
+				</include> -->
 				
 			
 			

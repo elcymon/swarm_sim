@@ -876,7 +876,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		this->rot_dist += abs((this->prev_yaw - this->my_pose.rot.GetYaw())/2.0 * this->chassis_diameter);
 		this->prev_yaw = this->my_pose.rot.GetYaw();
 		
-		if(_info.simTime.nsec==0 or (this->log_timer >= this->log_rate))//rate of 100Hz
+		if(this->log_timer >= this->log_rate)//rate of 100Hz
 		{
 			this->log_timer = 0;
 			//log:x,y,yaw,turn_prob,seen_litter,neighbours,comm_signal,this->litter_db,state

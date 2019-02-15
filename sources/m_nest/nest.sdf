@@ -2,7 +2,7 @@
 <sdf version ='1.6'>
   <model name ='m_nest'>
     <pose>0 0 0 0 0 0</pose>
-    <static>true</static>
+    <static>false</static>
     <link name ='chassis'>
 			<pose>0 0 0.3 0 0 0</pose>
 	    <inertial>
