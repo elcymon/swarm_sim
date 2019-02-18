@@ -3,8 +3,8 @@
 hpc=$1
 
 if ((! hpc)); then
-    skipRows=940
-    resultFolder=NA_Vel_M_D_Test_10 #NA-move100m
+    skipRows=0
+    resultFolder=NA_att_threshold_vs_robDist #NA-move100m
     lastPort=0
     worldName=NoBound
     ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
@@ -12,9 +12,9 @@ if ((! hpc)); then
 else
 
 # investigating effect of using home signal to form boundary for swarm
-    taskSize=3000
+    taskSize=150
     skipRows=0
-    resultFolder=NA_Vel_M_D_Test_10 #NA-move100m
+    resultFolder=NA_att_threshold_vs_robDist #NA-move100m
 
     # lastPort=0
     # worldName=CircleBound
