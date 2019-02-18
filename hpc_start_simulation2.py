@@ -26,7 +26,9 @@ world_db = {
 	'NoBound':'$PWD/sources/w_swarm1/world_db/20190208_no_bound.world',
 
 	'Uniform_rad14': '$PWD/sources/w_swarm1/world_db/20190218_uniform100_rad14.world',
-	'Uniform_rad14_noBound': '$PWD/sources/w_swarm1/world_db/20190218_uniform100_rad14_noBound.world'
+	'Uniform_rad14_noBound': '$PWD/sources/w_swarm1/world_db/20190218_uniform100_rad14_noBound.world',
+	'Uniform_100m':'$PWD/sources/w_swarm1/world_db/20190218_Uniform_Bound_100m.world',
+	'Uniform_100m_noBound': '$PWD/sources/w_swarm1/world_db/20190218_Uniform_noBound_100m.world'
 	
 	
 }

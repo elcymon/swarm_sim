@@ -40,12 +40,30 @@ namespace gazebo
 			bool initialized;//nest initialized
 
 			gazebo::physics::Model_V robots;
+
+			//needed for to and fro exploration of nest
+			std::vector<int> xPoints;
+			std::vector<int> yPoints;
+			std::vector<int>::iterator xIt;
+			std::vector<int>::iterator yIt;
+
+			gazebo::math::Vector3 goal_checkpoint;
+
 			
 			// Pointer to the update event connection
 			 event::ConnectionPtr updateConnection;
 		
 		public : void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 		{
+			
+			//initialize exploration checkpoints
+			this->xPoints = {100,100, 0, 0, 100,100,0, 0, 100,100,0};
+			this->xIt = this->xPoints.begin();
+
+			this->yPoints = {0,  20, 20,40, 40, 60, 60,80, 80,100,100};
+			this->yIt = this->yPoints.begin();
+
+			
 			//Initialize the litter vector
 			
 			//create a subscriber to subscribe to the litter topic
@@ -92,19 +110,36 @@ namespace gazebo
 		{/*
 			Takes in error in heading and adjust wheel velocities to minimize the error
 		*/
-			double va = dxn_eror * 100 * this->nVel;
-			double r = this->nVel + va * this->wheel_separation/2;
-			double l = this->nVel - va * this->wheel_separation/2;
+			double l = 0, r = 0;
+				if(abs(dxn_eror) < 0.09){
+					double va = dxn_eror * 100 * this->nVel;
+					r = this->nVel + va * this->wheel_separation/2;
+					l = this->nVel - va * this->wheel_separation/2;
 
-			if (r > this->nVel)
-				r = this->nVel;
-			if (r < 0)
-				r = 0;
+					if (r > this->nVel)
+						r = this->nVel;
+					if (r < 0)
+						r = 0;
 
-			if (l > this->nVel)
-				l = this->nVel;
-			if (l < 0)
-				l = 0;
+					if (l > this->nVel)
+						l = this->nVel;
+					if (l < 0)
+						l = 0;
+				}
+				else {
+						if(dxn_eror > 0)
+						{//Object on the right. Turn right
+							l = -(this->nVel/2);
+							r = this->nVel/2;
+							
+						}
+						else if(dxn_eror < 0)
+						{//Object on left. Turn left.
+							l = this->nVel/2;
+							r = -(this->nVel/2);
+						}
+				}
+			
 			
 			//set robot velocities
 			this->rwheel->SetVelocity(0,r);
@@ -202,6 +237,11 @@ namespace gazebo
 				swarm_data << "," << rName <<"_x," << rName << "_y," << rName << "_dst";
 			}
 
+			//intitialize first checkpoint
+			this->goal_checkpoint.z = 0;
+			this->goal_checkpoint.y = *(this->yIt);
+			this->goal_checkpoint.x = *(this->xIt);
+
 			msgs::Any b;
 			b.set_type(msgs::Any::STRING);
 			b.set_string_value(swarm_data.str());
@@ -246,6 +286,28 @@ namespace gazebo
 				//compute the heading error of the nest
 				gazebo::math::Pose myPose = this->nest_model->GetWorldPose();
 				myPose.pos.z = 0;
+
+				double checkpoint_dist = this->goal_checkpoint.Distance(myPose.pos);
+				if (checkpoint_dist < 0.05) {
+					this->yIt++;
+					this->xIt++;
+
+					if(this->yIt == this->yPoints.end()){
+						this->yIt = this->yPoints.begin();
+						this->xIt = this->yPoints.begin();
+					}
+
+					this->goal_checkpoint.y = *(this->yIt);
+					this->goal_checkpoint.x = *(this->xIt);
+				}
+
+				//get next checkpoint pos
+				double checkpoint_loc = atan2(this->goal_checkpoint.y - myPose.pos.y,
+											this->goal_checkpoint.x - myPose.pos.x);
+				
+				this->desired_heading = this->normalize(checkpoint_loc);
+				//compute checkpoint orientation
+
 				double heading_error = this->desired_heading - 
 										myPose.rot.GetYaw();
 				heading_error = this->normalize(heading_error);

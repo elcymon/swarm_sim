@@ -18,6 +18,7 @@
 	</include>
 	<!--start: insert nest model-->
 	<include>
+		<pose>50 50 0 0 0 0</pose>
 		<uri>model://m_nest</uri>
 	</include>
 	<!--end: insert home model-->
@@ -33,6 +34,7 @@
  
 
 	<%start_r = 0.80
+	nest_p = 50
 	r = start_r
 	dist = 0.5
 	angle = 0
@@ -41,12 +43,12 @@
 	y_starrt = 0
 	id = 1
 	while id <= rb
-		x = r * Math.cos(angle)
-		y = r * Math.sin(angle)
+		x = r * Math.cos(angle) + nest_p
+		y = r * Math.sin(angle) + nest_p
 		
 		if angle == 0
-			x_start = x
-			y_start = y
+			x_start = x 
+			y_start = y 
 			
 			angle_step = 2 * Math.asin(dist / (2.0 * r))
 		end
@@ -91,16 +93,18 @@
 	<%heap = [[-7 * scale,-7 * scale,50,6 * scale - 0.2],[7 * scale,-7 * scale,50,6 * scale - 0.2],[-7 * scale,7 * scale,50,6 * scale - 0.2],[7 * scale,7 * scale,50,6 * scale - 0.2]]%>-->
 	
 	<!--create litter locations of 100 litter objects within 10m radius of nest-->
-	<%heap = [[0,0,100,13.9]]%>
+	<!--theta = rand(0..2*Math::PI); dist = rand(2..radius);
+	lx = dist*Math.cos(theta) + x; ly = dist*Math.sin(theta) + y;-->
+	<%heap = [[0,0,100,100]]%>
 	<%
 	size = 0
 	lit = 1
 	for i in heap
 		 x = i[0];y = i[1]; size = size + i[2]; radius = i[3]
 		 while lit <= size
-			theta = rand(0..2*Math::PI); dist = rand(2..radius);
-			lx = dist*Math.cos(theta) + x; ly = dist*Math.sin(theta) + y;
-			if lx > radius or ly > radius
+			dx = rand(0.0..1.0)*radius; dy = rand(0.0..1.0)*radius;
+			lx = dx + x; ly = dy + y;
+			if lx < 2 or ly < 2
 				next
 			end
 			%>
@@ -117,17 +121,17 @@
 	
 	<!--start: create boundary-->
 	<%
-	quad=false
-	circ=true
+	quad=true
+	circ=false
 	if quad %>
-		<%b_length=20%><!--length of boundary-->
+		<%b_length=100%><!--length of boundary-->
 		<%b_width=b_length%><!--width of boundary-->
 		<%b_thick=0.1%><!--boundary thickness-->
 		<%b_height=0.5%><!--boundary height-->
 	
 	<model name='boundary1'>
 		<static>1</static>
-		<pose>0 0 0 0 0 0</pose>
+		<pose>50 50 0 0 0 0</pose>
 		<link name='link'>
 			<collision name='collision1'>
 				<pose>-<%=b_length/2+b_thick/2%> 0 0.0 0 0 0</pose>
