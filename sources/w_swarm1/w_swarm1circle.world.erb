@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version='1.6'>
 	<%scale=2.5%>
-	<%rb=20;%><!--size of swarm-->
+	<%rb=10;%><!--size of swarm-->
 	<%b_length=20 * scale%><!--length of boundary-->
 	<%b_width=b_length%><!--width of boundary-->
 	<%b_thick=0.1%><!--boundary thickness-->
@@ -89,20 +89,24 @@
 	<%heap = [[-9.3,-9.3,50,1],[9.3,9.3,50,1]]%>
 	<%heap = [[-7 * scale,-7 * scale,100,6 * scale - 0.2],[7 * scale,7 * scale,100,6 * scale - 0.2]]%>
 	<%heap = [[-7 * scale,-7 * scale,50,6 * scale - 0.2],[7 * scale,-7 * scale,50,6 * scale - 0.2],[-7 * scale,7 * scale,50,6 * scale - 0.2],[7 * scale,7 * scale,50,6 * scale - 0.2]]%>-->
-	<%heap = [[0,0,1,b_length - 0.2]]%>
+	
+	<!--create litter locations of 100 litter objects within 10m radius of nest-->
+	<%heap = [[0,0,100,13.9]]%>
 	<%
 	size = 0
 	lit = 1
 	for i in heap
-		 x = i[0];y = i[1]; size = size + i[2]; radius = i[3]/2.0
+		 x = i[0];y = i[1]; size = size + i[2]; radius = i[3]
 		 while lit <= size
-			lx = rand(-1.0..1.0)*radius + x; ly = rand(-1.0..1.0)*radius + y;
-			if lx.abs < 2 and ly.abs < 2
+			theta = rand(0..2*Math::PI); dist = rand(2..radius);
+			lx = dist*Math.cos(theta) + x; ly = dist*Math.sin(theta) + y;
+			if lx > radius or ly > radius
 				next
-			end%>
+			end
+			%>
 			<include>
 				<name>m_litter<%=lit%></name>
-				<pose>10000 10000 0.025 0 0 0</pose>
+				<pose><%=lx%> <%=ly%> 0.025 0 0 0</pose>
 				<uri>model://m_litter</uri>
 			</include><% lit = lit+1 %>
 		 <%end
@@ -114,7 +118,7 @@
 	<!--start: create boundary-->
 	<%
 	quad=false
-	circ=false
+	circ=true
 	if quad %>
 		<%b_length=20%><!--length of boundary-->
 		<%b_width=b_length%><!--width of boundary-->
@@ -199,10 +203,10 @@
 		</link>
 	</model>
 	<%elsif circ
-	radius=10
+	radius=14
 	thickness=0.1
 	height=0.5
-	delTheta=22.0/(7*100)
+	delTheta=22.0/(7*200)
 	theta = Array((0..(44.0/7-delTheta)).step(delTheta))
 	theta.push(0.0)%>
 

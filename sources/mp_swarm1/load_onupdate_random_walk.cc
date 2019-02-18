@@ -746,7 +746,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		double dxn_eror = this->d_heading - this->my_pose.rot.GetYaw();
 		dxn_eror = this->normalize(dxn_eror);
 		
-		if(this->pick_litter and not this->picking_lit_wait  and abs(dxn_eror) < M_PI/6.0)
+		if(this->pick_litter and not this->picking_lit_wait)//just pick up when in range  and abs(dxn_eror) < M_PI/6.0)
 		{//pick litter that is within 30 degrees of robot yaw.
 			//cout<<" pick: "<<this->LitterName<<endl;
 			if(this->try_pick(this->LitterName))

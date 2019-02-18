@@ -6,7 +6,7 @@ if ((! hpc)); then
     skipRows=0
     resultFolder=NA_att_threshold_vs_robDist #NA-move100m
     lastPort=0
-    worldName=NoBound
+    worldName=Uniform_rad14_noBound
     ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 else

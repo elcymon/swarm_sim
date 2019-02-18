@@ -539,7 +539,7 @@ namespace gazebo
 					this->world->Reset();
 					// this->end_experiment = this->world_gov_experiment_control;
 				}
-				if(/*this->litter_in_nest >= this->litter_tot */ 
+				if(this->litter_in_nest >= this->litter_tot  
 					this->nest_distance_travelled >= this->max_nest_travel
 					or _info.simTime.sec >= this->exp_dur)// or st.sec >= 30)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 				{
@@ -613,7 +613,7 @@ namespace gazebo
 					}
 					std::cout<<s<<std::endl;
 					/End :: Test seen litter messages*/
-					if(/*this->litter_in_nest >= this->litter_tot or */
+					if(this->litter_in_nest >= this->litter_tot or 
 						this->nest_distance_travelled >= this->max_nest_travel
 						or st.sec >= this->exp_dur)//(true and this->no_litter) or  false and (st.sec >= 300 and st.nsec==0))
 					{
