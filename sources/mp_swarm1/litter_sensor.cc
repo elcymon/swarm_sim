@@ -179,8 +179,8 @@ void ModelVel::LitterSensor()
 	seen_litter_msg.set_string_value(my_name + ":" + to_string(this->seen_litter));
 	this->pub_seen_litter->Publish(seen_litter_msg);//Publish seen litter
 	
-	if(!litter_name.empty() and litter_distance < this->chassis_diameter/2.0)
-	{//Pick litter if the distance to litter is less than robot radius.
+	if(!litter_name.empty() and litter_distance <= this->lit_sensing)//this->chassis_diameter/2.0)
+	{//Pick litter if the distance to litter is less than robot sensing area.
 		this->LitterName = litter_name;
 		this->pick_litter = true;
 	}

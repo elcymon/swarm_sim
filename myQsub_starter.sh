@@ -3,10 +3,10 @@
 hpc=$1
 
 if ((! hpc)); then
-    skipRows=60
+    skipRows=30
     resultFolder=NA_bound_vs_nobound #NA-move100m
     lastPort=0
-    worldName=Uniform_100m
+    worldName=Uniform_100m_noBound
     ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 else
