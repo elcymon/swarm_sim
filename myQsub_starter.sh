@@ -14,7 +14,7 @@ else
 # investigating effect of using home signal to form boundary for swarm
     taskSize=60
     skipRows=0
-    resultFolder=NA_bound_vs_nobound #NA-move100m
+    resultFolder=NA_bound_vs_nobound_1m #NA-move100m
 
     lastPort=0
     worldName=Uniform_100m_noBound

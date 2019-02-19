@@ -294,7 +294,7 @@ namespace gazebo
 
 					if(this->yIt == this->yPoints.end()){
 						this->yIt = this->yPoints.begin();
-						this->xIt = this->yPoints.begin();
+						this->xIt = this->xPoints.begin();
 					}
 
 					this->goal_checkpoint.y = *(this->yIt);
