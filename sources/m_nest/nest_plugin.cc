@@ -399,16 +399,18 @@ namespace gazebo
 				//compute nest distance travelled
 				myPose.pos.z=0;
 				//increment total distance travelled
-				this->distance = this->distance + round(myPose.pos.Distance(this->prevPose.pos)*100)/100.0;
+				this->distance = this->distance + myPose.pos.Distance(this->prevPose.pos);
 				this->prevPose = myPose;//update prevpose to be used in next time step
 				
 				if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate ))//rate of 100Hz
 				{
 					this->log_timer = 0;
+					double dx = round(this->distance * 100.0) / 100.0;
+
 					std::string log_litter_count(to_string(_info.simTime.Double()));
 					log_litter_count += "," + to_string(this->litter_count.size()) +
 										"," + to_string(myPose.pos.x) + "," + to_string(myPose.pos.y) +
-										"," + to_string(myPose.rot.GetYaw()) + "," + to_string(this->distance)
+										"," + to_string(myPose.rot.GetYaw()) + "," + to_string(dx)
 										+ swarm_data.str();
 					msgs::Any b;
 					b.set_type(msgs::Any::STRING);

@@ -14,7 +14,7 @@ else
 # investigating effect of using home signal to form boundary for swarm
     taskSize=120
     skipRows=0
-    resultFolder=NA_M10_D50 #NA-move100m
+    resultFolder=NA_M10_D50n2 #NA-move100m
 
     lastPort=0
     worldName=Uniform_100m_noBound
@@ -25,7 +25,7 @@ else
     # qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     lastPort=$(($lastPort + $taskSize))
-    resultFolder=NA_M8_D1000
+    resultFolder=NA_M8_D1000n2
     skipRows=120
     worldName=Uniform_100m_noBound
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
