@@ -32,7 +32,6 @@ namespace gazebo
 			int mvStop;//delete
 			double desired_heading;
 			double nest_diameter;
-			gazebo::math::Pose startPose;//robot start location
 			double log_timer;
 			double max_step_size;
 			double log_rate;
@@ -48,8 +47,14 @@ namespace gazebo
 			std::vector<int>::iterator yIt;
 
 			gazebo::math::Vector3 goal_checkpoint;
+			//switch x and y then reverse points order
+			bool switchedXY;
 
-			
+			//keep track of distance travelled by nest
+			gazebo::math::Pose startPose;//robot start location
+			gazebo::math::Pose prevPose;
+			double distance;
+
 			// Pointer to the update event connection
 			 event::ConnectionPtr updateConnection;
 		
@@ -57,11 +62,14 @@ namespace gazebo
 		{
 			
 			//initialize exploration checkpoints
-			this->xPoints = {10,90,90, 10, 10, 90,90,10, 10, 90};
+			this->xPoints = {10,90,90, 10, 10, 90, 90, 10, 10, 90};
 			this->xIt = this->xPoints.begin();
 
-			this->yPoints = {10, 10,  30, 30,50, 50, 70, 70,90, 90};
+			this->yPoints = {10, 10,30, 30,50, 50, 70, 70, 90, 90};
 			this->yIt = this->yPoints.begin();
+
+			//initially  iterators are not switched
+			this->switchedXY = false;
 
 			
 			//Initialize the litter vector
@@ -228,6 +236,8 @@ namespace gazebo
 			this->log_timer = 0;//reset timer
 			this->startPose = this->nest_model->GetWorldPose();
 			this->startPose.pos.z = 0;//only interested in xy distance
+			this->prevPose = this->startPose;
+			this->distance = 0;//initialize distance travelled as zero
 
 			//log data header
 			std::stringstream swarm_data;
@@ -289,16 +299,37 @@ namespace gazebo
 
 				double checkpoint_dist = this->goal_checkpoint.Distance(myPose.pos);
 				if (checkpoint_dist < 0.05) {
-					this->yIt++;
-					this->xIt++;
 
-					if(this->yIt == this->yPoints.end()){
-						this->yIt = this->yPoints.begin();
-						this->xIt = this->xPoints.begin();
+					
+					if(this->switchedXY)
+					{//if switched, move in reverse order
+						this->yIt--;
+						this->xIt--;
+						if(this->yIt == this->xPoints.begin())
+						{//beginning of point reached. Switch again
+							this->switchedXY = false;
+							this->yIt = this->yPoints.begin();
+							this->xIt = this->xPoints.begin();
+						}
 					}
+					else{//correct motion through the points from beginning to end
+						this->yIt++;
+						this->xIt++;
 
+						if(this->yIt == this->yPoints.end()){
+							//switch points if end is reached
+							this->switchedXY = true;
+							this->yIt = this->xPoints.end();
+							this->xIt = this->yPoints.end();
+							//end is an invalid point, so decrement immediately
+							this->yIt--;
+							this->xIt--;
+						}
+					}
+					//update checkpoint
 					this->goal_checkpoint.y = *(this->yIt);
 					this->goal_checkpoint.x = *(this->xIt);
+					
 				}
 
 				//get next checkpoint pos
@@ -365,16 +396,19 @@ namespace gazebo
 				// 	this->headingControl(heading_error);
 				// }
 				
+				//compute nest distance travelled
+				myPose.pos.z=0;
+				//increment total distance travelled
+				this->distance = this->distance + round(myPose.pos.Distance(this->prevPose.pos)*100)/100.0;
+				this->prevPose = myPose;//update prevpose to be used in next time step
+				
 				if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate ))//rate of 100Hz
 				{
-					//compute nest distance travelled
-					myPose.pos.z=0;
-					double distance = round(myPose.pos.Distance(this->startPose.pos)*100)/100.0;
 					this->log_timer = 0;
 					std::string log_litter_count(to_string(_info.simTime.Double()));
 					log_litter_count += "," + to_string(this->litter_count.size()) +
 										"," + to_string(myPose.pos.x) + "," + to_string(myPose.pos.y) +
-										"," + to_string(myPose.rot.GetYaw()) + "," + to_string(distance)
+										"," + to_string(myPose.rot.GetYaw()) + "," + to_string(this->distance)
 										+ swarm_data.str();
 					msgs::Any b;
 					b.set_type(msgs::Any::STRING);

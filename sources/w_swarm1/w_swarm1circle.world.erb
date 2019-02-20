@@ -95,7 +95,7 @@
 	<!--create litter locations of 100 litter objects within 10m radius of nest-->
 	<!--theta = rand(0..2*Math::PI); dist = rand(2..radius);
 	lx = dist*Math.cos(theta) + x; ly = dist*Math.sin(theta) + y;-->
-	<%heap = [[0,0,100,100]]%>
+	<%heap = [[0,0,1000,99.9]]%>
 	<%
 	size = 0
 	lit = 1
@@ -104,7 +104,7 @@
 		 while lit <= size
 			dx = rand(0.0..1.0)*radius; dy = rand(0.0..1.0)*radius;
 			lx = dx + x; ly = dy + y;
-			if lx < 2 or ly < 2
+			if lx < 0 or ly < 0
 				next
 			end
 			%>
