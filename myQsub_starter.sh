@@ -3,26 +3,26 @@
 hpc=$1
 
 if ((! hpc)); then
-    skipRows=940
-    resultFolder=NA_Vel_M1-50_D1 #NA-move100m
+    skipRows=0
+    resultFolder=RW-NA0 #NA-move100m
     lastPort=0
-    worldName=NoBound
+    worldName=Uniform_100m_noBoundv0
     ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 else
 
 # investigating effect of using home signal to form boundary for swarm
-    taskSize=2250
+    taskSize=30
     skipRows=0
-    resultFolder=NA_Vel_M1-50_D1 #NAtD8_M6_D1000 #NA-move100m
+    resultFolder=RW-NA0 #NAtD8_M6_D1000 #NA-move100m
 
     lastPort=0
-    worldName=NoBound #Uniform_100m_noBound
+    worldName=Uniform_rad14_noBound #NoBound #Uniform_100m_noBound
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
-    # lastPort=$(($lastPort + $taskSize))
-    # worldName=SquareBound
-    # qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
+    lastPort=$(($lastPort + $taskSize))
+    worldName=Uniform_100m_noBoundv0
+    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     # lastPort=$(($lastPort + $taskSize))
     # resultFolder=NAtD10_M6_D1000

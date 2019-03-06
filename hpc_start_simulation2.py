@@ -28,6 +28,7 @@ world_db = {
 	'Uniform_rad14': '$PWD/sources/w_swarm1/world_db/20190218_uniform100_rad14.world',
 	'Uniform_rad14_noBound': '$PWD/sources/w_swarm1/world_db/20190218_uniform100_rad14_noBound.world',
 	'Uniform_100m':'$PWD/sources/w_swarm1/world_db/20190218_Uniform_Bound_100m.world',
+	'Uniform_100m_noBoundv0':'$PWD/sources/w_swarm1/world_db/20190218_Uniform_NoBoundv0_100m.world',
 	'Uniform_100m_noBound': '$PWD/sources/w_swarm1/world_db/20190218_Uniform_NoBound_100m.world',
 
 	'Uniform1000_100mBound': '$PWD/sources/w_swarm1/world_db/20190219_Uniform_Bound_100m_1000targets.world',
