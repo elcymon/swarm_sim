@@ -39,6 +39,7 @@ namespace gazebo
 			bool initialized;//nest initialized
 
 			gazebo::physics::Model_V robots;
+			gazebo::physics::Model_V litters;
 
 			//needed for to and fro exploration of nest
 			std::vector<int> xPoints;
@@ -102,6 +103,9 @@ namespace gazebo
 				std::string model_name = m->GetName();
 				if(model_name.find("m_4wrobot") != std::string::npos) {
 					this->robots.push_back(m);
+				}
+				else if (model_name.find("litter") != std::string::npos) {
+					this->litters.push_back(m);
 				}
 			}
 			// Listen to the update event. This event is broadcast every
@@ -241,11 +245,20 @@ namespace gazebo
 
 			//log data header
 			std::stringstream swarm_data;
+			
 			swarm_data << "t,litter_count,nest_x,nest_y,nest_yaw,nest_dst";
+			//robots header
 			for (auto robot : this->robots) {
 				std::string rName = robot->GetName();
 				swarm_data << "," << rName <<"_x," << rName << "_y," << rName << "_dst";
 			}
+
+			//targets/litter header
+			for (auto l : this->litters) {
+				std::string lName = l->GetName();
+				swarm_data << "," << lName << "_x," << lName << "_y";
+			}
+			
 
 			//intitialize first checkpoint
 			this->goal_checkpoint.z = 0;
@@ -370,6 +383,12 @@ namespace gazebo
 						//if obstruction is in front and less than nest diameter.
 						frontClear = false;
 					}
+				}
+
+				//litter/targets location data
+				for(auto l : this->litters) {
+					gazebo::math::Vector3 lPos = l->GetWorldPose().pos;
+					swarm_data << "," << lPos.x << "," << lPos.y;
 				}
 				if(frontClear) {
 					this->headingControl(heading_error);
