@@ -3,9 +3,9 @@
 hpc=$1
 
 if ((! hpc)); then
-    skipRows=4
+    skipRows=7
     resultFolder=Target-Loc
-    worldName=Uniform_100m_noBoundv0
+    worldName=Uniform_100m #_noBoundv0 
     ./hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
 else
@@ -19,10 +19,10 @@ else
     worldName=Uniform_100m_noBound #NoBound #Uniform_100m_noBound
     qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
-    skipRows=4
-    lastPort=$(($lastPort + $taskSize))
-    worldName=Uniform_rad14_noBound
-    qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
+    # skipRows=4
+    # lastPort=$(($lastPort + $taskSize))
+    # worldName=Uniform_rad14_noBound
+    # qsub hpc_qsub.sh $hpc $worldName $resultFolder $skipRows $lastPort
 
     # lastPort=$(($lastPort + $taskSize))
     # resultFolder=NAtD10_M6_D1000

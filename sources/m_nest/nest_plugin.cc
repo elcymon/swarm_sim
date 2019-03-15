@@ -63,10 +63,10 @@ namespace gazebo
 		{
 			
 			//initialize exploration checkpoints
-			this->xPoints = {0,100};//{10,90,90, 10, 10, 90, 90, 10, 10, 90};
+			this->xPoints = {10,90,90, 10, 10, 90, 90, 10, 10, 90};
 			this->xIt = this->xPoints.begin();
 
-			this->yPoints = {0,0};//{10, 10,30, 30,50, 50, 70, 70, 90, 90};
+			this->yPoints = {10, 10,30, 30,50, 50, 70, 70, 90, 90};
 			this->yIt = this->yPoints.begin();
 
 			//initially  iterators are not switched
