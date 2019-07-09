@@ -1,4 +1,4 @@
-
+### DO NOT USE THIS SHELL SCRIPT
 # Use current working directory and current modules
 #$ -cwd -V
 
