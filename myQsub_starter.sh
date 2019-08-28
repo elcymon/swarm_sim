@@ -4,7 +4,7 @@ hpc=$1
 if((! hpc)); then
     lastPort=0
     skipRows=0
-    ./hpc_qsub.sh $hpc OneCluster100m SR-Noise0-100pct-Q1-40-100m $skipRows $lastPort
+    ./hpc_qsub.sh $hpc OneCluster100m test-run $skipRows $lastPort
 else
     # # # SR and SA TESTS 100m World 2018-12-11
     # ##SR
