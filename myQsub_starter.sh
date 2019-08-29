@@ -4,7 +4,18 @@ hpc=$1
 if((! hpc)); then
     lastPort=0
     skipRows=0
-    ./hpc_qsub.sh $hpc OneCluster100m test-run $skipRows $lastPort
+    # ./hpc_qsub.sh $hpc OneCluster100m test-run $skipRows $lastPort
+    # ./hpc_qsub.sh $hpc OneCluster100m test-run 1 1
+    ./hpc_qsub.sh $hpc OneCluster100m test-run 2 2
+    
+    # ./hpc_qsub.sh $hpc Uniform100m test-run $skipRows $lastPort
+    # ./hpc_qsub.sh $hpc Uniform100m test-run 1 10
+    ./hpc_qsub.sh $hpc Uniform100m test-run 2 20
+    
+    # ./hpc_qsub.sh $hpc FourClusters100m test-run $skipRows $lastPort
+    # ./hpc_qsub.sh $hpc FourClusters100m test-run 1 100
+    ./hpc_qsub.sh $hpc FourClusters100m test-run 2 200
+    
 else
     # # # SR and SA TESTS 100m World 2018-12-11
     # ##SR
