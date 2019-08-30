@@ -182,7 +182,7 @@ namespace gazebo
 					this->max_step_size = std::stod(param_value_str);;
 				}
 				else if(param_name.compare("logPrefix") == 0){
-					gzdbg << param_value_str;
+					// gzdbg << param_value_str;
 					this->createFileNames(param_value_str);
 					this->logDetails(true,0);
 				}
