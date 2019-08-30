@@ -13,6 +13,8 @@
 #include <iostream> //needed in order to use cout
 #include <mutex>
 #include <unistd.h>
+#include <boost/filesystem.hpp>
+
 using namespace std;
 
 namespace gazebo
@@ -61,7 +63,7 @@ namespace gazebo
 				this->writeData(this->littersFile.str(),litterx);
 				this->writeData(this->littersFile.str(),littery);
 
-				this->writeData(this->nestFile.str(),"time,litterCount,tPlusProcessing");
+				this->writeData(this->nestFile.str(),"time,litterCount,pickedLitter");
 
 				string robotNames="names",robotPose="pose";
 				for (auto m : this->robots) {
@@ -76,12 +78,15 @@ namespace gazebo
 				string litterInfo = to_string(t);
 				string robotsInfo = to_string(t);
 				string nestInfo = to_string(t);
+				int pickedLitter = 0;
+
 				for (auto m : this->litters) {
-					if (m->GetWorldPose().pos.x < 100 and abs(m->GetWorldPose().pos.y) < 100) {
+					if (m->GetWorldPose().pos.x < 100 and abs(m->GetWorldPose().pos.y) < 100) {//yet to pick this litter
 						litterInfo += "," + to_string(1);
 					}
-					else {
+					else {//litter has been picked
 						litterInfo += "," + to_string(0);
+						pickedLitter++;
 					}
 				}
 				this->writeData(this->littersFile.str(),litterInfo);
@@ -95,7 +100,7 @@ namespace gazebo
 					robotsInfo += ",0.00";
 				}
 				this->writeData(this->robotsFile.str(),robotsInfo);
-				nestInfo += "," + to_string(this->numLitter) + "," + to_string(t);
+				nestInfo += "," + to_string(this->numLitter) + "," + to_string(pickedLitter);
 				this->writeData(this->nestFile.str(),nestInfo);
 
 			}
@@ -107,12 +112,10 @@ namespace gazebo
 									ss << x;
 									return ss.str();
 								}
-		public : void createFileNames() {
-			auto tt = std::time(nullptr);
-			auto ttm = *std::localtime(&tt);
-			this->littersFile << std::put_time(&ttm,"/home/elcymon/containers/icra2020-sim-csv/%Y-%m-%d-%H-%M-%S-littersFile.csv");
-			this->robotsFile << std::put_time(&ttm,"/home/elcymon/containers/icra2020-sim-csv/%Y-%m-%d-%H-%M-%S-robotsFile.csv");
-			this->nestFile << std::put_time(&ttm,"/home/elcymon/containers/icra2020-sim-csv/%Y-%m-%d-%H-%M-%S-nestFile.csv");
+		public : void createFileNames(string logPrefix) {
+			this->littersFile << logPrefix << "_littersFile.csv";
+			this->robotsFile << logPrefix << "_robotsFile.csv";
+			this->nestFile << logPrefix << "_nestFile.csv";
 
 
 		}
@@ -130,10 +133,10 @@ namespace gazebo
 		}
 		public : void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 		{
-			this->getModelsLitterRobot(_parent->GetWorld());
-			this->createFileNames();
 			
-			this->logDetails(true,0);
+			
+			this->getModelsLitterRobot(_parent->GetWorld());
+			
 			// this->logDetails(false,0);
 			this->numLitter = 0;
 			//Initialize the litter vector
@@ -177,6 +180,11 @@ namespace gazebo
 				else if(param_name.compare("max_step_size") == 0)
 				{
 					this->max_step_size = std::stod(param_value_str);;
+				}
+				else if(param_name.compare("logPrefix") == 0){
+					gzdbg << param_value_str;
+					this->createFileNames(param_value_str);
+					this->logDetails(true,0);
 				}
 				else
 				{
@@ -225,6 +233,7 @@ namespace gazebo
 			
 			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
 			{
+				
 				this->log_timer = 0;
 				std::string log_litter_count(to_string(_info.simTime.Double()));
 				log_litter_count += "," + to_string(this->litter_count.size());

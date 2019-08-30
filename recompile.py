@@ -36,15 +36,15 @@ def compile_plugins():
 		copy_np = subprocess.run("cp sources/m_nest/build/libnest_plugin.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 	print()
 
-	# print('compiling world governor')
-	# world_governor = subprocess.run("cd sources/world_governor/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
-	# if world_governor.returncode:
-	# 	print('*************world governor compilation failed')
-	# 	print(world_governor.stdout)
-	# else:
-	# 	print('world governor compilation successful')
-	# 	subprocess.run("rm world_governor",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
-	# 	copy_wg = subprocess.run("cp sources/world_governor/build/world_governor .",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	print('compiling world governor')
+	world_governor = subprocess.run("cd sources/world_governor/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	if world_governor.returncode:
+		print('*************world governor compilation failed')
+		print(world_governor.stdout)
+	else:
+		print('world governor compilation successful')
+		subprocess.run("rm world_governor",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+		copy_wg = subprocess.run("cp sources/world_governor/build/world_governor .",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 		#print(copy_wg.stderr)
 		
 
