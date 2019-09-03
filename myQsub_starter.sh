@@ -4,7 +4,7 @@ paramLine=$2
 experiment=RW-RAN0Q1-RAN100Q40
 
 if((! hpc)); then
-    ./hpc_qsub.sh $hpc OneCluster $experiment $paramLine 1$paramLine
+    # ./hpc_qsub.sh $hpc OneCluster $experiment $paramLine 1$paramLine
     
     # ./hpc_qsub.sh $hpc TwoClusters $experiment $paramLine 2$paramLine
     
@@ -22,7 +22,7 @@ if((! hpc)); then
     
     # ./hpc_qsub.sh $hpc HalfCluster100m $experiment $paramLine 44$paramLine
     
-    # ./hpc_qsub.sh $hpc Uniform100m $experiment $paramLine 55$paramLine
+    ./hpc_qsub.sh $hpc Uniform100m $experiment $paramLine 55$paramLine
 else
     qsub hpc_qsub.sh $hpc OneCluster $experiment $paramLine 1$paramLine
     
