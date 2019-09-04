@@ -1,7 +1,7 @@
 # testing simulation on local machine
 hpc=$1
 paramLine=$2
-experiment=RW-RAN0Q1-RAN100Q40
+experiment=Rep-Att-$3
 
 if((! hpc)); then
     # ./hpc_qsub.sh $hpc OneCluster $experiment $paramLine 1$paramLine

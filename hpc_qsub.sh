@@ -29,7 +29,7 @@
 #$ -t 1-30
 
 #Iterations in batch of
-#$ -tc 1
+#$ -tc 2
 
 
 #e-mail

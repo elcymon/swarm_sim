@@ -113,7 +113,7 @@ void CommModels::average_filter(std::deque<double> *signal, double *prev, double
     double total_magnitude = std::accumulate(signal->begin(), signal->end(), 0);//computes sum
     
     //update curr signal
-    *curr = total_magnitude / ((int) signal->size());
+    *curr = total_magnitude / std::distance(signal->begin(), signal->end());
     
     //clear contents
     signal->clear();
@@ -125,8 +125,8 @@ void CommModels::average_filter(std::deque<double> *signal, double *prev, double
 void CommModels::sliding_window_filter(std::deque<double> *signal, double *prev, double *curr){
     std::deque<double>::iterator middle = std::next(signal->begin(),signal->size() / 2);
 
-    *prev = std::accumulate(signal->begin(), middle - 1, 0) / (signal->size() / 2);
-    *curr = std::accumulate(middle, signal->end(), 0) / (signal->size() / 2);
+    *prev = std::accumulate(signal->begin(), middle - 1, 0) / std::distance(signal->begin(), middle - 1);
+    *curr = std::accumulate(middle, signal->end(), 0) / std::distance(middle, signal->end());
     
     signal->pop_front();//remove first measurement in list/queue
 }

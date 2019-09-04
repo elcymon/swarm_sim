@@ -14,12 +14,12 @@ int main() {
 
     for (int i = 1; i <= q * 10; i++) {
         double call = (double) i;
-        double repel = 2*call;
+        double repel = -2*call;
         double tStamp = call / q;
         averageFilter.update_comm_signals(call,repel,tStamp);
 
         //print values
-        if(i % q == 0 || true){
+        if(i % q == 0){
             std::cout<<i<<" "
                     <<"[call: "<<averageFilter.get_value("delta_call_signal")<<" = "
                     <<averageFilter.get_value("prev_call_signal")<<","
