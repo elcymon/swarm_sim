@@ -12,7 +12,7 @@ if((! hpc)); then
     
     # ./hpc_qsub.sh $hpc HalfCluster $experiment $paramLine 4$paramLine
     
-    # ./hpc_qsub.sh $hpc Uniform $experiment $paramLine 5$paramLine
+    ./hpc_qsub.sh $hpc Uniform $experiment $paramLine 5$paramLine
     
     # ./hpc_qsub.sh $hpc OneCluster100m $experiment $paramLine 11$paramLine
     
@@ -22,7 +22,7 @@ if((! hpc)); then
     
     # ./hpc_qsub.sh $hpc HalfCluster100m $experiment $paramLine 44$paramLine
     
-    ./hpc_qsub.sh $hpc Uniform100m $experiment $paramLine 55$paramLine
+    # ./hpc_qsub.sh $hpc Uniform100m $experiment $paramLine 55$paramLine
 else
     qsub hpc_qsub.sh $hpc OneCluster $experiment $paramLine 1$paramLine
     
