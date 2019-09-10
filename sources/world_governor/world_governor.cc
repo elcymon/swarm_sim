@@ -38,6 +38,8 @@
 
 #include <vector>
 
+#include <boost/filesystem.hpp>
+
 std::mutex mutex1;
 //#include <gazebo/Server.hh>
 
@@ -49,7 +51,7 @@ std::string folder_name = "";//initialize directory to save results
 std::string start_time = "";
 std::string end_time = "";
 std::string prefix = "";
-std::string prefix1,prefix2;
+ostringstream startTime;
 std::string sim_data; //used to store simulation parameters
 std::string algorithmID = "";
 int algorithm_index = 0;
@@ -82,13 +84,13 @@ void topic_model_log_cb(ConstAnyPtr &any)
 {std::lock_guard<std::mutex> lock(mutex1);
 		time(&message_time);
 	
-		std::string log = any->string_value();
+		// std::string log = any->string_value();
 		
-		std::size_t pos = log.find(":");
-		std::string robot_name = log.substr(0,pos);
-		ofstream myfile(folder_name + prefix +"_"+ robot_name+".txt",std::ios::app|std::ios::ate);
-		myfile << log<<std::endl;
-		myfile.close();
+		// std::size_t pos = log.find(":");
+		// std::string robot_name = log.substr(0,pos);
+		// ofstream myfile(folder_name + prefix +"_"+ robot_name+".txt",std::ios::app|std::ios::ate);
+		// myfile << log<<std::endl;
+		// myfile.close();
 	
 }
 void litter_in_nest_cb(ConstAnyPtr &any)
@@ -96,17 +98,17 @@ void litter_in_nest_cb(ConstAnyPtr &any)
 	std::lock_guard<std::mutex> lock(mutex1);
 	time(&message_time);
 	//if(start_sim)
-	{
-		std::string lit_count = any->string_value();
-		std::size_t pos = lit_count.find(",");
-		std::string time_string = lit_count.substr(0,pos);
-		double curr_time = std::stod(time_string);
+	// {
+	// 	std::string lit_count = any->string_value();
+	// 	std::size_t pos = lit_count.find(",");
+	// 	std::string time_string = lit_count.substr(0,pos);
+	// 	double curr_time = std::stod(time_string);
 
-		sim_time = curr_time;
-		ofstream myfile2(folder_name + prefix + "_litter_count.txt",std::ios::app|std::ios::ate);
-		myfile2 <<lit_count<<std::endl;
-		myfile2.close();
-	}
+	// 	sim_time = curr_time;
+	// 	ofstream myfile2(folder_name + prefix + "_litter_count.txt",std::ios::app|std::ios::ate);
+	// 	myfile2 <<lit_count<<std::endl;
+	// 	myfile2.close();
+	// }
 }
 void start_sim_cb(ConstAnyPtr &any)
 {//detect when a new experiment starts and name file appropriately
@@ -141,13 +143,12 @@ void experiment_control_cb(ConstAnyPtr &any)
 	ofstream myfile2(folder_name + "readme.md",std::ios::app|std::ios::ate);
 	if(data.compare("end") !=0)
 	{
-		ttm = *std::localtime(&tt);
 		ostringstream si1;
-		si1 <<algorithm_index<<"-"<<algorithmID<< std::put_time(&ttm,"-%Y-%m-%d--%H-%M-%S");
+		si1 << algorithm_index << "-" << algorithmID << "-" << startTime.str();
 		prefix = si1.str();
 		si1.str("");
 		si1.clear();
-		si1 << data << std::put_time(&ttm,",start_time:%Y-%m-%d--%H-%M-%S");
+		si1 << data << ",start_time:" << startTime.str();
 		sim_data = si1.str();//data ;
 		
 		// myfile2 //<<std::put_time(&ttm,"end_time:%Y-%m-%d--%H-%M-%S\n")
@@ -166,6 +167,50 @@ void experiment_control_cb(ConstAnyPtr &any)
 /////////////////////////////////////////////////
 int main(int _argc, char **_argv)
 {
+	std::string simulationFolder = _argv[1];
+	paramLine = std::stoi(_argv[2]);
+	int sge_task_id = std::stoi(_argv[3]);
+
+	//set up folder name to save results
+	boost::filesystem::path full_path(boost::filesystem::current_path());
+	// gzdbg << full_path << std::endl;
+
+	ostringstream si1;
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+	si1 << std::put_time(&tm,"%Y-%m-%d-");
+	
+	folder_name =  full_path.string() + "/results/" + si1.str()+ simulationFolder + "/";
+	
+	const char *mk_dir = folder_name.c_str();
+	
+	int a = mkdir("results", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	if (a==0 or errno==EEXIST)
+	{
+		if(mkdir(mk_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
+		{
+			if(errno==EEXIST){
+				//already exists
+				std::cout<<folder_name<<" already exists"<<endl;
+			}
+			else {
+				std::cout<<"cannot create: "<<folder_name<<" errno: "<<errno<<endl;
+				exit(errno);
+			}
+		}
+		// ofstream myfilex(folder_name + "readme.md",std::ios::app|std::ios::ate);
+		// myfilex <<"\n**************\n"
+		// 		  <<"New Experiment"
+		// 		<<"\n**************\n";
+		// myfilex.close();
+	}
+	else
+	{
+		std::cout<<"something went wrong while creating results folder. Errno = "<<errno<<endl;
+		exit(errno);
+	}
+	
+	
 	//Read params.csv file:
 	//All params to be simulated are stored in a vector
 	vector<string> my_params;
@@ -177,7 +222,6 @@ int main(int _argc, char **_argv)
 	myfile.open("params/params.csv");
 	if(myfile.is_open()){
 		getline(myfile,header);
-		paramLine = std::stoi(_argv[2]);
 		int paramCounter = 0;
 		while(getline(myfile,line)){
 			paramCounter++;
@@ -185,6 +229,7 @@ int main(int _argc, char **_argv)
 				size_t hsep1 = 0, hsep2 = 0, psep1 = 0, psep2 = 0;
 				string hparam, param_value;
 				string param_line = "";
+
 				while(header.find(",",hsep1) != string::npos and
 						line.find(",",psep1) != string::npos)
 				{
@@ -198,7 +243,14 @@ int main(int _argc, char **_argv)
 					psep1 = psep2 + 1;
 
 					if(hparam.compare("ID") == 0){
+
 						algorithmID = param_value;
+						//set up start time for the experiment
+						auto logT = *std::localtime(&tt);
+						startTime << std::put_time(&logT,"%Y-%m-%d-%H-%M-%S");
+						std::ostringstream sge_task_id_stream;
+						sge_task_id_stream << std::setfill('0') << std::setw(3) << sge_task_id;
+						param_line += "logPrefix:" + folder_name + algorithmID + "_" + sge_task_id_stream.str() + "_" + startTime.str()+ ",";
 					}
 				}
 				my_params.push_back(param_line);
@@ -229,40 +281,7 @@ int main(int _argc, char **_argv)
 	}
 
 
-	//set up folder name to save results
-	ostringstream si1;
-	auto t = std::time(nullptr);
-	auto tm = *std::localtime(&t);
-	si1 << std::put_time(&tm,"%Y-%m-%d-");
 	
-	folder_name =  "./results/" + si1.str()+ _argv[1] + "/";
-	const char *mk_dir = folder_name.c_str();
-	
-	int a = mkdir("results", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	if (a==0 or errno==EEXIST)
-	{
-		if(mkdir(mk_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
-		{
-			if(errno==EEXIST){
-				//already exists
-				std::cout<<folder_name<<" already exists"<<endl;
-			}
-			else {
-				std::cout<<"cannot create: "<<folder_name<<" errno: "<<errno<<endl;
-				exit(errno);
-			}
-		}
-		// ofstream myfilex(folder_name + "readme.md",std::ios::app|std::ios::ate);
-		// myfilex <<"\n**************\n"
-		// 		  <<"New Experiment"
-		// 		<<"\n**************\n";
-		// myfilex.close();
-	}
-	else
-	{
-		std::cout<<"something went wrong while creating results folder. Errno = "<<errno<<endl;
-		exit(errno);
-	}
 		
 	
 	

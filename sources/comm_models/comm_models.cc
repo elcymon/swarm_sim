@@ -79,9 +79,16 @@ void CommModels::update_comm_signals(double call_comm, double repel_comm, double
 
     if( (int) this->time_stamp.size() >= this->queue_size ) {
         //compute signal intensitites
-        this->average_filter(&(this->call_queue), &(this->prev_call_signal), &(this->curr_call_signal));
-        this->average_filter(&(this->repel_queue), &(this->prev_repel_signal), &(this->curr_repel_signal));
-        this->time_stamp.clear();//clear time (done for average filter only)
+        if ((this->filter_type).compare("average_filter") == 0){
+            this->average_filter(&(this->call_queue), &(this->prev_call_signal), &(this->curr_call_signal));
+            this->average_filter(&(this->repel_queue), &(this->prev_repel_signal), &(this->curr_repel_signal));
+            this->time_stamp.clear();//clear time (done for average filter only)
+        }
+        else if ((this->filter_type).compare("sliding_window_filter") == 0) {
+            this->sliding_window_filter(&(this->call_queue), &(this->prev_call_signal), &(this->curr_call_signal));
+            this->sliding_window_filter(&(this->repel_queue), &(this->prev_repel_signal), &(this->curr_repel_signal));
+            this->time_stamp.pop_front();
+        }
         //compute gradients
         this->delta_call_signal = this->curr_call_signal - this->prev_call_signal;
         this->delta_repel_signal = this->curr_repel_signal - this->prev_repel_signal;
@@ -103,17 +110,23 @@ void CommModels::average_filter(std::deque<double> *signal, double *prev, double
     *prev = *curr;
 
     //compute average
-    double total_magnitude = 0;
-    for (std::deque<double>::iterator it = signal->begin(); it != signal->end(); it++) {
-        total_magnitude += *it;
-    }
+    double total_magnitude = std::accumulate(signal->begin(), signal->end(), 0);//computes sum
     
     //update curr signal
-    *curr = total_magnitude / ((int) signal->size());
+    *curr = total_magnitude / std::distance(signal->begin(), signal->end());
     
     //clear contents
     signal->clear();
     
 
 
+}
+
+void CommModels::sliding_window_filter(std::deque<double> *signal, double *prev, double *curr){
+    std::deque<double>::iterator middle = std::next(signal->begin(),signal->size() / 2);
+
+    *prev = std::accumulate(signal->begin(), middle - 1, 0) / std::distance(signal->begin(), middle - 1);
+    *curr = std::accumulate(middle, signal->end(), 0) / std::distance(middle, signal->end());
+    
+    signal->pop_front();//remove first measurement in list/queue
 }

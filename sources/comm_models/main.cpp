@@ -9,12 +9,12 @@ int main() {
     //needed for testing the features of CommModels Class
     int q = 40;
     CommModels averageFilter;
-    averageFilter = CommModels(q, "average_filter");
+    averageFilter = CommModels(q, "sliding_window_filter");
     
 
     for (int i = 1; i <= q * 10; i++) {
         double call = (double) i;
-        double repel = - call * 2;
+        double repel = -2*call;
         double tStamp = call / q;
         averageFilter.update_comm_signals(call,repel,tStamp);
 

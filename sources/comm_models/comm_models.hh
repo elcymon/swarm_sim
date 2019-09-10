@@ -3,6 +3,8 @@
     #include <iostream>
     #include <string>
     #include <deque>
+    #include <numeric>
+    #include <iterator>
 #endif
 
 class CommModels {

@@ -6,9 +6,15 @@
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 //#include <gazebo/sdf/sdf.hh>
+#include <fstream>
+#include <ctime>
+#include <time.h>
+#include <sstream>
 #include <iostream> //needed in order to use cout
 #include <mutex>
 #include <unistd.h>
+#include <boost/filesystem.hpp>
+
 using namespace std;
 
 namespace gazebo
@@ -17,6 +23,7 @@ namespace gazebo
 	{
 		private:
 			std::vector<std::string> litter_count;
+			int numLitter;
 			transport::NodePtr node;
 			transport::SubscriberPtr sub;
 			transport::PublisherPtr pub;
@@ -28,12 +35,110 @@ namespace gazebo
 			double max_step_size;
 			double log_rate;
 			bool start_sim;
+
+			physics::Model_V litters;
+			physics::Model_V robots;
+			ostringstream littersFile,robotsFile,nestFile;
 			
 			// Pointer to the update event connection
 			 event::ConnectionPtr updateConnection;
-		
+		public: void writeData(string fileName,string data) {
+			ofstream myfile(fileName,std::ios::app|std::ios::ate);
+			myfile << data << std::endl;
+			myfile.close();
+		}
+		public : void logDetails(bool header,int t) {
+			ostringstream timeStepData;
+			if (header) {
+				string litterNames = "name",litterx = "x",littery = "y";
+				for (auto m : this->litters){
+					litterNames += "," + m->GetName();
+					litterx += "," + to_string(m->GetWorldPose().pos.x);
+					littery += "," + to_string(m->GetWorldPose().pos.y);
+				}
+				// ofstream myfile(this->littersFile,std::ios::app|std::ios::ate);
+				this->writeData(this->littersFile.str(),litterNames);
+				// gzdbg << litterNames <<std::endl;
+				// gzdbg << this->littersFile.str() <<std::endl;
+				this->writeData(this->littersFile.str(),litterx);
+				this->writeData(this->littersFile.str(),littery);
+
+				this->writeData(this->nestFile.str(),"time,litterCount,pickedLitter");
+
+				string robotNames="names",robotPose="pose";
+				for (auto m : this->robots) {
+					robotNames += "," + m->GetName() + "," + m->GetName() + "," + m->GetName() + "," + m->GetName();
+					robotPose += ",x,y,yaw,litterCount";
+				}
+				this->writeData(this->robotsFile.str(),robotNames);
+				this->writeData(this->robotsFile.str(),robotPose);
+				this->writeData(this->robotsFile.str(),"time");
+			}
+			else {
+				string litterInfo = to_string(t);
+				string robotsInfo = to_string(t);
+				string nestInfo = to_string(t);
+				int pickedLitter = 0;
+
+				for (auto m : this->litters) {
+					if (m->GetWorldPose().pos.x < 100 and abs(m->GetWorldPose().pos.y) < 100) {//yet to pick this litter
+						litterInfo += "," + to_string(1);
+					}
+					else {//litter has been picked
+						litterInfo += "," + to_string(0);
+						pickedLitter++;
+					}
+				}
+				this->writeData(this->littersFile.str(),litterInfo);
+
+				for (auto m : this->robots) {
+					math::Vector3 pos = m->GetWorldPose().pos;
+					math::Quaternion rot = m->GetWorldPose().rot;
+					robotsInfo += "," + this->setNumDP(pos.x,3);
+					robotsInfo += "," + this->setNumDP(pos.y,3);
+					robotsInfo += "," + this->setNumDP(rot.GetYaw(),3);
+					robotsInfo += ",0.00";
+				}
+				this->writeData(this->robotsFile.str(),robotsInfo);
+				nestInfo += "," + to_string(this->numLitter) + "," + to_string(pickedLitter);
+				this->writeData(this->nestFile.str(),nestInfo);
+
+			}
+		}
+		public : string setNumDP(const double x, const int decDigits) {
+									stringstream ss;
+									ss << fixed;
+									ss.precision(decDigits); // set # places after decimal
+									ss << x;
+									return ss.str();
+								}
+		public : void createFileNames(string logPrefix) {
+			this->littersFile << logPrefix << "_littersFile.csv";
+			this->robotsFile << logPrefix << "_robotsFile.csv";
+			this->nestFile << logPrefix << "_nestFile.csv";
+
+
+		}
+		public: void getModelsLitterRobot(const physics::WorldPtr world) {
+			physics::Model_V all_models = world->GetModels();
+			for(auto m : all_models) {
+				string m_name = m->GetName();
+				if (m_name.find("m_4wrobot") != string::npos) {
+					this->robots.push_back(m);
+				}
+				else if (m_name.find("litter") != string::npos) {
+					this->litters.push_back(m);
+				}
+			}
+		}
 		public : void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 		{
+			
+			
+			this->getModelsLitterRobot(_parent->GetWorld());
+			
+			// this->logDetails(false,0);
+			this->numLitter = 0;
 			//Initialize the litter vector
 			
 			//create a subscriber to subscribe to the litter topic
@@ -75,6 +180,11 @@ namespace gazebo
 				else if(param_name.compare("max_step_size") == 0)
 				{
 					this->max_step_size = std::stod(param_value_str);;
+				}
+				else if(param_name.compare("logPrefix") == 0){
+					// gzdbg << param_value_str;
+					this->createFileNames(param_value_str);
+					this->logDetails(true,0);
 				}
 				else
 				{
@@ -123,13 +233,16 @@ namespace gazebo
 			
 			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
 			{
+				
 				this->log_timer = 0;
 				std::string log_litter_count(to_string(_info.simTime.Double()));
 				log_litter_count += "," + to_string(this->litter_count.size());
+				this->numLitter =  (int) this->litter_count.size();
 				msgs::Any b;
 				b.set_type(msgs::Any::STRING);
 				b.set_string_value(log_litter_count);
 				this->pub->Publish(b);
+				this->logDetails(false,st.sec);
 			}
 			
 			if(this->log_timer > this->log_rate)

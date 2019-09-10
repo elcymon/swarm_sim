@@ -190,7 +190,7 @@ void ModelVel::LitterSensor()
 	}
 	msgs::Any seen_litter_msg;
 	seen_litter_msg.set_type(msgs::Any::STRING);
-	seen_litter_msg.set_string_value(my_name + ":" + to_string(this->seen_litter));
+	seen_litter_msg.set_string_value(my_name + ":" + to_string(this->seen_litter - (this->capacity - this->litter_count)));
 	this->pub_seen_litter->Publish(seen_litter_msg);//Publish seen litter
 	
 	if(!litter_name.empty() and litter_distance < this->chassis_diameter/2.0)

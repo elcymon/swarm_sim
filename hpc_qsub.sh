@@ -26,10 +26,10 @@
 #$ -l h_rt=2:0:0
 
 #Iterations
-#$ -t 1-720
+#$ -t 1-30
 
 #Iterations in batch of
-#$ -tc 20
+#$ -tc 2
 
 
 #e-mail
@@ -43,7 +43,7 @@
 hpc=$1 # true if working on hpc false otherwise
 if ((hpc)); then
     module load singularity
-    folder=/nobackup/scsoo
+    folder=$PWD
 else
     folder=.
     JOB_ID=123
@@ -59,13 +59,11 @@ world_name=$2
 #experiment is used to know which parameter you are investigating
 experiment=$3
 #how many rows of parameters should be ignored us 0 if none
-row_shift=$4
-#the previous SGE_TASK_ID maximum value
-prev_ID_end=$5
-line_number=$(($SGE_TASK_ID + $row_shift))
+paramLine=$4
+
 #there should be no repetition of server port or else they will overwrite each other. Adding 1 just to be safe
-port_number=$(($SGE_TASK_ID + $prev_ID_end + 1))
-echo world_name: $world_name, experiment: $experiment, row_shift: $row_shift, prev_ID_end: $prev_ID_end, line_number: $line_number, port_number: $port_number
+port_number=$(($SGE_TASK_ID + $5 + 1))
+echo world_name: $world_name, experiment: $experiment, row_shift: $row_shift, paramLine: $paramLine, port_number: $port_number
 mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 
-singularity exec --bind $folder/results:$PWD/results,$folder/results:$folder/swarm_sim*/results,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $line_number $port_number
+singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $paramLine $SGE_TASK_ID $port_number

@@ -41,7 +41,7 @@ namespace gazebo
 			std::map<std::string,transport::PublisherPtr> pub_commSignal;
 			//std::map<std::string,transport::PublisherPtr> pub_attraction;
 			
-			std::map<std::string,int> seen_litter_map;
+			std::map<std::string,int> extra_litter_map;
 			gazebo::transport::SubscriberPtr sub_seen_litter;//Models publish seen litter to this topic
 			
 			std::map<std::string,std::string> robot_status_map;
@@ -196,7 +196,7 @@ namespace gazebo
 						this->robot_ptr.push_back(m);
 						this->pub_commSignal[model_name] = this->node->Advertise<msgs::Any>("/"+model_name+"/comm_signal");
 						//this->pub_attraction[model_name] = this->node->Advertise<msgs::Any>("/"+model_name+"/attract_signal");
-						this->seen_litter_map[model_name] = 0;
+						this->extra_litter_map[model_name] = 0;
 						this->robot_status_map[model_name] = "searching";
 					}
 					
@@ -257,7 +257,7 @@ namespace gazebo
 				std::string model_name = seen_litter_msg.substr(0,n_loc);
 				int seen_litter_num = std::stoi(seen_litter_msg.substr(n_loc+1));
 				//update appropriate model with it's seen litter
-				this->seen_litter_map[model_name] = seen_litter_num;
+				this->extra_litter_map[model_name] = seen_litter_num;
 			}
 			
 			void robot_status_cb(ConstAnyPtr &any)
@@ -547,7 +547,7 @@ namespace gazebo
 					
 					/*/Start::Testing Seen litter messages
 					std::string s="";
-					for(auto it = this->seen_litter_map.begin(); it != this->seen_litter_map.end();it++)
+					for(auto it = this->extra_litter_map.begin(); it != this->extra_litter_map.end();it++)
 					{
 						s = s + it->first + ":" + to_string(it->second) + ",";
 					}
@@ -594,7 +594,7 @@ namespace gazebo
 								math::Vector3 n_pos = n->GetWorldPose().pos;
 								
 								std::string n_status = this->robot_status_map[n_name];
-								int n_seen_litter = this->seen_litter_map[n_name];
+								int n_extra_litter = this->extra_litter_map[n_name];
 								
 								
 								//std::cout<<n_name<<" "<<n_status<<std::endl;
@@ -660,9 +660,9 @@ namespace gazebo
 												rep_data = rep_data + "," + to_string(dist);
 											}
 											
-											if(n_seen_litter >= this->lit_threshold)//If seen litter is greater than 5, send an attraction signal
+											if(n_extra_litter > 0)//If seen litter is greater than space left, send an attraction signal
 											{
-												//cout<<"n_seen_litter:"<<n_seen_litter<<" this->lit_threshold:"<<this->lit_threshold<<endl;
+												//cout<<"n_extra_litter:"<<n_extra_litter<<" this->lit_threshold:"<<this->lit_threshold<<endl;
 												att_neighbours += 1;
 												double attraction_intensity = 0;
 												if(this->com_model.compare("linear") == 0){
