@@ -6,15 +6,15 @@ def compile_plugins():
 	copy_rp=None
 	copy_np=None
 	copy_wg=None
-	# print('compiling world plugin')
-	# world_plugin = subprocess.run("cd sources/w_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
-	# if world_plugin.returncode:
-	# 	print('************world plugin compilation failed')
-	# 	print(world_plugin.stderr)
-	# else:
-	# 	print('world plugin compilation successful')
-	# 	copy_wp = subprocess.run("cp sources/w_swarm1/build/libwp_swarm1.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
-	# print()
+	print('compiling world plugin')
+	world_plugin = subprocess.run("cd sources/w_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	if world_plugin.returncode:
+		print('************world plugin compilation failed')
+		print(world_plugin.stderr)
+	else:
+		print('world plugin compilation successful')
+		copy_wp = subprocess.run("cp sources/w_swarm1/build/libwp_swarm1.so ./compiled_plugins",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+	print()
 
 	print('compiling robot plugin')
 	robot_plugin = subprocess.run("cd sources/mp_swarm1/build;rm -rf *;cmake ../;make",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)

@@ -125,6 +125,12 @@ namespace gazebo
 			std::set<std::string> litter_db;
 			gazebo::math::Pose litter_dump_site;
 			bool no_litter;
+			physics::Model_V myLitterDB;//list of litter this robot can detect
+			std::string visionModel;
+			double detectionProbability;
+			transport::PublisherPtr pub_myDetectedLitterNames;
+			transport::PublisherPtr pub_myDetectableLitters;
+
 			
 			bool go_home;
 			bool at_home;

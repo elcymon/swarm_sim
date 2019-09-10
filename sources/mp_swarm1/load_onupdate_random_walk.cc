@@ -66,6 +66,9 @@ void ModelVel::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	//*********************************************************************//
 	
 	this->pub_litter = this->node->Advertise<msgs::Any>("/litter_deposits");
+	this->pub_myDetectedLitterNames = this->node->Advertise<msgs::Any>("/robotDetectedLitterNames");
+	this->pub_myDetectableLitters = this->node->Advertise<msgs::Any>("/robotDetectableLitterNames");
+	
 	this->litter_dump_site = gazebo::math::Pose(1000.0,1000.0, 0.0, 0.0, 0.0, 0.0);
 	/*
 	gazebo::physics::Model_V all_models = this->world->GetModels();
@@ -299,6 +302,14 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			this->filter_type = param_value_str;
 		}
+		else if(param_name.compare("visionModel") == 0)
+		{
+			this->visionModel = param_value_str;
+		}
+		else if(param_name.compare("detectionProbability") == 0)
+		{
+			this->detectionProbability = std::stod(param_value_str);
+		}
 		else
 		{
 			//std::cout<<temp<<"::"<<value<<std::endl;
@@ -308,25 +319,6 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	//litter processing variables
 	this->picking_lit_wait = false;
 	this->pick_lit_time = 0;
-	//int seed = rand();// std::stoi((this->model->GetName()).substr(9));
-	//std::cout<<seed<<endl;
-	/*this->nei_sensing = 5;//neighbour sensirng range
-	this->lit_sensing = 2;//litter sensing range
-	this->rVel  = 5; //robot velocity value represents angular velocity of wheel joint
-	this->turn_prob = 0.0001;//probability of making a turn during random walk
-	this->abandon_prob = 0.5;//probability of abandoning a litter when blocked by another robot
-	this->capacity = 3; 									//Max litter_count to pick================3,5
-	this->umin = 0.0;
-	this->umax = 1.0;//minimum and maximum for uniform distribution
-	// Normalize value within code
-	this->n_stddev = M_PI/2.0;//stamdard deviation of 90degs
-	this->n_mean = M_PI;//mean of 180 degs
-	 this->escape_dist = 1;*/
-	//----------------END: PARAMTERS THAT VARY BETWEEN DIFFERENT SIMULATIONS----------
-	
-	
-	//this->com_sig_set.clear();
-	//this->cummulative_sig = 0;
 	
 	//Reset litter capacity
 	this->litter_db.clear();
@@ -334,8 +326,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->Kp = 10*this->rVel;
 	this->no_litter = false;
 	//*****************************************/
-	//******dropping litter handlers***********/
-	//*****************************************/
+	
 	//***********Explore environment with random turn
 	this->turn_complete = true;
 	this->turn_set = false;
@@ -417,6 +408,32 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->t_oa_homing = 0;
 
 	this->timeStamp = 0;//initialize time stamp to zero
+
+	//****** populate litter database based on visionModel and detection Probability***//
+	std::string detectableLitters = (this->ModelName).substr(9) + ":";
+	for (auto m : this->world->GetModels())
+	{
+		std::string m_name = m->GetName();
+		if (m_name.find("litter") != std::string::npos && //only handle detections of litter objects
+			  ((this->visionModel).compare("instantaneous") == 0 || //instantaneous based detection will be done at runtime of simulation
+
+			    ((this->visionModel).compare("initialization") == 0 && //initialization based will filter out litter that robot can detect
+			      this->uform_rand(this->generator) <= this->detectionProbability
+				)
+			  )
+		   )
+		{
+			this->myLitterDB.push_back(m);
+			detectableLitters += m->GetName() + ",";
+		}
+	}
+	msgs::Any detectableLitterMsg;
+	detectableLitterMsg.set_type(msgs::Any::STRING);
+	detectableLitterMsg.set_string_value(detectableLitters);
+	this->pub_myDetectableLitters->Publish(detectableLitterMsg);
+
+	//*********************************************************************************//
+	
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)

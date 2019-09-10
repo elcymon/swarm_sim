@@ -18,6 +18,26 @@
 using namespace std;
 namespace gazebo
 {
+	struct LitterInfo {
+		physics::ModelPtr litterModel;
+		int numberOfDetections;
+		bool picked;
+		std::string detectableBy;
+		LitterInfo()
+		: litterModel(nullptr), numberOfDetections(0), picked(false),detectableBy("")
+		{}
+		LitterInfo(physics::ModelPtr model)
+		: litterModel(model), numberOfDetections(0), picked(false),detectableBy("")
+		{}
+		void updateDetectableBy(std::string robotID)
+		{
+			if ((this->detectableBy).empty())
+				this->detectableBy += robotID;
+			else
+				this->detectableBy += ";" + robotID;
+		}
+	};
+
 	class WP_Swarm1 : public WorldPlugin
 	{
 		//Pointer to the update event connection
@@ -45,6 +65,11 @@ namespace gazebo
 			gazebo::transport::SubscriberPtr sub_seen_litter;//Models publish seen litter to this topic
 			
 			std::map<std::string,std::string> robot_status_map;
+			std::map<std::string,LitterInfo> litterNumberOfDetections;
+			transport::SubscriberPtr sub_robotDetectedLitterNames;
+			transport::SubscriberPtr sub_robotDetectableLitters;
+			std::string logPrefix;
+
 			gazebo::transport::SubscriberPtr sub_robot_status;//Models publish their status to this sub
 			
 			gazebo::transport::PublisherPtr pub_repel_signal;
@@ -207,8 +232,12 @@ namespace gazebo
 						this->litter_ptr.push_back(m);
 						all_litter_pos = all_litter_pos + to_string(lit_loc.x) + ","
 														+ to_string(lit_loc.y) + ":";
+						this->litterNumberOfDetections[model_name] = LitterInfo(m);
 					}
 				}
+				this->sub_robotDetectedLitterNames = this->node->Subscribe("/robotDetectedLitterNames", &WP_Swarm1::cb_robotDetectedLitterNames, this);
+				this->sub_robotDetectableLitters = this->node->Subscribe("/robotDetectableLitterNames", &WP_Swarm1::cb_robotDetectableLitters, this);
+				
 				msgs::Any all_litter_pos_msg;
 				all_litter_pos_msg.set_type(msgs::Any::STRING);
 				all_litter_pos_msg.set_string_value(all_litter_pos);
@@ -240,6 +269,43 @@ namespace gazebo
 				this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 							boost::bind(&WP_Swarm1::OnUpdate,this,_1));
 				// std::cout<<"world loaded"<<std::endl;
+			}
+			void cb_robotDetectedLitterNames(ConstAnyPtr &any)
+			{
+				std::lock_guard<std::mutex> lock(this->mutex);
+				std::string detectionStr = any->string_value();
+				while(detectionStr.find(",") != std::string::npos)
+				{
+					std::size_t nameLoc = detectionStr.find(",");
+					std::string litterName = detectionStr.substr(0,nameLoc);
+					if (litterName.find("litter") != std::string::npos)
+					{
+						(this->litterNumberOfDetections[litterName]).numberOfDetections += 1;
+
+					}
+					detectionStr = detectionStr.substr(nameLoc + 1);
+				}
+			}
+			void cb_robotDetectableLitters(ConstAnyPtr &any)
+			{
+				std::lock_guard<std::mutex> lock(this->mutex);
+				std::string detectabilityStr = any->string_value();
+				
+				std::size_t robIDloc = detectabilityStr.find(":");
+				std::string robotID = detectabilityStr.substr(0,robIDloc);
+				detectabilityStr = detectabilityStr.substr(robIDloc + 1);
+
+				while(detectabilityStr.find(",") != std::string::npos)
+				{
+					std::size_t nameLoc = detectabilityStr.find(",");
+					std::string litterName = detectabilityStr.substr(0,nameLoc);
+					if (litterName.find("litter") != std::string::npos)
+					{
+						(this->litterNumberOfDetections[litterName]).updateDetectableBy(robotID);
+
+					}
+					detectabilityStr = detectabilityStr.substr(nameLoc + 1);
+				}
 			}
 			void litter_in_nest_cb(ConstAnyPtr &any)
 			{
@@ -273,7 +339,12 @@ namespace gazebo
 				
 				//std::cout<<model_name<<" "<<robot_status<<std::endl;
 			}
-			
+			// void logDetectionDetails(string litterName,int numberOfDetections,bool picked)
+			// {
+			// 	ofstream detectionDetails(this->logPrefix + "_litterDetectionDetails.csv",std::ios::app|std::ios::ate);
+			// 	detectionDetails << litterName << "," << numberOfDetections << "," << picked << std::endl;
+			// 	detectionDetails.close();
+			// }
 			void my_Init()
 			{
 				// std::cout<<"Init called"<<std::endl;
@@ -400,6 +471,10 @@ namespace gazebo
 						physicsMsg.set_max_step_size(value);
 						this->physicsPub->Publish(physicsMsg);
 						this->set_max_step_size = false;
+					}
+					else if(param_name.compare("logPrefix") == 0)
+					{
+						this->logPrefix = param_value_str;
 					}
 					else
 					{
@@ -752,6 +827,9 @@ namespace gazebo
 							this->no_litter = true;//Assume there is no litter within world
 							//std::cout<<this->psec<<endl;
 							std::string all_litter_pos = "";
+							ofstream detectionDetails(this->logPrefix + "_litterDetectionDetails.csv", std::ofstream::out | std::ofstream::trunc);
+							detectionDetails << "name,detectableBy,numberOfDetections,picked" << std::endl;
+								
 							for(auto m: this->litter_ptr)
 							{//Get current pose of all litter in world
 								gazebo::math::Vector3 lit_loc = m->GetWorldPose().pos;
@@ -759,11 +837,22 @@ namespace gazebo
 								if(abs(lit_loc.x) < 500 && abs(lit_loc.y) < 500)
 								{
 									this->no_litter = false;
+									
+								}
+								else
+								{
+									(this->litterNumberOfDetections[m->GetName()]).picked = true;
 								}
 								all_litter_pos = all_litter_pos + to_string(lit_loc.x) + ","
 																+ to_string(lit_loc.y) + ":";
 								
+								detectionDetails << m->GetName() << ","
+										<< (this->litterNumberOfDetections[m->GetName()]).detectableBy << ","
+										<< (this->litterNumberOfDetections[m->GetName()]).numberOfDetections << ","
+										<< (this->litterNumberOfDetections[m->GetName()]).picked << std::endl;
+								
 							}
+							detectionDetails.close();
 							msgs::Any all_litter_pos_msg;
 							all_litter_pos_msg.set_type(msgs::Any::STRING);
 							

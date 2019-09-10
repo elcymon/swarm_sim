@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <sdf version='1.6'>
   <model name='m_litter1'>
-	  <static>0</static>
+	  <static>1</static>
 	  <pose>0 0 0.025 0 0 0</pose><! needed to tell you where the robot should be at start of simulation>
 	  <link name='link'>
 		 <inertial>
@@ -23,16 +23,16 @@
 					size>0.13 0.13 0.05</size>
 				</cylinder>-->
 				<box>
-					<size>0.1 0.1 0.001</size>
+					<size>0.1 0.1 0.0001</size>
 				</box>
 			</geometry>
 			<surface>
 				<friction>
 					<ode>
-						<mu>1</mu>
-						<mu2>1</mu2>
-						<slip1>0</slip1>
-						<slip2>0</slip2>
+						<mu>0</mu>
+						<mu2>0</mu2>
+						<slip1>1</slip1>
+						<slip2>1</slip2>
 					</ode>
 				</friction>
 			</surface>
