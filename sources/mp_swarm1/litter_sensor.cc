@@ -56,7 +56,7 @@ void ModelVel::LitterSensor()
 {
 	//std::lock_guard<std::mutex> lock(this->mutex);
 	this->no_litter = true;
-	
+	this->LitterName = "";
 	std::string detections = "";
 	//this->neighbours = 0;
 	this->seen_litter = 0;
