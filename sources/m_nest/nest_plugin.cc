@@ -14,6 +14,7 @@
 #include <mutex>
 #include <unistd.h>
 #include <boost/filesystem.hpp>
+#include <map>
 
 using namespace std;
 
@@ -38,6 +39,8 @@ namespace gazebo
 
 			physics::Model_V litters;
 			physics::Model_V robots;
+			std::map<std::string,std::string> robotStateMap;
+			transport::SubscriberPtr sub_robotStateMap;
 			ostringstream littersFile,robotsFile,nestFile;
 			
 			// Pointer to the update event connection
@@ -68,7 +71,8 @@ namespace gazebo
 				string robotNames="names",robotPose="pose";
 				for (auto m : this->robots) {
 					robotNames += "," + m->GetName() + "," + m->GetName() + "," + m->GetName() + "," + m->GetName();
-					robotPose += ",x,y,yaw,litterCount";
+					robotPose += ",x,y,yaw,state";
+					this->robotStateMap[m->GetName()] = "searching";//default starting state for robots
 				}
 				this->writeData(this->robotsFile.str(),robotNames);
 				this->writeData(this->robotsFile.str(),robotPose);
@@ -97,7 +101,7 @@ namespace gazebo
 					robotsInfo += "," + this->setNumDP(pos.x,3);
 					robotsInfo += "," + this->setNumDP(pos.y,3);
 					robotsInfo += "," + this->setNumDP(rot.GetYaw(),3);
-					robotsInfo += ",0.00";
+					robotsInfo += "," + this->robotStateMap[m->GetName()];
 				}
 				this->writeData(this->robotsFile.str(),robotsInfo);
 				nestInfo += "," + to_string(this->numLitter) + "," + to_string(pickedLitter);
@@ -149,6 +153,9 @@ namespace gazebo
 			this->sub = this->node->Subscribe("/litter_deposits",&Nest_Plugin::Collect_Litter,this);
 			this->pub = this->node->Advertise<msgs::Any>("/litter_in_nest");
 			this->start_sim = false;
+
+			//logging robot status
+			this->sub_robotStateMap = this->node->Subscribe("/topic_robot_status",&Nest_Plugin::robotState_cb,this);
 			
 			this->sub_my_Init = this->node->Subscribe("/my_Init",&Nest_Plugin::my_Init,this);
 			this->sub_start_sim = this->node->Subscribe("/start_sim",&Nest_Plugin::start_sim_cb,this);
@@ -195,6 +202,7 @@ namespace gazebo
 			this->log_timer = 0;//reset timer
 		}
 		
+
 		public: void start_sim_cb(ConstAnyPtr &any)
 		{//receives true when simulation is to start and false when simulation stops
 			std::lock_guard<std::mutex> lock(this->mutex);
@@ -206,7 +214,19 @@ namespace gazebo
 				
 			}
 		}
-		
+		public: void robotState_cb(ConstAnyPtr &any)
+		{
+			std::lock_guard<std::mutex> lock(this->mutex);
+			
+			std::string robot_status_msg = any->string_value();
+			size_t n_loc = robot_status_msg.find(":");
+			std::string model_name = robot_status_msg.substr(0,n_loc);
+			std::string robot_status = robot_status_msg.substr(n_loc+1);
+			
+			this->robotStateMap[model_name] = robot_status;
+		}
+
+
 		public: void Collect_Litter(ConstAnyPtr &any)
 		{
 			std::lock_guard<std::mutex> lock(this->mutex);

@@ -26,10 +26,10 @@
 #$ -l h_rt=2:0:0
 
 #Iterations
-#$ -t 1-30
+#$ -t 1-1
 
 #Iterations in batch of
-#$ -tc 2
+#$ -tc 1
 
 
 #e-mail
