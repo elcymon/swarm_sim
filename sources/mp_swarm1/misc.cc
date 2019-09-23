@@ -19,3 +19,40 @@ double ModelVel::normalize(double angle)
 	D_angle.Normalize();
 	return D_angle.Radian();
 }
+double ModelVel::computeObjectOrientation(math::Vector3 objectPos, math::Vector3 myPos, double myYaw)
+{
+	return this->normalize(atan2(objectPos.y - myPos.y,objectPos.x - myPos.x)) - myYaw;
+}
+bool ModelVel::testObjectWithinFoV(double objectOrientation, double halffov)
+{
+	return (objectOrientation >= -halffov and objectOrientation <= halffov);
+}
+
+bool ModelVel::litterInPickingRange(std::string litterName)
+{
+	
+	
+	if(!(litterName).empty())
+	{//Pick litter if the distance to litter is less than robot radius.
+	
+		math::Vector3 litterPos = (this->litterModel->GetWorldPose()).pos;
+		math::Vector3 myPos = (this->my_pose).pos;
+		double litterDistance = this->dxy(litterPos, myPos);
+
+		double litter_or = this->computeObjectOrientation(litterPos,myPos,this->my_pose.rot.GetYaw());
+		if(this->testObjectWithinFoV(litter_or,this->halffov))
+		{
+			double rot_dist = litter_or / 2.0 * this->chassis_diameter;
+			if ((litterDistance + rot_dist) < this->chassis_diameter / 2.0)
+			{
+				return true;
+			}
+
+		}
+		
+	}
+	this->LitterName = "";
+	this->litterModel = nullptr;
+	this->litter_pos.z = -9000.1;
+	return false;//not in picking range because no litterName, not in FoV or not within picking distance
+}

@@ -62,6 +62,10 @@ namespace gazebo
 			
 			void my_Init(ConstAnyPtr &any);
 			void start_sim_cb(ConstAnyPtr &any);
+			
+			bool litterInPickingRange(std::string litterName);
+			double computeObjectOrientation(math::Vector3 objectPos, math::Vector3 myPos, double myYaw);
+			bool testObjectWithinFoV(double objectOrientation, double halffov);
 	
 		private:
 			
@@ -114,6 +118,7 @@ namespace gazebo
 			std::string neighbours_info;
 			gazebo::math::Vector3 litter_pos;
 			std::string LitterName;
+			double litter_distance;
 			bool pick_litter;
 			bool picking_lit_wait;
 			double picking_lit_dur;
@@ -130,7 +135,9 @@ namespace gazebo
 			double detectionProbability;
 			transport::PublisherPtr pub_myDetectedLitterNames;
 			transport::PublisherPtr pub_myDetectableLitters;
-
+			double detectionDuration;//time taken to perform detection
+			double previousVisionTime;
+			physics::ModelPtr litterModel;
 			
 			bool go_home;
 			bool at_home;

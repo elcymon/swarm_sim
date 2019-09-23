@@ -57,10 +57,11 @@ void ModelVel::LitterSensor()
 	//std::lock_guard<std::mutex> lock(this->mutex);
 	this->no_litter = true;
 	this->LitterName = "";
+	this->litterModel = nullptr;
 	std::string detections = "";
 	//this->neighbours = 0;
 	this->seen_litter = 0;
-	double litter_distance = 1000000;
+	this->litter_distance = 1000000;
 	double lit_or = M_PI;
 	//math::Vector3 litter_pos;
 	this->litter_pos.z=-9000.1;//initialize closest litter at unreasonable distance in z direction
@@ -86,20 +87,21 @@ void ModelVel::LitterSensor()
 				abs(my_p.y - m_p.y) <  this->lit_sensing)
 			{
 				double dist = this->dxy(my_p,m_p);//linear distance
-				lit_or = this->normalize(atan2(m_p.y - my_p.y,m_p.x - my_p.x)) - this->my_pose.rot.GetYaw();//amount of angle to rotate
+				lit_or = this->computeObjectOrientation(m_p,my_p,this->my_pose.rot.GetYaw());
 				
-				if(dist <= this->lit_sensing and (lit_or >= -this->halffov and lit_or <= this->halffov))
+				if(dist <= this->lit_sensing and this->testObjectWithinFoV(lit_or,this->halffov))
 				{
 					//computing the rotaional distance
 					//double rot_dist = lit_or/(2 * M_PI) * (M_PI * this->chassis_diameter);//original formula
 					double rot_dist = lit_or/2.0 * this->chassis_diameter;//original formula reduces to this
 					dist = dist + abs(rot_dist); //add rotational distance
-					if(dist + 0.01 < litter_distance)//if difference between distances is more than 10cm, you can change closest litter
+					if(dist + 0.01 < this->litter_distance)//if difference between distances is more than 10cm, you can change closest litter
 					{
-						//cout<<litter_name<<":"<<litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
+						//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
 						this->litter_pos = m_p;
 						this->LitterName = m->GetName();
-						litter_distance = dist;//update closest litter
+						this->litter_distance = dist;//update closest litter
+						this->litterModel = m;
 					}
 					this->seen_litter += 1;
 					detections += m->GetName() + ",";
@@ -119,13 +121,6 @@ void ModelVel::LitterSensor()
 	this->pub_myDetectedLitterNames->Publish(detectedLitterMsg);
 
 
-	if(!(this->LitterName).empty() and litter_distance < this->chassis_diameter/2.0)
-	{//Pick litter if the distance to litter is less than robot radius.
-		this->pick_litter = true;
-	}
-	else
-	{
-		this->pick_litter = false;
-	}
+	this->pick_litter = this->litterInPickingRange(this->LitterName);
 	
 }

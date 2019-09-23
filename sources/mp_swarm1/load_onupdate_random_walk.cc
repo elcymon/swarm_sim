@@ -306,6 +306,10 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			this->visionModel = param_value_str;
 		}
+		else if (param_name.compare("detectionDuration") == 0)
+		{
+			this->detectionDuration = std::stod(param_value_str);
+		}
 		else if(param_name.compare("detectionProbability") == 0)
 		{
 			this->detectionProbability = std::stod(param_value_str);
@@ -341,7 +345,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->LitterName = "";
 	this->pick_litter = false;
 	this->litter_count = 0;
-	
+	this->previousVisionTime = 0; //initialize time previous vision system was executed
 	this->go_home = false;
 	this->at_home = false;
 	this->waiting_t = 0;
@@ -581,8 +585,16 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		{//If desired escape distance has been reached/exceeded, set escape to invalide input
 			this->escape = -1.0;
 		}
+		if (_info.simTime.Double() - this->previousVisionTime >= this->detectionDuration)
+		{
+			this->LitterSensor();
+			this->previousVisionTime = _info.simTime.Double();
+		}
+		else
+		{
+			this->pick_litter = this->litterInPickingRange(this->LitterName);
+		}
 		
-		this->LitterSensor();
 		if(this->no_litter and not this->litter_db.empty())
 		{
 			this->go_home = true;

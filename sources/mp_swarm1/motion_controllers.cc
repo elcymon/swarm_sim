@@ -201,7 +201,8 @@ bool ModelVel::turn_control()
 		return true;
 	}
 }
-*/	
+*/
+
 bool ModelVel::try_pick(std::string litter_name)
 {// pick litter if I have enough space
 	int my_capacity = this->capacity;
@@ -220,49 +221,44 @@ bool ModelVel::try_pick(std::string litter_name)
 	//check if I have enough space to pick it
 	if(my_litter_count < my_capacity)
 	{
-			
-		auto result = this->litter_db.insert(litter_name);
-		//cout<<this->litter_db.size()<<endl;
-		
-		
-		//***********Test contents of the robot***********************//
-		/*std::string ss = to_string(litter_db.size()) + ": ";
-		for(auto it : this->litter_db)
-		{
-			std::string litter_name = it;
-			ss = ss + litter_name + ",";
-		}
-		ss = ss + "inserting: " + litter_name;
-		msgs::Any any;
-		any.set_type(msgs::Any::STRING);
-		any.set_string_value(ss);
-		this->pub_info->Publish(any);*/
-		//************************************************************//
-		
-		
-		if(result.second)
-		{//insertion successful
-			this->litter_collected += 1;
-			this->litter_count += 1;// litter_cost;
-			//this->litter_db.insert(litter_name);
+		if(this->litterInPickingRange(litter_name)){
+			auto result = this->litter_db.insert(litter_name);
+			//cout<<this->litter_db.size()<<endl;
 			
 			
-			//transport::requestNoReply(this->node,"entity_delete",litter_name);
-			//physics::ModelPtr l = this->world->GetModel(this->LitterName);
-			//l->Fini();
-			//this->LitterName = "";
-			return true;
+			//***********Test contents of the robot***********************//
+			/*std::string ss = to_string(litter_db.size()) + ": ";
+			for(auto it : this->litter_db)
+			{
+				std::string litter_name = it;
+				ss = ss + litter_name + ",";
+			}
+			ss = ss + "inserting: " + litter_name;
+			msgs::Any any;
+			any.set_type(msgs::Any::STRING);
+			any.set_string_value(ss);
+			this->pub_info->Publish(any);*/
+			//************************************************************//
+			
+			
+			if(result.second)
+			{//insertion successful
+				this->litter_collected += 1;
+				this->litter_count += 1;// litter_cost;
+				//this->litter_db.insert(litter_name);
+				
+				
+				//transport::requestNoReply(this->node,"entity_delete",litter_name);
+				//physics::ModelPtr l = this->world->GetModel(this->LitterName);
+				//l->Fini();
+				//this->LitterName = "";
+				return true;
+			}
+			
 		}
-		else
-		{//unsuccessful because of duplicate
-			return false;
-		}
-		//return true;
 	}
-	else
-	{//unsuccessful because capacity is full
-		return false;
-	}
+	
+	return false;//unsuccessful because not in picking range, full or not in FoV
 }
 
 
