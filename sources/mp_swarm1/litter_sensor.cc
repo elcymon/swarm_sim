@@ -55,16 +55,17 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 void ModelVel::LitterSensor()
 {
 	//std::lock_guard<std::mutex> lock(this->mutex);
-	this->no_litter = true;
 	this->LitterName = "";
 	this->litterModel = nullptr;
+	this->litter_distance = 1000000;
+	this->litter_pos.z=-9000.1;//initialize closest litter at unreasonable distance in z direction
+	
+	this->seen_litter = 0;
+	this->no_litter = true;
 	std::string detections = "";
 	//this->neighbours = 0;
-	this->seen_litter = 0;
-	this->litter_distance = 1000000;
 	double lit_or = M_PI;
 	//math::Vector3 litter_pos;
-	this->litter_pos.z=-9000.1;//initialize closest litter at unreasonable distance in z direction
 	
 	math::Vector3 my_p = this->my_pose.pos;
 	

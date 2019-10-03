@@ -547,39 +547,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			}
 		}
 		
-		/*if(this->turn_prob <= this->turn_prob_min)
-		{
-			this->turn_prob = this->turn_prob_min;
-		}*/
 		
-		//end: modify turn probability based on comm signal
-		
-		//msgs::Color *homColMsg;
-		////msgs::Color *homDiffMsg;
-		////msgs::Visual visMsg;
-		////msgs::Material *materialMsg;
-		/*gazebo::common::Color newColor(0.0,1.0,0.0,1.0);
-		msgs::Color *homColMsg = new gazebo::msgs::Color(gazebo::msgs::Convert(newColor));
-		msgs::Color *homDiffMsg = new gazebo::msgs::Color(*homColMsg);
-		gazebo::physics::LinkPtr link = this->model->GetLink("chassis");
-		
-		
-		
-		msgs::Visual visMsg = link->GetVisualMessage("visual");
-		msgs::Material *materialMsg = visMsg.mutable_material();
-		materialMsg->clear_ambient();
-		materialMsg->clear_diffuse();
-		
-		visMsg.set_name(link->GetScopedName()+"::visual");
-		visMsg.set_parent_name(this->model->GetScopedName());
-		
-		materialMsg->set_allocated_ambient(homColMsg);
-		materialMsg->set_allocated_diffuse(homDiffMsg);
-		*/
-		//this->pub_visual->Publish(visMsg);
-		
-		
-		//cout<<this->ModelName<<" running"<<endl;
 		this->my_pose = this->model->GetWorldPose();
 		if(this->escape > 0 && this->dxy(this->my_pose.pos,this->escape_start) >= this->escape)
 		{//If desired escape distance has been reached/exceeded, set escape to invalide input
@@ -590,40 +558,42 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->LitterSensor();
 			this->previousVisionTime = _info.simTime.Double();
 		}
-		else
-		{
-			this->pick_litter = this->litterInPickingRange(this->LitterName);
+		else if ((this->litter_pos).z > -1) // litter_pos is always set to -9000.1 
+		{//to show that no litter is being acquired by a robot in this time step
+			math::Vector3 myPos = (this->my_pose).pos;
+			this->litter_distance = this->dxy(this->litter_pos, myPos);
+
+			double litter_or = this->computeObjectOrientation(this->litter_pos,\
+						myPos,this->my_pose.rot.GetYaw());
+			
+			if(this->testObjectWithinFoV(litter_or,this->halffov))
+			{
+				double rot_dist = litter_or / 2.0 * this->chassis_diameter;
+				this->litter_distance += rot_dist;
+				if (this->litter_distance < this->chassis_diameter / 2.0)
+				{
+					this->pick_litter = true;
+				}
+				else
+				{
+					this->pick_litter = false;
+				}
+				
+			}
+			else
+			{
+				this->pick_litter = false;
+			}
 		}
 		
 		if(this->no_litter and not this->litter_db.empty())
 		{
 			this->go_home = true;
 		}
-		//static bool xx = true;
-		/*if(_info.simTime.nsec == 0)
-		{
-			cout<<this->ContactMsg<<endl;
-		}*/
-		if(false && _info.simTime.nsec == 0)//this->send_name)
-		{
-			//cout<<this->acTion<<endl;
-			//msgs::Any any;
-			//any.set_type(msgs::Any::STRING);
-			//any.set_string_value(this->acTion);
-			
-			//this->pub_info->Publish(any);
-			//any.set_string_value(this->neighbours_info);
-			//this->lit_nei_pub->Publish(any);
-		}	
 		
 		if(this->turn_complete and this->litter_db.size() < this->capacity and this->seen_litter <= 0)
 		{//If not in the middle of turning, litter storage not full and not seeing any litter
-			//double x = rand()/double(RAND_MAX);
-			//std::uniform_real_distribution<double> my_rand(0.0,1.0);
 			
-			
-			//cout<<std::scientific;
-			//cout<<x<<'\t'<<turn_prob<<endl;
 			if(this->uform_rand(this->generator) < this->turn_prob)
 			{//Make a random turn
 				//When making random turn, reset turn_prob
@@ -654,32 +624,12 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				this->waiting_t = 0;//reset waiting time.
 			}
 				
-				
-				//cout<<"random turn: "<<this->d_heading<<endl;
-				
-			
-			/*
-			msgs::Pose  p = msgs::Convert(this->model->GetWorldPose().Ign());
-			p.set_name(this->model->GetName());
-			msgs::Any any;
-			
-			//msgs::Any any = msgs::ConvertAny(this->model->GetWorldPose().Ign());
-			any.set_type(msgs::Any::POSE3D);
-			any.mutable_pose3d_value()->CopyFrom(p);
-			//any.set_type(msgs::Any::STRING);
-			//any.set_string_value(this->model->GetName());
-			this->pub_name->Publish(any);
-			this->send_name = false;
-			*/
 			
 		}
 		
 		if(this->rep_neighbours > 0 and false)
 		{
 			this->d_heading = this->normalize(this->rslt_theta);
-			//cout<<this->ModelName<<":"<<this->rslt_theta<<endl;
-			//string x;
-			//cin>>x;
 		}
 		
 		if(this->seen_litter > 0 && this->litter_pos.z > -100 and this->litter_db.size() < this->capacity)
@@ -790,16 +740,18 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				//this->deposit_litter();
 				//l->Fini();
 				//this->world->RemoveModel(this->LitterName);
-				this->LitterName = "";
+				
 				if(this->litter_db.size() >= this->capacity)
 				{//If litter capacity is full, activate go home behaviour
 					this->go_home = true;
 				}
-				
+				this->picking_lit_wait = true;
+				this->pick_lit_time = _info.simTime.Double();
 			}
+			this->LitterName = "";
+			this->litterModel = nullptr;
+			this->litter_pos.z = -9000.1;
 			this->pick_litter = false;
-			this->picking_lit_wait = true;
-			this->pick_lit_time = _info.simTime.Double();
 		}
 		
 		

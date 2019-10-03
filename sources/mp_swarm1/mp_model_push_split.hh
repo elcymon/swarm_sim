@@ -47,25 +47,21 @@ namespace gazebo
 			void rotate_v2(double dxn_eror);
 			void straight();//Straight motion
 			double avoid_obstacle(double x, double y,math::Pose my_pos);
-			bool try_pick(std::string litter_name);// pick litter if I have enough space
-		
-		
-			double dxy(math::Vector3 A, math::Vector3 B);
 			void my_acTion(std::string acTion);
 			double normalize(double angle);
-			
-			void LitterSensor();
-			void deposit_litter();
-			
 			void RepulsionSender(std::string neibour,double distance);
 			void CommSignal(ConstAnyPtr &a);
-			
 			void my_Init(ConstAnyPtr &any);
 			void start_sim_cb(ConstAnyPtr &any);
 			
+			double dxy(math::Vector3 A, math::Vector3 B);
+			bool try_pick(std::string litter_name);// pick litter if I have enough space
+			void LitterSensor();
 			bool litterInPickingRange(std::string litterName);
 			double computeObjectOrientation(math::Vector3 objectPos, math::Vector3 myPos, double myYaw);
 			bool testObjectWithinFoV(double objectOrientation, double halffov);
+			void deposit_litter();
+			
 	
 		private:
 			
@@ -106,16 +102,18 @@ namespace gazebo
 			int neighbour_bounces;//keep count of number of times you hit another robot
 			
 			transport::PublisherPtr pub_robot_status;
+			int rep_neighbours;
+			int call_neighbours;
+			int nei_sensing;
+			std::string neighbours_info;
+			
+			double halffov;
+			
 			transport::PublisherPtr lit_nei_pub;
 			transport::PublisherPtr pub_seen_litter;
 			int seen_litter;
-			int rep_neighbours;
-			int call_neighbours;
 			double lit_sensing;
-			double halffov;
-			int nei_sensing;
 			std::string litter_info;
-			std::string neighbours_info;
 			gazebo::math::Vector3 litter_pos;
 			std::string LitterName;
 			double litter_distance;

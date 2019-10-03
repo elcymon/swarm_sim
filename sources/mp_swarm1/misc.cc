@@ -51,8 +51,5 @@ bool ModelVel::litterInPickingRange(std::string litterName)
 		}
 		
 	}
-	this->LitterName = "";
-	this->litterModel = nullptr;
-	this->litter_pos.z = -9000.1;
 	return false;//not in picking range because no litterName, not in FoV or not within picking distance
 }

@@ -3,6 +3,11 @@ hpc=$1
 paramLine=$2
 experiment=$3
 
+if (( hpc )); then
+    submit=qsub
+else
+    submit=sh
+fi
 
 #qsub hpc_qsub.sh $hpc OneCluster $experiment $paramLine 1$paramLine
 
@@ -12,7 +17,7 @@ experiment=$3
 
 #qsub hpc_qsub.sh $hpc HalfCluster $experiment $paramLine 4$paramLine
 
-qsub hpc_qsub.sh $hpc Uniform $experiment $paramLine 5$paramLine
+$submit hpc_qsub.sh $hpc Uniform $experiment $paramLine 5$paramLine
 
 #qsub hpc_qsub.sh $hpc OneCluster100m $experiment $paramLine 11$paramLine
 
