@@ -37,6 +37,12 @@ namespace gazebo
 				this->detectableBy += ";" + robotID;
 		}
 	};
+	struct RobotInfo {
+		physics::ModelPtr robotModel;
+		int litterCount;
+		std::string seenLitter;
+		std::string state;
+	};
 
 	class WP_Swarm1 : public WorldPlugin
 	{

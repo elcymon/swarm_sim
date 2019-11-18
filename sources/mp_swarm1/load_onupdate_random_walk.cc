@@ -302,17 +302,17 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			this->filter_type = param_value_str;
 		}
-		else if(param_name.compare("visionModel") == 0)
+		else if(param_name.compare("p_s2s") == 0)
 		{
-			this->visionModel = param_value_str;
+			this->p_s2s = std::stod(param_value_str);	
+		}
+		else if(param_name.compare("p_u2s") == 0)
+		{
+			this->p_u2s = std::stod(param_value_str);
 		}
 		else if (param_name.compare("detectionDuration") == 0)
 		{
 			this->detectionDuration = std::stod(param_value_str);
-		}
-		else if(param_name.compare("detectionProbability") == 0)
-		{
-			this->detectionProbability = std::stod(param_value_str);
 		}
 		else
 		{
@@ -413,31 +413,21 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 
 	this->timeStamp = 0;//initialize time stamp to zero
 
-	//****** populate litter database based on visionModel and detection Probability***//
-	std::string detectableLitters = (this->ModelName).substr(9) + ":";
+	this->prev_seen.clear();//reset seen litter
+
+	//****** populate litter database***//
 	for (auto m : this->world->GetModels())
 	{
 		std::string m_name = m->GetName();
-		if (m_name.find("litter") != std::string::npos && //only handle detections of litter objects
-			  ((this->visionModel).compare("instantaneous") == 0 || //instantaneous based detection will be done at runtime of simulation
-
-			    ((this->visionModel).compare("initialization") == 0 && //initialization based will filter out litter that robot can detect
-			      this->uform_rand(this->generator) <= this->detectionProbability
-				)
-			  )
-		   )
+		if (m_name.find("litter") != std::string::npos)
 		{
 			this->myLitterDB.push_back(m);
-			detectableLitters += m->GetName() + ",";
 		}
 	}
-	msgs::Any detectableLitterMsg;
-	detectableLitterMsg.set_type(msgs::Any::STRING);
-	detectableLitterMsg.set_string_value(detectableLitters);
-	this->pub_myDetectableLitters->Publish(detectableLitterMsg);
 
 	//*********************************************************************************//
 	
+
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)

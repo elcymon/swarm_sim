@@ -16,7 +16,7 @@ world_db = {
 	
 }
 
-def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number):
+def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,gzmode):
 	port_number = int(port_number) + 11345
 	folder_name = world_name + '-' + experiment
 
@@ -50,7 +50,7 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number)
 
 	#start up gazebo if all processes are successful
 	if(all_set == 0):
-		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};gazebo --verbose {}'.format(port_number,world_db[world_name])
+		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};{} --verbose {}'.format(port_number,gzmode,world_db[world_name])
 		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
@@ -87,4 +87,4 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number)
 if __name__=='__main__':
 	# paramLine and port_number vary based on $SGE_TASK_ID value
 	# start_simulation(world_name, experiment, paramLine,   sge_task_id, port_number)
-	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],sys.argv[6])

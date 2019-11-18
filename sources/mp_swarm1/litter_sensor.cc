@@ -1,14 +1,3 @@
-void ModelVel::RepulsionSender(std::string neighbour, double distance)
-{
-	//transport::PublisherPtr pub_repulsion;
-	//this->pub_repulsion = this->node->Advertise<msgs::Any>("/"+neighbour+"/comm_signal");
-	double repulsion_intensity = (this->nei_sensing - distance)/((double)this->nei_sensing);
-	msgs::Any any;
-	any.set_type(msgs::Any::DOUBLE);
-	any.set_double_value(repulsion_intensity);
-	//this->pub_repulsion[neighbour]->Publish(any);
-}
-
 void ModelVel::CommSignal(ConstAnyPtr &a)
 {
 	std::lock_guard<std::mutex> lock(this->mutex);
@@ -71,44 +60,59 @@ void ModelVel::LitterSensor()
 	
 	for(auto m : this->myLitterDB)
 	{
-		if((this->visionModel).compare("initialization") == 0 || //if initialization based, litter has already been filtered
-			((this->visionModel).compare("instantaneous") == 0 && //if instantaneous based, perform litter filtering now
-			  this->uform_rand(this->generator) <= this->detectionProbability //filter based on detection probability
-			)
-		  )
-		{//Check all litter within the world and count them
-			//find the closest litter and orientation.
+		
+		math::Vector3 m_p = m->GetWorldPose().pos;
+		bool seen = false;
+		auto p_seen = this->prev_seen.find(m->GetName());
+		double probability = this->p_u2s; //assume not previously seen
+		
+		if (p_seen != this->prev_seen.end())
+		{//seen previously
+			probability = this->p_s2s;
+		}
+
+		if(abs(m_p.x) < 500 and abs(m_p.y) < 500)
+		{//Litter still within arena
+			this->no_litter = false;
+			double dist = this->dxy(my_p,m_p);//linear distance
+			lit_or = this->computeObjectOrientation(m_p,my_p,this->my_pose.rot.GetYaw());
 			
-			math::Vector3 m_p = m->GetWorldPose().pos;
-			if(abs(m_p.x) < 500 and abs(m_p.y) < 500)
-			{//Litter still within arena
-				this->no_litter = false;
-			}
-			if(abs(my_p.x - m_p.x) < this->lit_sensing and
-				abs(my_p.y - m_p.y) <  this->lit_sensing)
+			if((dist <= this->lit_sensing) and 
+			    (this->testObjectWithinFoV(lit_or,this->halffov)) and
+				(this->uform_rand(this->generator) < probability)
+			  )
 			{
-				double dist = this->dxy(my_p,m_p);//linear distance
-				lit_or = this->computeObjectOrientation(m_p,my_p,this->my_pose.rot.GetYaw());
-				
-				if(dist <= this->lit_sensing and this->testObjectWithinFoV(lit_or,this->halffov))
+				seen = true;
+				//computing the rotaional distance
+				//double rot_dist = lit_or/(2 * M_PI) * (M_PI * this->chassis_diameter);//original formula
+				double rot_dist = lit_or/2.0 * this->chassis_diameter;//original formula reduces to this
+				dist = dist + abs(rot_dist); //add rotational distance
+				if(dist + 0.01 < this->litter_distance)//if difference between distances is more than 10cm, you can change closest litter
 				{
-					//computing the rotaional distance
-					//double rot_dist = lit_or/(2 * M_PI) * (M_PI * this->chassis_diameter);//original formula
-					double rot_dist = lit_or/2.0 * this->chassis_diameter;//original formula reduces to this
-					dist = dist + abs(rot_dist); //add rotational distance
-					if(dist + 0.01 < this->litter_distance)//if difference between distances is more than 10cm, you can change closest litter
-					{
-						//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
-						this->litter_pos = m_p;
-						this->LitterName = m->GetName();
-						this->litter_distance = dist;//update closest litter
-						this->litterModel = m;
-					}
-					this->seen_litter += 1;
-					detections += m->GetName() + ",";
+					//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
+					this->litter_pos = m_p;
+					this->LitterName = m->GetName();
+					this->litter_distance = dist;//update closest litter
+					this->litterModel = m;
 				}
+				this->seen_litter += 1;
+				detections += m->GetName() + ",";
 			}
 		}
+		// else{//delete from DB because litter is not within world area
+		// this->myLitterDB.erase(m);
+
+		// }
+
+		if(seen)
+		{//insert litter name to previously seen (data type is set, so it will fail if it already exists)
+			this->prev_seen.insert(m->GetName());
+		}
+		else
+		{//remove litter name from previously seen
+			this->prev_seen.erase(m->GetName());
+		}
+		
 		
 	}
 	msgs::Any seen_litter_msg;

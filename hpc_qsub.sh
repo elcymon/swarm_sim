@@ -44,10 +44,12 @@ hpc=$1 # true if working on hpc false otherwise
 if ((hpc)); then
     module load singularity
     folder=$PWD
+    gzmode=gzserver
 else
     folder=.
     JOB_ID=123
     SGE_TASK_ID=1
+    gzmode=gazebo
 fi
 
 #execute simulation
@@ -66,4 +68,4 @@ port_number=$(($SGE_TASK_ID + $5 + 1))
 echo world_name: $world_name, experiment: $experiment, row_shift: $row_shift, paramLine: $paramLine, port_number: $port_number
 mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 
-singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $paramLine $SGE_TASK_ID $port_number
+singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $paramLine $SGE_TASK_ID $port_number $gzmode

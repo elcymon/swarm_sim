@@ -49,7 +49,6 @@ namespace gazebo
 			double avoid_obstacle(double x, double y,math::Pose my_pos);
 			void my_acTion(std::string acTion);
 			double normalize(double angle);
-			void RepulsionSender(std::string neibour,double distance);
 			void CommSignal(ConstAnyPtr &a);
 			void my_Init(ConstAnyPtr &any);
 			void start_sim_cb(ConstAnyPtr &any);
@@ -129,12 +128,15 @@ namespace gazebo
 			gazebo::math::Pose litter_dump_site;
 			bool no_litter;
 			physics::Model_V myLitterDB;//list of litter this robot can detect
-			std::string visionModel;
-			double detectionProbability;
-			transport::PublisherPtr pub_myDetectedLitterNames;
-			transport::PublisherPtr pub_myDetectableLitters;
+			
+			double p_s2s;//probability of seen to seen
+			double p_u2s;//probability of unseen to seen
 			double detectionDuration;//time taken to perform detection
 			double previousVisionTime;
+			std::set<std::string> prev_seen;
+			
+			transport::PublisherPtr pub_myDetectedLitterNames;
+			transport::PublisherPtr pub_myDetectableLitters;
 			physics::ModelPtr litterModel;
 			
 			bool go_home;
