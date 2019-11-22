@@ -68,6 +68,7 @@ void ModelVel::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	this->pub_litter = this->node->Advertise<msgs::Any>("/litter_deposits");
 	this->pub_myDetectedLitterNames = this->node->Advertise<msgs::Any>("/robotDetectedLitterNames");
 	this->pub_myDetectableLitters = this->node->Advertise<msgs::Any>("/robotDetectableLitterNames");
+	this->pub_myLitter_DB = this->node->Advertise<msgs::Any>("/myLitter_DB");
 	
 	this->litter_dump_site = gazebo::math::Pose(1000.0,1000.0, 0.0, 0.0, 0.0, 0.0);
 	/*
@@ -462,7 +463,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 	}
 	
 	this->prev_state = this->state;//set previous state value to state in last iteration
-	this->state = "searching";//the default state is searching
+	
 	
 	if(this->start_sim)
 	{
@@ -638,7 +639,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				//change heading toward closest litter
 				this->d_heading = this->normalize(litter_loc);
 			}
-			this->state = "go4litter";	
+			//this->state = "go4litter";	
 		}
 		
 		
@@ -668,7 +669,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				this->go_home = false;
 				this->at_home = false;
 			}
-			this->state = "homing";
+			//this->state = "homing";
 			
 		}
 		
@@ -731,10 +732,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				//l->Fini();
 				//this->world->RemoveModel(this->LitterName);
 				
-				if(this->litter_db.size() >= this->capacity)
-				{//If litter capacity is full, activate go home behaviour
-					this->go_home = true;
-				}
+				
 				this->picking_lit_wait = true;
 				this->pick_lit_time = _info.simTime.Double();
 			}
@@ -742,8 +740,13 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->litterModel = nullptr;
 			this->litter_pos.z = -9000.1;
 			this->pick_litter = false;
+			
+			
 		}
-		
+		if((this->litter_db.size() >= this->capacity) and (not this->picking_lit_wait))
+		{//If litter capacity is full, activate go home behaviour
+			this->go_home = true;
+		}
 		
 		
 		//cout<<"turn_complete: "<<this->turn_complete<<" d_heading: "<<this->d_heading<<" curr_h: "<<this->my_pose.rot.GetYaw()<<" dxn_eror: "<<dxn_eror<<endl;
@@ -809,6 +812,21 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->picking_lit_wait = false;
 		}
 		
+		//UPDATE ROBOT STATES BASED ON CURRENT CONDITIONS
+		if (this->go_home)
+		{
+			this->state = "homing";
+		}
+		else if (this->seen_litter > 0)
+		{
+			this->state = "go4litter";
+		}
+		else
+		{
+			this->state = "searching";//the default state is searching
+		}
+		
+
 		//Process activity times needed for logging
 		// this->escape
 		if(this->escape >= 0){
@@ -845,6 +863,20 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		
 		if(_info.simTime.nsec==0 or (this->log_timer >= this->log_rate))//rate of 100Hz
 		{
+			//publish all litter currently in my capacity
+			std::stringstream litterNamesStream;
+			litterNamesStream << this->ModelName <<":";
+			for (auto i : this->litter_db)
+			{
+				litterNamesStream << i << ",";
+			}
+			msgs::Any litterNamesMsg;
+
+			litterNamesMsg.set_type(msgs::Any::STRING);
+			litterNamesMsg.set_string_value(litterNamesStream.str());
+
+			this->pub_myLitter_DB->Publish(litterNamesMsg);
+			
 			this->log_timer = 0;
 			//log:x,y,yaw,turn_prob,seen_litter,neighbours,comm_signal,this->litter_db,state
 			std::string my_log_data;

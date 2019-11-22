@@ -37,12 +37,6 @@ namespace gazebo
 				this->detectableBy += ";" + robotID;
 		}
 	};
-	struct RobotInfo {
-		physics::ModelPtr robotModel;
-		int litterCount;
-		std::string seenLitter;
-		std::string state;
-	};
 
 	class WP_Swarm1 : public WorldPlugin
 	{
@@ -280,6 +274,10 @@ namespace gazebo
 			{
 				std::lock_guard<std::mutex> lock(this->mutex);
 				std::string detectionStr = any->string_value();
+				std::size_t robotNameLoc = detectionStr.find(":");
+				std::string robotName = detectionStr.substr(0,robotNameLoc);
+				detectionStr = detectionStr.substr(robotNameLoc + 1);
+				
 				while(detectionStr.find(",") != std::string::npos)
 				{
 					std::size_t nameLoc = detectionStr.find(",");

@@ -19,6 +19,30 @@ using namespace std;
 
 namespace gazebo
 {
+
+	struct RobotInfo {
+		physics::ModelPtr robotModel;
+		std::string litterCount;
+		std::string seenLitter;
+		std::string state;
+		
+		RobotInfo()
+		{
+			robotModel = nullptr;
+			litterCount = "";
+			seenLitter = "";
+			state = "";
+		}
+		RobotInfo(physics::ModelPtr model)
+		{
+			robotModel = model;
+			litterCount = "";//topic is /robotPickedLitterNames, msg "robotName:l1,l2,ln,"
+			seenLitter = "";//topic is /robotDetectedLitterNames, msg "robotName:l1,l2,ln,"
+			state = "";//topic is /topic_robot_status, msg "robotName:status"
+		}
+
+	};
+
 	class Nest_Plugin : public ModelPlugin
 	{
 		private:
@@ -37,8 +61,13 @@ namespace gazebo
 			bool start_sim;
 
 			physics::Model_V litters;
-			physics::Model_V robots;
+			std::map<std::string,RobotInfo> robots;
 			ostringstream littersFile,robotsFile,nestFile;
+
+			transport::SubscriberPtr sub_myDetectedLitterNames;
+			transport::SubscriberPtr sub_myLitter_DB;
+			transport::SubscriberPtr sub_robot_status;
+
 			
 			// Pointer to the update event connection
 			 event::ConnectionPtr updateConnection;
@@ -65,13 +94,13 @@ namespace gazebo
 
 				this->writeData(this->nestFile.str(),"time,litterCount,pickedLitter");
 
-				string robotNames="names",robotPose="pose";
+				string robotNames="names",robotInfo="info";
 				for (auto m : this->robots) {
-					robotNames += "," + m->GetName() + "," + m->GetName() + "," + m->GetName() + "," + m->GetName();
-					robotPose += ",x,y,yaw,litterCount";
+					robotNames += "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first;
+					robotInfo += ",x,y,yaw,litterPicked,seenLitter,state";
 				}
 				this->writeData(this->robotsFile.str(),robotNames);
-				this->writeData(this->robotsFile.str(),robotPose);
+				this->writeData(this->robotsFile.str(),robotInfo);
 				this->writeData(this->robotsFile.str(),"time");
 			}
 			else {
@@ -92,12 +121,15 @@ namespace gazebo
 				this->writeData(this->littersFile.str(),litterInfo);
 
 				for (auto m : this->robots) {
-					math::Vector3 pos = m->GetWorldPose().pos;
-					math::Quaternion rot = m->GetWorldPose().rot;
+					physics::ModelPtr robotMode = (m.second).robotModel;
+					math::Vector3 pos = robotMode->GetWorldPose().pos;
+					math::Quaternion rot = robotMode->GetWorldPose().rot;
 					robotsInfo += "," + this->setNumDP(pos.x,3);
 					robotsInfo += "," + this->setNumDP(pos.y,3);
 					robotsInfo += "," + this->setNumDP(rot.GetYaw(),3);
-					robotsInfo += ",0.00";
+					robotsInfo += "," + (m.second).litterCount;
+					robotsInfo += "," + (m.second).seenLitter;
+					robotsInfo += "," + (m.second).state;
 				}
 				this->writeData(this->robotsFile.str(),robotsInfo);
 				nestInfo += "," + to_string(this->numLitter) + "," + to_string(pickedLitter);
@@ -124,7 +156,7 @@ namespace gazebo
 			for(auto m : all_models) {
 				string m_name = m->GetName();
 				if (m_name.find("m_4wrobot") != string::npos) {
-					this->robots.push_back(m);
+					this->robots[m->GetName()] = RobotInfo(m);
 				}
 				else if (m_name.find("litter") != string::npos) {
 					this->litters.push_back(m);
@@ -149,15 +181,82 @@ namespace gazebo
 			this->sub = this->node->Subscribe("/litter_deposits",&Nest_Plugin::Collect_Litter,this);
 			this->pub = this->node->Advertise<msgs::Any>("/litter_in_nest");
 			this->start_sim = false;
+
+
 			
 			this->sub_my_Init = this->node->Subscribe("/my_Init",&Nest_Plugin::my_Init,this);
 			this->sub_start_sim = this->node->Subscribe("/start_sim",&Nest_Plugin::start_sim_cb,this);
+			
+			this->sub_myDetectedLitterNames = this->node->Subscribe("/robotDetectedLitterNames", &Nest_Plugin::cb_robotDetectedLitterNames, this);
+			this->sub_myLitter_DB = this->node->Subscribe("/myLitter_DB",&Nest_Plugin::cb_myLitter_DB,this);
+			this->sub_robot_status = this->node->Subscribe("/topic_robot_status",&Nest_Plugin::robot_status_cb,this);
+
 			// Listen to the update event. This event is broadcast every
 			// simulation iteration.
 			this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Nest_Plugin::OnUpdate, this, _1));
 		}
-		
+
+		public: std::string extractLitterIDs(std::string detectionStr)
+		{
+			
+			std::string detectionsID = "";
+			while(detectionStr.find(",") != std::string::npos)
+			{
+				std::size_t nameLoc = detectionStr.find(",");
+				std::string litterName = detectionStr.substr(0,nameLoc);
+				if (litterName.find("litter") != std::string::npos)
+				{
+					if (detectionsID != ""){
+						detectionsID += ";";
+					}
+					detectionsID += litterName.substr(8);//ignore m_litter part of littername
+
+				}
+				detectionStr = detectionStr.substr(nameLoc + 1);
+			}
+			return detectionsID;
+		}
+		public: void cb_myLitter_DB(ConstAnyPtr &any)
+		{
+			std::lock_guard<std::mutex> lock(this->mutex);
+			
+			std::string detectionStr = any->string_value();
+
+			std::size_t robotNameLoc = detectionStr.find(":");
+			std::string robotName = detectionStr.substr(0,robotNameLoc);
+			detectionStr = detectionStr.substr(robotNameLoc + 1);
+			
+			this->robots[robotName].litterCount = this->extractLitterIDs(detectionStr);
+			// gzdbg << robotName << ":" << detectionStr << std::endl;
+		}
+		public: void cb_robotDetectedLitterNames(ConstAnyPtr &any)
+		{
+			std::lock_guard<std::mutex> lock(this->mutex);
+			
+			std::string detectionStr = any->string_value();
+
+			std::size_t robotNameLoc = detectionStr.find(":");
+			std::string robotName = detectionStr.substr(0,robotNameLoc);
+			detectionStr = detectionStr.substr(robotNameLoc + 1);
+
+			this->robots[robotName].seenLitter = this->extractLitterIDs(detectionStr);
+			// gzerr << robotName << ":" << detectionStr << std::endl;
+		}
+
+		public: void robot_status_cb(ConstAnyPtr &any)
+		{
+			std::lock_guard<std::mutex> lock(this->mutex);
+			
+			std::string robot_status_msg = any->string_value();
+			size_t n_loc = robot_status_msg.find(":");
+			std::string model_name = robot_status_msg.substr(0,n_loc);
+			std::string robot_status = robot_status_msg.substr(n_loc+1);
+			
+			this->robots[model_name].state = robot_status;
+			
+		}
+
 		public: void my_Init(ConstAnyPtr &any)
 		{//used to initialize/reset simulation parameters
 			std::lock_guard<std::mutex> lock(this->mutex);

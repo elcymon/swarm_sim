@@ -137,6 +137,7 @@ namespace gazebo
 			
 			transport::PublisherPtr pub_myDetectedLitterNames;
 			transport::PublisherPtr pub_myDetectableLitters;
+			transport::PublisherPtr pub_myLitter_DB;//publisher of names of litter picked by robot
 			physics::ModelPtr litterModel;
 			
 			bool go_home;

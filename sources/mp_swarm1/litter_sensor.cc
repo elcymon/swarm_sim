@@ -51,7 +51,7 @@ void ModelVel::LitterSensor()
 	
 	this->seen_litter = 0;
 	this->no_litter = true;
-	std::string detections = "";
+	std::string detections = this->model->GetName() + ":";
 	//this->neighbours = 0;
 	double lit_or = M_PI;
 	//math::Vector3 litter_pos;
