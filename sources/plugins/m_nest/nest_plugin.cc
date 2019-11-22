@@ -14,6 +14,7 @@
 #include <mutex>
 #include <unistd.h>
 #include <boost/filesystem.hpp>
+#include "robot_info.pb.h"
 
 using namespace std;
 

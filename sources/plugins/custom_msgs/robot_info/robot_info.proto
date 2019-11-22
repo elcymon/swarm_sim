@@ -1,0 +1,13 @@
+package custom_msgs.msgs;
+
+message RobotInfo
+{
+    required double x = 1;
+    required double y = 2;
+    required double yaw = 3;
+    required double litter_count = 4;
+    required string litter_db = 5;
+    required string seen_litter = 6;
+    required string state = 7;
+    required string robot_name = 8;
+}
