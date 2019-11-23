@@ -28,5 +28,6 @@
 //including communication handling class for different kinds filters
 
 #include "../comm_models/comm_models.cc"
+
 //Register this plugin with the simulator
 GZ_REGISTER_MODEL_PLUGIN(ModelVel)

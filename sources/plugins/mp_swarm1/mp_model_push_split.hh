@@ -26,6 +26,8 @@
     #include "../comm_models/comm_models.hh"
 #endif
 
+#include "robot_info.pb.h"
+
 using namespace std;
 //using namespace cv;
 using namespace gazebo;
@@ -125,6 +127,7 @@ namespace gazebo
 			int litter_collected;// all litter a robot has collected so far
 			int litter_deposited;// all litter dropped by robot at the nest
 			std::set<std::string> litter_db;
+			std::string detectedLitterNames;//names of litters currently within view of robot
 			gazebo::math::Pose litter_dump_site;
 			bool no_litter;
 			physics::Model_V myLitterDB;//list of litter this robot can detect
@@ -135,6 +138,7 @@ namespace gazebo
 			double previousVisionTime;
 			std::set<std::string> prev_seen;
 			
+			transport::PublisherPtr pub_robot_info;
 			transport::PublisherPtr pub_myDetectedLitterNames;
 			transport::PublisherPtr pub_myDetectableLitters;
 			transport::PublisherPtr pub_myLitter_DB;//publisher of names of litter picked by robot

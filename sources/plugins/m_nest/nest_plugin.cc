@@ -20,6 +20,9 @@ using namespace std;
 
 namespace gazebo
 {
+	typedef const boost::shared_ptr<
+  const custom_msgs::msgs::RobotInfo>
+    ConstRobotInfoPtr;
 
 	struct RobotInfo {
 		physics::ModelPtr robotModel;
@@ -54,6 +57,7 @@ namespace gazebo
 			transport::PublisherPtr pub;
 			transport::SubscriberPtr sub_my_Init;
 			transport::SubscriberPtr sub_start_sim;
+			transport::SubscriberPtr sub_robot_info;
 			std::mutex mutex;
 			
 			double log_timer;
@@ -187,15 +191,21 @@ namespace gazebo
 			
 			this->sub_my_Init = this->node->Subscribe("/my_Init",&Nest_Plugin::my_Init,this);
 			this->sub_start_sim = this->node->Subscribe("/start_sim",&Nest_Plugin::start_sim_cb,this);
-			
-			this->sub_myDetectedLitterNames = this->node->Subscribe("/robotDetectedLitterNames", &Nest_Plugin::cb_robotDetectedLitterNames, this);
-			this->sub_myLitter_DB = this->node->Subscribe("/myLitter_DB",&Nest_Plugin::cb_myLitter_DB,this);
-			this->sub_robot_status = this->node->Subscribe("/topic_robot_status",&Nest_Plugin::robot_status_cb,this);
+			this->sub_robot_info = this->node->Subscribe("/robot_info",&Nest_Plugin::cb_robot_info,this);
+			// this->sub_myDetectedLitterNames = this->node->Subscribe("/robotDetectedLitterNames", &Nest_Plugin::cb_robotDetectedLitterNames, this);
+			// this->sub_myLitter_DB = this->node->Subscribe("/myLitter_DB",&Nest_Plugin::cb_myLitter_DB,this);
+			// this->sub_robot_status = this->node->Subscribe("/topic_robot_status",&Nest_Plugin::robot_status_cb,this);
 
 			// Listen to the update event. This event is broadcast every
 			// simulation iteration.
 			this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 				boost::bind(&Nest_Plugin::OnUpdate, this, _1));
+		}
+		public: void cb_robot_info(ConstRobotInfoPtr &robot_info)
+		{
+			std::lock_guard<std::mutex> lock(this->mutex);
+			gzdbg << robot_info->robot_name() << ":[seen_litter: " << robot_info->seen_litter()
+				<<"], [litter_db: " <<std::endl;
 		}
 
 		public: std::string extractLitterIDs(std::string detectionStr)

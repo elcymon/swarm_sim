@@ -69,6 +69,7 @@ void ModelVel::Load(physics::ModelPtr _parent, sdf::ElementPtr /*_sdf*/)
 	this->pub_myDetectedLitterNames = this->node->Advertise<msgs::Any>("/robotDetectedLitterNames");
 	this->pub_myDetectableLitters = this->node->Advertise<msgs::Any>("/robotDetectableLitterNames");
 	this->pub_myLitter_DB = this->node->Advertise<msgs::Any>("/myLitter_DB");
+	this->pub_robot_info = this->node->Advertise<custom_msgs::msgs::RobotInfo>("/robot_info");
 	
 	this->litter_dump_site = gazebo::math::Pose(1000.0,1000.0, 0.0, 0.0, 0.0, 0.0);
 	/*
@@ -427,7 +428,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	}
 
 	//*********************************************************************************//
-	
+	this->detectedLitterNames = "";//initially no litters were detected
 
 }
 		
@@ -863,13 +864,35 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		
 		if(_info.simTime.nsec==0 or (this->log_timer >= this->log_rate))//rate of 100Hz
 		{
-			//publish all litter currently in my capacity
+			//all litter currently in my capacity
 			std::stringstream litterNamesStream;
-			litterNamesStream << this->ModelName <<":";
+			litterNamesStream << "";
 			for (auto i : this->litter_db)
 			{
-				litterNamesStream << i << ",";
+				if (i != *(this->litter_db.begin()))
+				{
+					litterNamesStream << ";";
+				}
+				litterNamesStream << i.substr(8);
 			}
+			
+			double theta = fmod(this->my_pose.rot.GetYaw() * 180.0/M_PI + 360.0, 360.0);
+			double xc = this->my_pose.pos.x;
+			double yc = this->my_pose.pos.y;
+			
+			//HANDLE DATA OF ROBOT TO BE PUBLISHED
+			custom_msgs::msgs::RobotInfo myInfo;
+			myInfo.set_x(xc);
+			myInfo.set_y(yc);
+			myInfo.set_yaw(theta);
+			myInfo.set_litter_count(this->litter_db.size());
+			myInfo.set_litter_db(litterNamesStream.str());
+			myInfo.set_seen_litter(this->detectedLitterNames);
+			myInfo.set_state(this->state);
+			myInfo.set_robot_name(this->ModelName);
+			
+			this->pub_robot_info->Publish(myInfo);
+			
 			msgs::Any litterNamesMsg;
 
 			litterNamesMsg.set_type(msgs::Any::STRING);
@@ -880,9 +903,6 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->log_timer = 0;
 			//log:x,y,yaw,turn_prob,seen_litter,neighbours,comm_signal,this->litter_db,state
 			std::string my_log_data;
-			double theta = fmod(this->my_pose.rot.GetYaw() * 180.0/M_PI + 360.0, 360.0);
-			double xc = this->my_pose.pos.x;
-			double yc = this->my_pose.pos.y;
 			//this->seen_litter;
 			//this->neighbours;
 			//this->comm_signal;

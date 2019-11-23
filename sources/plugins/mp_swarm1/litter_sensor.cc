@@ -51,7 +51,7 @@ void ModelVel::LitterSensor()
 	
 	this->seen_litter = 0;
 	this->no_litter = true;
-	std::string detections = this->model->GetName() + ":";
+	std::string detections = "";
 	//this->neighbours = 0;
 	double lit_or = M_PI;
 	//math::Vector3 litter_pos;
@@ -96,7 +96,11 @@ void ModelVel::LitterSensor()
 					this->litterModel = m;
 				}
 				this->seen_litter += 1;
-				detections += m->GetName() + ",";
+				if (detections != "")
+				{
+					detections += ";";
+				}
+				detections += (m->GetName()).substr(8);
 			}
 		}
 		// else{//delete from DB because litter is not within world area
@@ -124,7 +128,9 @@ void ModelVel::LitterSensor()
 	detectedLitterMsg.set_type(msgs::Any::STRING);
 	detectedLitterMsg.set_string_value(detections);
 	this->pub_myDetectedLitterNames->Publish(detectedLitterMsg);
+	
 
+	this->detectedLitterNames = detections;
 
 	this->pick_litter = this->litterInPickingRange(this->LitterName);
 	

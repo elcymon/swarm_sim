@@ -34,7 +34,7 @@ target_link_libraries(nest_plugin custom_msgs ${Boost_LIBRARIES} ${GAZEBO_LIBRAR
 add_dependencies(nest_plugin custom_msgs)
 
 add_library(mp_swarm1 SHARED mp_swarm1/mp_model_push_split.cc)
-target_link_libraries(mp_swarm1 ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(mp_swarm1 custom_msgs ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 add_dependencies(mp_swarm1 custom_msgs)
 
 

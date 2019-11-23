@@ -235,8 +235,8 @@ namespace gazebo
 						this->litterNumberOfDetections[model_name] = LitterInfo(m);
 					}
 				}
-				this->sub_robotDetectedLitterNames = this->node->Subscribe("/robotDetectedLitterNames", &WP_Swarm1::cb_robotDetectedLitterNames, this);
-				this->sub_robotDetectableLitters = this->node->Subscribe("/robotDetectableLitterNames", &WP_Swarm1::cb_robotDetectableLitters, this);
+				// this->sub_robotDetectedLitterNames = this->node->Subscribe("/robotDetectedLitterNames", &WP_Swarm1::cb_robotDetectedLitterNames, this);
+				// this->sub_robotDetectableLitters = this->node->Subscribe("/robotDetectableLitterNames", &WP_Swarm1::cb_robotDetectableLitters, this);
 				
 				msgs::Any all_litter_pos_msg;
 				all_litter_pos_msg.set_type(msgs::Any::STRING);
