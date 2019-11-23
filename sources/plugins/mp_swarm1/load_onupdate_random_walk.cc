@@ -862,36 +862,39 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		this->rot_dist += abs((this->prev_yaw - this->my_pose.rot.GetYaw())/2.0 * this->chassis_diameter);
 		this->prev_yaw = this->my_pose.rot.GetYaw();
 		
+		//all litter currently in my capacity
+		std::stringstream litterNamesStream;
+		litterNamesStream << "";
+		for (auto i : this->litter_db)
+		{
+			if (i != *(this->litter_db.begin()))
+			{
+				litterNamesStream << ";";
+			}
+			litterNamesStream << i.substr(8);
+		}
+		
+		double theta = this->my_pose.rot.GetYaw();//fmod(this->my_pose.rot.GetYaw() * 180.0/M_PI + 360.0, 360.0);
+		double xc = this->my_pose.pos.x;
+		double yc = this->my_pose.pos.y;
+		
+		//HANDLE DATA OF ROBOT TO BE PUBLISHED
+		custom_msgs::msgs::RobotInfo myInfo;
+		myInfo.set_x(xc);
+		myInfo.set_y(yc);
+		myInfo.set_yaw(theta);
+		myInfo.set_extra_litter(this->seen_litter - 
+				(this->capacity - this->litter_db.size()));
+		myInfo.set_litter_count(this->litter_db.size());
+		myInfo.set_litter_db(litterNamesStream.str());
+		myInfo.set_seen_litter(this->detectedLitterNames);
+		myInfo.set_state(this->state);
+		myInfo.set_robot_name(this->ModelName);
+		
+		this->pub_robot_info->Publish(myInfo);
+		
 		if(_info.simTime.nsec==0 or (this->log_timer >= this->log_rate))//rate of 100Hz
 		{
-			//all litter currently in my capacity
-			std::stringstream litterNamesStream;
-			litterNamesStream << "";
-			for (auto i : this->litter_db)
-			{
-				if (i != *(this->litter_db.begin()))
-				{
-					litterNamesStream << ";";
-				}
-				litterNamesStream << i.substr(8);
-			}
-			
-			double theta = fmod(this->my_pose.rot.GetYaw() * 180.0/M_PI + 360.0, 360.0);
-			double xc = this->my_pose.pos.x;
-			double yc = this->my_pose.pos.y;
-			
-			//HANDLE DATA OF ROBOT TO BE PUBLISHED
-			custom_msgs::msgs::RobotInfo myInfo;
-			myInfo.set_x(xc);
-			myInfo.set_y(yc);
-			myInfo.set_yaw(theta);
-			myInfo.set_litter_count(this->litter_db.size());
-			myInfo.set_litter_db(litterNamesStream.str());
-			myInfo.set_seen_litter(this->detectedLitterNames);
-			myInfo.set_state(this->state);
-			myInfo.set_robot_name(this->ModelName);
-			
-			this->pub_robot_info->Publish(myInfo);
 			
 			msgs::Any litterNamesMsg;
 

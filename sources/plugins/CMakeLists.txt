@@ -39,5 +39,5 @@ add_dependencies(mp_swarm1 custom_msgs)
 
 
 add_library(wp_swarm1 SHARED w_swarm1/wp_swarm1.cc)
-target_link_libraries(wp_swarm1 ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(wp_swarm1 custom_msgs ${GAZEBO_LIBRARIES} ${Boost_LIBRARIES})
 add_dependencies(wp_swarm1 custom_msgs)

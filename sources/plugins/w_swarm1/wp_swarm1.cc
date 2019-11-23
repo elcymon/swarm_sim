@@ -15,9 +15,16 @@
 #include <iomanip>
 #include <ctime>
 
+#include "robot_info.pb.h"
+#include "../utils/utils.cc"
+
 using namespace std;
 namespace gazebo
 {
+	typedef const boost::shared_ptr<
+  const custom_msgs::msgs::RobotInfo>
+    ConstRobotInfoPtr;
+	
 	struct LitterInfo {
 		physics::ModelPtr litterModel;
 		int numberOfDetections;
@@ -61,10 +68,11 @@ namespace gazebo
 			std::map<std::string,transport::PublisherPtr> pub_commSignal;
 			//std::map<std::string,transport::PublisherPtr> pub_attraction;
 			
-			std::map<std::string,int> extra_litter_map;
+			transport::SubscriberPtr sub_robot_info;
+			std::map<std::string,RobotInfo> robots;
+			
 			gazebo::transport::SubscriberPtr sub_seen_litter;//Models publish seen litter to this topic
 			
-			std::map<std::string,std::string> robot_status_map;
 			std::map<std::string,LitterInfo> litterNumberOfDetections;
 			transport::SubscriberPtr sub_robotDetectedLitterNames;
 			transport::SubscriberPtr sub_robotDetectableLitters;
@@ -144,57 +152,6 @@ namespace gazebo
 				this->physicsPub->Publish(physicsMsg);
 
 				this->set_max_step_size = true;
-				//this->psec = 0;
-				//exit(5);
-				//load simulation paramters
-				// ifstream myfile;
-				// string line, header;
-				// myfile.open("params/params.csv");
-				// if(myfile.is_open())
-				// {
-				// 	getline(myfile,header);
-				// 	while(getline(myfile,line))
-				// 	{
-				// 		size_t hsep1=0,hsep2=0,psep1=0,psep2=0;
-				// 		string hparam,param_value;
-				// 		string param_line = "";
-				// 		while(header.find(",",hsep1) != string::npos and
-				// 				line.find(",",psep1) != string::npos)
-				// 		{
-				// 			hsep2 = header.find(",",hsep1);
-				// 			hparam = header.substr(hsep1,hsep2-hsep1);
-				// 			psep2 = line.find(",",psep1);
-				// 			param_value = line.substr(psep1,psep2-psep1);
-							
-				// 			param_line = param_line + hparam + ":" + param_value + ",";
-				// 			hsep1 = hsep2 + 1;
-				// 			psep1 = psep2 + 1;
-				// 			if(hparam.compare("max_step_size") == 0)
-				// 			{
-				// 				transport::PublisherPtr physicsPub = 
-				// 				node->Advertise<msgs::Physics>("~/physics");
-				// 				msgs::Physics physicsMsg;
-				// 				physicsMsg.set_type(msgs::Physics::ODE);
-								
-				// 				double value = std::stod(param_value);
-				// 				//this->max_step_size = value;
-				// 				//value = 1.0/value;
-				// 				physicsMsg.set_max_step_size(value);
-				// 				physicsPub->Publish(physicsMsg);
-				// 			}
-				// 		}
-				// 		this->my_params.push_back(param_line);
-				// 	}
-				// 	//iterator set to first parameter list
-				// 	this->param_it = this->my_params.begin();
-				// 	myfile.close();
-				// }
-				// else
-				// {
-				// 	//cout<<"unable to load file"<<endl;
-				// 	//exit(5);
-				// }
-				
 				
 				
 				math::Box boundary = this->world->GetModel("boundary1")->GetBoundingBox();
@@ -220,9 +177,8 @@ namespace gazebo
 					{
 						this->robot_ptr.push_back(m);
 						this->pub_commSignal[model_name] = this->node->Advertise<msgs::Any>("/"+model_name+"/comm_signal");
-						//this->pub_attraction[model_name] = this->node->Advertise<msgs::Any>("/"+model_name+"/attract_signal");
-						this->extra_litter_map[model_name] = 0;
-						this->robot_status_map[model_name] = "searching";
+						
+						this->robots[model_name].init_info(m);
 					}
 					
 					if(model_name.find("litter") != std::string::npos)
@@ -235,8 +191,7 @@ namespace gazebo
 						this->litterNumberOfDetections[model_name] = LitterInfo(m);
 					}
 				}
-				// this->sub_robotDetectedLitterNames = this->node->Subscribe("/robotDetectedLitterNames", &WP_Swarm1::cb_robotDetectedLitterNames, this);
-				// this->sub_robotDetectableLitters = this->node->Subscribe("/robotDetectableLitterNames", &WP_Swarm1::cb_robotDetectableLitters, this);
+				this->sub_robot_info = this->node->Subscribe("/robot_info",&WP_Swarm1::cb_robot_info,this);
 				
 				msgs::Any all_litter_pos_msg;
 				all_litter_pos_msg.set_type(msgs::Any::STRING);
@@ -269,6 +224,14 @@ namespace gazebo
 				this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 							boost::bind(&WP_Swarm1::OnUpdate,this,_1));
 				// std::cout<<"world loaded"<<std::endl;
+			}
+
+			public: void cb_robot_info(ConstRobotInfoPtr &robot_info)
+			{
+				std::lock_guard<std::mutex> lock(this->mutex);
+				(this->robots[robot_info->robot_name()]).update_data(*robot_info);
+				// gzdbg << robot_info->robot_name() << ":[seen_litter: " << robot_info->seen_litter()
+				// 	<<"], [litter_db: " <<std::endl;
 			}
 			void cb_robotDetectedLitterNames(ConstAnyPtr &any)
 			{
@@ -327,7 +290,7 @@ namespace gazebo
 				std::string model_name = seen_litter_msg.substr(0,n_loc);
 				int seen_litter_num = std::stoi(seen_litter_msg.substr(n_loc+1));
 				//update appropriate model with it's seen litter
-				this->extra_litter_map[model_name] = seen_litter_num;
+				
 			}
 			
 			void robot_status_cb(ConstAnyPtr &any)
@@ -339,7 +302,7 @@ namespace gazebo
 				std::string model_name = robot_status_msg.substr(0,n_loc);
 				std::string robot_status = robot_status_msg.substr(n_loc+1);
 				
-				this->robot_status_map[model_name] = robot_status;
+				
 				
 				//std::cout<<model_name<<" "<<robot_status<<std::endl;
 			}
@@ -672,8 +635,8 @@ namespace gazebo
 								std::string n_name = n->GetName();
 								math::Vector3 n_pos = n->GetWorldPose().pos;
 								
-								std::string n_status = this->robot_status_map[n_name];
-								int n_extra_litter = this->extra_litter_map[n_name];
+								std::string n_status = (this->robots[n_name]).state;
+								int n_extra_litter = (this->robots[n_name]).extra_litter;
 								
 								
 								//std::cout<<n_name<<" "<<n_status<<std::endl;
