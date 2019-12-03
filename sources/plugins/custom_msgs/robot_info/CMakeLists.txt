@@ -13,5 +13,5 @@ set (msgs
   ${PROTOBUF_IMPORT_DIRS}/time.proto
 )
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS ${msgs})
-add_library(custom_msgs SHARED ${PROTO_SRCS})
-target_link_libraries(custom_msgs ${PROTOBUF_LIBRARY})
+#add_library(custom_msgs SHARED ${PROTO_SRCS})
+#target_link_libraries(custom_msgs ${PROTOBUF_LIBRARY})
