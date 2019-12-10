@@ -54,7 +54,10 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,
 		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
-			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {}'.format(port_number, folder_name, paramLine, sge_task_id),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+			alns_waypoints = world_db[world_name].replace('_100m','')\
+												.replace('.world','.csv')\
+												.replace('/sources/w_swarm1/world_db/','/params/waypointsCSV/')
+			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {} {}'.format(port_number, folder_name, paramLine, sge_task_id,alns_waypoints),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 			if load_logger.returncode==None:
 				print('''
 				\n\n

@@ -300,6 +300,23 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			seed = std::stod(param_value_str);;
 		}
+		else if(param_name.compare(this->model->GetName() + "_wp") == 0)
+		{
+			size_t sep1 = 0, sep2 = 0;
+			param_value_str += ";";
+			// if (this->model->GetName().compare("m_4wrobot24") == 0)
+			// {
+				while(param_value_str.find(";",sep1) != string::npos)
+				{
+					sep2 = param_value_str.find(";",sep1);
+					// gzdbg << param_value_str.substr(sep1,sep2 - sep1) << std::endl;
+					this->litter_wp.push_back(param_value_str.substr(sep1,sep2 - sep1));
+					sep1 = sep2 + 1;
+				}
+			// gzdbg << this->model->GetName() << ": "<<param_value_str<<std::endl;//<< this->litter_wp.data() << std::endl;
+			// }
+			
+		}
 		else if(param_name.compare("filter_type") == 0)
 		{
 			this->filter_type = param_value_str;
@@ -468,161 +485,53 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 	
 	if(this->start_sim)
 	{
-		//update repulsion and attraction signals
-		this->repel_signal = this->commModel.get_value("curr_repel_signal");
-		this->prev_repel_signal = this->commModel.get_value("prev_repel_signal");
-		this->call_signal = this->commModel.get_value("curr_call_signal");
-		this->prev_call_signal = this->commModel.get_value("prev_call_signal");
-
-
-		//start: modify turn probability based on comm signal
-		//this section handles repulsion signals
-		if(this->turn_complete)// and this->new_comm_signal)
-		{//change turning probability and update communication signal only when not turning i.e. only when moving straight
-			//also, do this only when there is new communcated information from neighbours
-
-			// this->new_comm_signal = false;//turn to false and wait till there is new signal.
-			
-			if (this->rep_neighbours > 0)
-			{
-				if(this->prev_repel_signal > this->repel_signal)
-				{
-					//this->turn_prob -= this->repel_scale;
-					this->turn_prob = this->turn_prob_min / this->repel_scale_div;
-				}
-				else if (this->prev_repel_signal < this->repel_signal)
-				{
-					this->turn_prob = this->turn_prob_min * this->repel_scale_mult;
-				}
-				else
-				{
-					this->turn_prob = this->turn_prob_min;
-				}
-			}
-			else
-			{
-				this->turn_prob = this->turn_prob_min;
-			}
-			
-			//This section handles attraction signals
-			if (this->call_neighbours > 0)
-			{
-				if(this->prev_call_signal > this->call_signal)
-				{
-					this->turn_prob = this->turn_prob * this->call_scale_mult;
-				}
-				else if(this->prev_call_signal < this->call_signal)
-				{
-					this->turn_prob = this->turn_prob / this->call_scale_div;
-				}
-				
-				else
-				{
-					this->turn_prob = this->turn_prob;
-				}
-			}
-			else
-			{
-				this->turn_prob = this->turn_prob;
-			}
-			if(this->turn_prob >= this->turn_prob_max)
-			{
-				this->turn_prob = this->turn_prob_max;
-			}
-			// this->prev_repel_signal = this->repel_signal;
-			// this->prev_call_signal = this->call_signal;
-		}
-		else{
-			if(this->correction_mtd.compare("prob_reset") == 0 and this->acTion.compare("turning") == 0)
-			{//Robot does not have new communication signal and correction method is prob_reset. Reset probability if robot action is turning.
-				this->turn_prob = this->turn_prob_min;
-			}
-		}
-		
-		
 		this->my_pose = this->model->GetWorldPose();
 		if(this->escape > 0 && this->dxy(this->my_pose.pos,this->escape_start) >= this->escape)
 		{//If desired escape distance has been reached/exceeded, set escape to invalide input
 			this->escape = -1.0;
 		}
-		if (_info.simTime.Double() - this->previousVisionTime >= this->detectionDuration)
+		if((this->litterModel == nullptr) and !(this->litter_wp.empty()))
 		{
-			this->LitterSensor();
-			this->previousVisionTime = _info.simTime.Double();
-		}
-		else if ((this->litter_pos).z > -1) // litter_pos is always set to -9000.1 
-		{//to show that no litter is being acquired by a robot in this time step
-			math::Vector3 myPos = (this->my_pose).pos;
-			this->litter_distance = this->dxy(this->litter_pos, myPos);
-
-			double litter_or = this->computeObjectOrientation(this->litter_pos,\
-						myPos,this->my_pose.rot.GetYaw());
-			
-			if(this->testObjectWithinFoV(litter_or,this->halffov))
+			//use litter and nest waypoints data to control robot motion
+			// if (this->model->GetName().compare("m_4wrobot10") == 0)
+			// {
+			// 	gzdbg << this->litter_wp.front() << std::endl;
+			// }
+			if (this->litter_wp.front().compare("m_nest") == 0)
 			{
-				double rot_dist = litter_or / 2.0 * this->chassis_diameter;
-				this->litter_distance += rot_dist;
-				if (this->litter_distance < this->chassis_diameter / 2.0)
-				{
-					this->pick_litter = true;
-				}
-				else
-				{
-					this->pick_litter = false;
-				}
-				
+				this->litter_wp.pop_front();
+				this->go_home = true;
 			}
 			else
 			{
-				this->pick_litter = false;
+				this->LitterName = this->litter_wp.front();
+				this->litter_wp.pop_front();
+				this->litterModel = this->world->GetModel(this->LitterName);
+				this->litter_pos = this->litterModel->GetWorldPose().pos;
+				math::Vector3 my_p = this->model->GetWorldPose().pos;
+				this->litter_distance = this->dxy(this->litter_pos,my_p);
+				
+				this->seen_litter = 1;
 			}
 		}
+		else if (this->litter_wp.empty() and this->litter_db.empty())
+		{
+			//Robot has ended its trips
+			// this->model->SetStatic(true);
+			double dp_x = rand() % 1000 + 1000;
+			double dp_y = rand() % 1000 + 1000;
+			gazebo::math::Pose robot_garage = gazebo::math::Pose(dp_x,dp_y, 2.0, 0.0, 0.0, 0.0);
+			this->model->SetWorldPose(robot_garage);
+		}
+		
+		this->pick_litter = this->litterInPickingRange(this->LitterName);
+
 		
 		if(this->no_litter and not this->litter_db.empty())
 		{
 			this->go_home = true;
 		}
 		
-		if(this->turn_complete and this->litter_db.size() < this->capacity and this->seen_litter <= 0)
-		{//If not in the middle of turning, litter storage not full and not seeing any litter
-			
-			if(this->uform_rand(this->generator) < this->turn_prob)
-			{//Make a random turn
-				//When making random turn, reset turn_prob
-				//this->turn_prob = this->turn_prob_min;
-				//std::uniform_real_distribution<double> my_rand_heading(-M_PI,M_PI);
-				//std::normal_distribution<double>my_rand_heading(mean,stddev);
-				
-				//Using uniform distribution
-				//this->d_heading = this->uform_rand_heading(this->generator);
-				
-				//Using normal distribution
-				
-				double temp_heading = this->normal_rand_heading(this->generator);
-				if(temp_heading > 2*M_PI) temp_heading = 2*M_PI;//cap to 360degs
-				
-				if(temp_heading < 0.0) temp_heading = 0.0;//cap to 0degs
-				
-				temp_heading = this->normalize(temp_heading);
-				//this->d_heading = temp_heading;/**/
-				this->d_heading = this->my_pose.rot.GetYaw() + temp_heading;
-				this->d_heading = this->normalize(this->d_heading);
-				//this->d_heading = (rand()/double(RAND_MAX) * 2 - 1) * M_PI;
-				//string ss ="random turn: " + to_string(this->d_heading);
-				//any.set_string_value(ss);
-				//this->pub_info->Publish(any);
-				this->turn_complete = false;
-				
-				this->waiting_t = 0;//reset waiting time.
-			}
-				
-			
-		}
-		
-		if(this->rep_neighbours > 0 and false)
-		{
-			this->d_heading = this->normalize(this->rslt_theta);
-		}
 		
 		if(this->seen_litter > 0 && this->litter_pos.z > -100 and this->litter_db.size() < this->capacity)
 		{//if litter seen is greater than 0 and the location is valid and there is space for more litter

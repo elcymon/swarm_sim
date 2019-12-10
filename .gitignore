@@ -16,7 +16,7 @@ results/*
 #sources/w_swarm1/build/*
 #sources/world_governor/build/*
 
-sources/*/build/*
+build/
 
 !.placeholder
 

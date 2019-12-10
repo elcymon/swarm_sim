@@ -170,6 +170,7 @@ int main(int _argc, char **_argv)
 	std::string simulationFolder = _argv[1];
 	paramLine = std::stoi(_argv[2]);
 	int sge_task_id = std::stoi(_argv[3]);
+	std::string alns_waypoints = _argv[4];
 
 	//set up folder name to save results
 	boost::filesystem::path full_path(boost::filesystem::current_path());
@@ -253,6 +254,21 @@ int main(int _argc, char **_argv)
 						param_line += "logPrefix:" + folder_name + algorithmID + "_" + sge_task_id_stream.str() + "_" + startTime.str()+ ",";
 					}
 				}
+				ifstream alns_wp_file;
+				string waypoints_line;
+				alns_wp_file.open(alns_waypoints);
+				if(alns_wp_file.is_open()){
+					while(getline(alns_wp_file,waypoints_line)){
+						size_t wp_sep = waypoints_line.find(",");
+						param_line += waypoints_line.substr(0,wp_sep) + "_wp:" + waypoints_line.substr(wp_sep + 1) + ",";
+					}
+				}
+				else{
+					std::cerr << "Could not load waypoints file: " << alns_waypoints <<std::endl;
+					exit(5);
+				}
+				std::cout << param_line << std::endl;
+
 				my_params.push_back(param_line);
 				if(paramLine > 0){//if param line is 0, read everything if it is greater than 0 seek desired line
 					break;//exit loop if parameter line is found.

@@ -13,6 +13,7 @@
 //Sensors Palava
 #include <string>
 #include <vector>
+#include <list>
 #include <map>
 #include <mutex>
 
@@ -127,6 +128,7 @@ namespace gazebo
 			int litter_collected;// all litter a robot has collected so far
 			int litter_deposited;// all litter dropped by robot at the nest
 			std::set<std::string> litter_db;
+			std::list<std::string> litter_wp;
 			std::string detectedLitterNames;//names of litters currently within view of robot
 			gazebo::math::Pose litter_dump_site;
 			bool no_litter;
