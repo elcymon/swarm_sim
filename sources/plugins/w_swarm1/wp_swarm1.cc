@@ -685,6 +685,10 @@ namespace gazebo
 												}
 												else if(this->com_model.compare("vector") == 0) {
 													//TO DO
+													double rep_x = (r_pos.x - n_pos.x)/dist;
+													double rep_y = (r_pos.y - n_pos.y)/dist;
+													rslt_x += rep_x;
+													rslt_y += rep_y;
 												}
 												//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
@@ -735,6 +739,10 @@ namespace gazebo
 												}
 												else if(this->com_model.compare("vector") == 0) {
 													//TO DO
+													double att_x = (n_pos.x - r_pos.x) / dist;
+													double att_y = (n_pos.y - r_pos.y) / dist;
+													rslt_x += att_x;
+													rslt_y += att_y;
 												}
 												// double attraction_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
@@ -751,12 +759,7 @@ namespace gazebo
 												att_signal += attraction_intensity;
 												att_data = att_data + "," + to_string(dist);
 											}
-											//Computing Resultant Vector
-											double vec_x,vec_y;
-											vec_x = (r_pos.x - n_pos.x)/dist;
-											vec_y = (r_pos.y - n_pos.y)/dist;
-											rslt_x += vec_x;
-											rslt_y += vec_y;
+											
 									// 	}
 									// }
 								}

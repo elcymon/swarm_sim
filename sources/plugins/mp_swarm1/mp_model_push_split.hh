@@ -226,6 +226,7 @@ namespace gazebo
 			double queue_size;
 		//***********************CommModels********************************//
 			CommModels commModel;//a communication handler that also has inbuild filter processing
+			std::string com_model;//string describing if communication is sound/linear/vector based
 			std::string filter_type;
 			//get time stamp of simulation
 			double timeStamp;

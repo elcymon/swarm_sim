@@ -296,6 +296,10 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			this->correction_mtd = param_value_str;
 		}
+		else if(param_name.compare("com_model") == 0)
+		{
+			this->com_model = param_value_str;//communication model is a string
+		}
 		else if(param_name.compare(this->model->GetName()) == 0)
 		{
 			seed = std::stod(param_value_str);;
@@ -477,13 +481,13 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 
 		//start: modify turn probability based on comm signal
 		//this section handles repulsion signals
-		if(this->turn_complete)// and this->new_comm_signal)
+		if(this->turn_complete and (this->com_model.compare("soundv2") == 0))// and this->new_comm_signal)
 		{//change turning probability and update communication signal only when not turning i.e. only when moving straight
 			//also, do this only when there is new communcated information from neighbours
 
 			// this->new_comm_signal = false;//turn to false and wait till there is new signal.
 			
-			if (this->rep_neighbours > 0)
+			if ((this->rep_neighbours > 0) )
 			{
 				if(this->prev_repel_signal > this->repel_signal)
 				{
@@ -586,6 +590,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		if(this->turn_complete and this->litter_db.size() < this->capacity and this->seen_litter <= 0)
 		{//If not in the middle of turning, litter storage not full and not seeing any litter
 			
+			
 			if(this->uform_rand(this->generator) < this->turn_prob)
 			{//Make a random turn
 				//When making random turn, reset turn_prob
@@ -615,14 +620,12 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				
 				this->waiting_t = 0;//reset waiting time.
 			}
-				
+			if (this->com_model.compare("vector") == 0){
+				this->d_heading = this->normalize(this->rslt_theta);
+			}
 			
 		}
 		
-		if(this->rep_neighbours > 0 and false)
-		{
-			this->d_heading = this->normalize(this->rslt_theta);
-		}
 		
 		if(this->seen_litter > 0 && this->litter_pos.z > -100 and this->litter_db.size() < this->capacity)
 		{//if litter seen is greater than 0 and the location is valid and there is space for more litter
