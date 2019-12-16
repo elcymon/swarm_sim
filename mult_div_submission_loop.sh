@@ -1,7 +1,7 @@
 hpc=$1
 start=$2
 stop=$3
-experiment=$4
+world=$4
 
 if (( hpc )); then
     for (( paramLine = start; paramLine <= stop; paramLine++)) do
@@ -11,5 +11,5 @@ if (( hpc )); then
 else
     experiment=test
     paramLine=$stop
-    sh hpc_qsub.sh $hpc Uniform $experiment $paramLine 5$paramLine
+    sh hpc_qsub.sh $hpc $world $experiment $paramLine 5$paramLine
 fi

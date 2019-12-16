@@ -72,11 +72,11 @@ namespace gazebo
 					littery += "," + to_string(m->GetWorldPose().pos.y);
 				}
 				// ofstream myfile(this->littersFile,std::ios::app|std::ios::ate);
-				this->writeData(this->littersFile.str(),litterNames);
 				// gzdbg << litterNames <<std::endl;
 				// gzdbg << this->littersFile.str() <<std::endl;
-				this->writeData(this->littersFile.str(),litterx);
-				this->writeData(this->littersFile.str(),littery);
+				// this->writeData(this->littersFile.str(),litterNames);
+				// this->writeData(this->littersFile.str(),litterx);
+				// this->writeData(this->littersFile.str(),littery);
 
 				this->writeData(this->nestFile.str(),"time,litterCount,pickedLitter");
 
@@ -85,9 +85,9 @@ namespace gazebo
 					robotNames += "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first;
 					robotInfo += ",x,y,yaw,litterPicked,seenLitter,state";
 				}
-				this->writeData(this->robotsFile.str(),robotNames);
-				this->writeData(this->robotsFile.str(),robotInfo);
-				this->writeData(this->robotsFile.str(),"time");
+				// this->writeData(this->robotsFile.str(),robotNames);
+				// this->writeData(this->robotsFile.str(),robotInfo);
+				// this->writeData(this->robotsFile.str(),"time");
 			}
 			else {
 				string litterInfo = to_string(t);
@@ -104,7 +104,7 @@ namespace gazebo
 						pickedLitter++;
 					}
 				}
-				this->writeData(this->littersFile.str(),litterInfo);
+				// this->writeData(this->littersFile.str(),litterInfo);
 
 				for (auto m : this->robots) {
 					robotsInfo += "," + this->setNumDP((m.second).x,3);
@@ -114,7 +114,7 @@ namespace gazebo
 					robotsInfo += "," + (m.second).seen_litter;
 					robotsInfo += "," + (m.second).state;
 				}
-				this->writeData(this->robotsFile.str(),robotsInfo);
+				// this->writeData(this->robotsFile.str(),robotsInfo);
 				nestInfo += "," + to_string(this->numLitter) + "," + to_string(pickedLitter);
 				this->writeData(this->nestFile.str(),nestInfo);
 
@@ -128,8 +128,8 @@ namespace gazebo
 									return ss.str();
 								}
 		public : void createFileNames(string logPrefix) {
-			this->littersFile << logPrefix << "_littersFile.csv";
-			this->robotsFile << logPrefix << "_robotsFile.csv";
+			// this->littersFile << logPrefix << "_littersFile.csv";
+			// this->robotsFile << logPrefix << "_robotsFile.csv";
 			this->nestFile << logPrefix << "_nestFile.csv";
 
 

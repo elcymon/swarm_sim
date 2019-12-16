@@ -770,6 +770,10 @@ namespace gazebo
 													+ ":" + to_string(rslt_theta) + ":" + 
 													to_string(att_neighbours) + ":" + to_string(att_signal));
 							this->pub_commSignal[r_name]->Publish(any);
+							if (att_signal > 0 and r_name.compare("m_4wrobot20") == 0)
+							{
+								gzdbg << r_name << ": " << att_neighbours << ", " << to_string(att_signal) << std::endl;
+							}
 							
 							//any.set_string_value(to_string(att_neighbours) + ":" + to_string(att_signal));
 							//this->pub_attraction[r_name]->Publish(any);
@@ -794,8 +798,8 @@ namespace gazebo
 							this->no_litter = true;//Assume there is no litter within world
 							//std::cout<<this->psec<<endl;
 							std::string all_litter_pos = "";
-							ofstream detectionDetails(this->logPrefix + "_litterDetectionDetails.csv", std::ofstream::out | std::ofstream::trunc);
-							detectionDetails << "name,detectableBy,numberOfDetections,picked" << std::endl;
+							// ofstream detectionDetails(this->logPrefix + "_litterDetectionDetails.csv", std::ofstream::out | std::ofstream::trunc);
+							// detectionDetails << "name,detectableBy,numberOfDetections,picked" << std::endl;
 								
 							for(auto m: this->litter_ptr)
 							{//Get current pose of all litter in world
@@ -813,13 +817,13 @@ namespace gazebo
 								all_litter_pos = all_litter_pos + to_string(lit_loc.x) + ","
 																+ to_string(lit_loc.y) + ":";
 								
-								detectionDetails << m->GetName() << ","
-										<< (this->litterNumberOfDetections[m->GetName()]).detectableBy << ","
-										<< (this->litterNumberOfDetections[m->GetName()]).numberOfDetections << ","
-										<< (this->litterNumberOfDetections[m->GetName()]).picked << std::endl;
+								// detectionDetails << m->GetName() << ","
+								// 		<< (this->litterNumberOfDetections[m->GetName()]).detectableBy << ","
+								// 		<< (this->litterNumberOfDetections[m->GetName()]).numberOfDetections << ","
+								// 		<< (this->litterNumberOfDetections[m->GetName()]).picked << std::endl;
 								
 							}
-							detectionDetails.close();
+							// detectionDetails.close();
 							msgs::Any all_litter_pos_msg;
 							all_litter_pos_msg.set_type(msgs::Any::STRING);
 							
