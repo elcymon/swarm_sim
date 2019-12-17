@@ -16,7 +16,10 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 	//Extract repulsion_signal
 	s = s.substr(div_loc+1);
 	div_loc = s.find(":");
-	repel_sig = std::stod(s.substr(0,div_loc));
+	stringstream repel_stream;
+	repel_stream << std::setprecision(10) << s.substr(0,div_loc);
+	repel_stream >> std::setprecision(10) >> repel_sig;
+	// repel_sig = std::stod(s.substr(0,div_loc));
 	this->repel_queue.push_back(repel_sig);
 
 	//Extract resultant theta
@@ -31,7 +34,10 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 	this->call_neighbours = call_neigh;
 	
 	//Extract attraction signal
-	call_sig = std::stod(s.substr(div_loc+1));
+	stringstream call_stream;
+	call_stream << std::setprecision(5) << s.substr(div_loc+1);
+	call_stream >> std::setprecision(5) >> call_sig;
+	// call_sig = std::stod(s.substr(div_loc+1));
 	this->call_queue.push_back(call_sig);
 	
 	//using proposed communication update method

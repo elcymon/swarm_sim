@@ -110,10 +110,10 @@ void CommModels::average_filter(std::deque<double> *signal, double *prev, double
     *prev = *curr;
 
     //compute average
-    double total_magnitude = std::accumulate(signal->begin(), signal->end(), 0);//computes sum
+    double total_magnitude = std::accumulate(signal->begin(), signal->end(), 0.0);//computes sum
     
     //update curr signal
-    *curr = total_magnitude / std::distance(signal->begin(), signal->end());
+    *curr = total_magnitude / (double) std::distance(signal->begin(), signal->end());
     
     //clear contents
     signal->clear();

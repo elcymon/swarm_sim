@@ -16,7 +16,7 @@ world_db = {
 	
 }
 
-def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,gzmode):
+def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id, port_number, gzmode):
 	port_number = int(port_number) + 11345
 	folder_name = world_name + '-' + experiment
 
@@ -54,7 +54,7 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,
 		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
-			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {}'.format(port_number, folder_name, paramLine, sge_task_id),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {} {}'.format(port_number, folder_name, params_file, paramLine, sge_task_id),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 			if load_logger.returncode==None:
 				print('''
 				\n\n
@@ -86,5 +86,5 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,
 
 if __name__=='__main__':
 	# paramLine and port_number vary based on $SGE_TASK_ID value
-	# start_simulation(world_name, experiment, paramLine,   sge_task_id, port_number)
-	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],sys.argv[6])
+	# start_simulation(world_name, experiment, params_file, paramLine,   sge_task_id, port_number, gzmode)
+	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])

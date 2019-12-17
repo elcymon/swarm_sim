@@ -770,10 +770,10 @@ namespace gazebo
 													+ ":" + to_string(rslt_theta) + ":" + 
 													to_string(att_neighbours) + ":" + to_string(att_signal));
 							this->pub_commSignal[r_name]->Publish(any);
-							if (att_signal > 0 and r_name.compare("m_4wrobot20") == 0)
-							{
-								gzdbg << r_name << ": " << att_neighbours << ", " << to_string(att_signal) << std::endl;
-							}
+							// if (att_signal > 0 and r_name.compare("m_4wrobot20") == 0)
+							// {
+							// 	gzdbg << r_name << ": " << att_neighbours << ", " << to_string(att_signal) << std::endl;
+							// }
 							
 							//any.set_string_value(to_string(att_neighbours) + ":" + to_string(att_signal));
 							//this->pub_attraction[r_name]->Publish(any);

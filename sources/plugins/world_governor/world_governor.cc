@@ -168,8 +168,10 @@ void experiment_control_cb(ConstAnyPtr &any)
 int main(int _argc, char **_argv)
 {
 	std::string simulationFolder = _argv[1];
-	paramLine = std::stoi(_argv[2]);
-	int sge_task_id = std::stoi(_argv[3]);
+	std::string params = _argv[2];
+	paramLine = std::stoi(_argv[3]);
+	int sge_task_id = std::stoi(_argv[4]);
+	
 
 	//set up folder name to save results
 	boost::filesystem::path full_path(boost::filesystem::current_path());
@@ -219,7 +221,7 @@ int main(int _argc, char **_argv)
 	ifstream myfile;//for loading file
 	string line, header;//which row in file and row 1 is header
 	int param_it_loc = 0;//keep track of which location in my_params vector we are at
-	myfile.open("params/params.csv");
+	myfile.open(full_path.string() + "/" + params);
 	if(myfile.is_open()){
 		getline(myfile,header);
 		int paramCounter = 0;
