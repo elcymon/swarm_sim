@@ -17,8 +17,8 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 	s = s.substr(div_loc+1);
 	div_loc = s.find(":");
 	stringstream repel_stream;
-	repel_stream << std::setprecision(10) << s.substr(0,div_loc);
-	repel_stream >> std::setprecision(10) >> repel_sig;
+	repel_stream << std::fixed << std::setprecision(10) << s.substr(0,div_loc);
+	repel_stream >> std::setprecision(10) >> std::fixed >> repel_sig;
 	// repel_sig = std::stod(s.substr(0,div_loc));
 	this->repel_queue.push_back(repel_sig);
 
@@ -35,8 +35,8 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 	
 	//Extract attraction signal
 	stringstream call_stream;
-	call_stream << std::setprecision(5) << s.substr(div_loc+1);
-	call_stream >> std::setprecision(5) >> call_sig;
+	call_stream <<std::fixed << std::setprecision(10) << s.substr(div_loc+1);
+	call_stream >> std::setprecision(10) >> std::fixed >> call_sig;
 	// call_sig = std::stod(s.substr(div_loc+1));
 	this->call_queue.push_back(call_sig);
 	

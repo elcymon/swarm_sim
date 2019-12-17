@@ -505,7 +505,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			}
 			// if (this->call_signal > 0 and this->model->GetName().compare("m_4wrobot20") == 0)
 			// {
-			// 	gzdbg << this->model->GetName() << ": " << this->call_neighbours << ", "
+			// 	gzdbg << std::fixed <<std::setprecision(10) << this->model->GetName() << ": " << this->call_neighbours << ", "
 			// 		<< this->prev_call_signal << ", " << this->call_signal <<"; "
 			// 		<< this->prev_repel_signal << ", " << this->repel_signal 
 			// 		<< std::endl;
