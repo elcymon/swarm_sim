@@ -461,7 +461,11 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		this->call_signal = this->commModel.get_value("curr_call_signal");
 		this->prev_call_signal = this->commModel.get_value("prev_call_signal");
 
-
+		if (this->model->GetName().compare("m_4wrobot10") == 0 and this->call_signal > 0 )
+		{
+			gzdbg << this->repel_signal <<", " << this->prev_repel_signal <<" : "
+				<< this->call_signal <<", " <<this->prev_call_signal << std::endl;
+		}
 		//start: modify turn probability based on comm signal
 		//this section handles repulsion signals
 		if(this->turn_complete)// and this->new_comm_signal)

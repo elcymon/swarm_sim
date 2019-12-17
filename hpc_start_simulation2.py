@@ -50,7 +50,7 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number)
 
 	#start up gazebo if all processes are successful
 	if(all_set == 0):
-		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};gzserver --verbose {}'.format(port_number,world_db[world_name])
+		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};gazebo --verbose {}'.format(port_number,world_db[world_name])
 		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
