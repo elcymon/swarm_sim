@@ -8,11 +8,12 @@ stop=$3
 world=$4
 experiment=$5
 param_file=$6
+port_shift=$7 #default is 0, but can take a value to prevent gzserver of two separate experiments from overlapping
 
 if (( hpc )); then
     for (( paramLine = start; paramLine <= stop; paramLine++)) do
         echo $paramLine # $(( $paramLine + $stop))
-        qsub hpc_qsub.sh $hpc $world $experiment $param_file $paramLine
+        qsub hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift
 
 #        qsub hpc_qsub.sh $hpc $world N100-Q40  $param_file $paramLine
 # $(( $paramLine + $stop ))
@@ -22,5 +23,5 @@ if (( hpc )); then
 else
     # experiment=test
     paramLine=$stop
-    sh hpc_qsub.sh $hpc $world $experiment $param_file $paramLine
+    ./hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift
 fi

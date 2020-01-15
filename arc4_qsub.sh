@@ -10,8 +10,8 @@
 #$ -o /nobackup/scsoo/logs/outputs
 
 # Request a full node (24 cores and 128 GB or 768 GB on ARC3)
-# -l nodes=0.25
-# -l node_type=24core-128G
+# -l nodes=0.1
+# -l node_type=40core-192G
 
 # To request for x cores on a single machine, with around y memory per core
 # -pe smp x -l h_vmem=yG
@@ -50,7 +50,7 @@ else
     folder=.
     JOB_ID=123
     SGE_TASK_ID=1
-    gzmode=gzserver
+    gzmode=gazebo
 fi
 
 #execute simulation
@@ -69,6 +69,6 @@ port_shift=$6 #to prevent overlap with another gzserver of a different experimen
 #there should be no repetition of server port or else they will overwrite each other. Adding 1 just to be safe
 port_number=$(( $SGE_TASK_ID + ( $port_shift + $paramLine ) * 32 ))
 echo world_name: $world_name, experiment: $experiment, paramLine: $paramLine, port_number: $port_number
-mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
+mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.40core-192G.q $folder/results
 
 singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $param_file $paramLine $SGE_TASK_ID $port_number $gzmode

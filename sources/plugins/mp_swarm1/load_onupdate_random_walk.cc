@@ -887,6 +887,27 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		double yc = this->my_pose.pos.y;
 		
 		//HANDLE DATA OF ROBOT TO BE PUBLISHED
+		string com_u2s = "n";
+		
+		if(this->state.compare("searching") == 0)
+		{
+			com_u2s = "r";
+		}
+		if((this->numseen_u2s - (this->capacity - this->litter_db.size())) > 0)
+		{
+			com_u2s = "a";
+		}
+
+		string com_pure = "r";
+		if((this->numseen_pure - (this->capacity - this->litter_db.size())) > 0)
+		{
+			com_pure = "a";
+		}
+		else if ((this->state.compare("homing") == 0) or (this->numseen_pure > 0))
+		{
+			com_pure = "n";
+		}
+
 		custom_msgs::msgs::RobotInfo myInfo;
 		myInfo.set_x(xc);
 		myInfo.set_y(yc);
@@ -898,6 +919,10 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		myInfo.set_seen_litter(this->detectedLitterNames);
 		myInfo.set_state(this->state);
 		myInfo.set_robot_name(this->ModelName);
+		myInfo.set_numseen_pure(this->numseen_pure);
+		myInfo.set_numseen_u2s(this->numseen_u2s);
+		myInfo.set_com_pure(com_pure);
+		myInfo.set_com_u2s(com_u2s);
 		
 		this->pub_robot_info->Publish(myInfo);
 		

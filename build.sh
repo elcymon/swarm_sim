@@ -12,4 +12,4 @@ cd build
 cmake ../
 make
 
-cp world_governor ../../../../
+cp -f world_governor ../../../../

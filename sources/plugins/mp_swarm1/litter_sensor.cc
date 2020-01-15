@@ -56,6 +56,8 @@ void ModelVel::LitterSensor()
 	this->litter_pos.z=-9000.1;//initialize closest litter at unreasonable distance in z direction
 	
 	this->seen_litter = 0;
+	this->numseen_pure = 0;
+	this->numseen_u2s = 0;
 	this->no_litter = true;
 	std::string detections = "";
 	//this->neighbours = 0;
@@ -84,29 +86,33 @@ void ModelVel::LitterSensor()
 			lit_or = this->computeObjectOrientation(m_p,my_p,this->my_pose.rot.GetYaw());
 			
 			if((dist <= this->lit_sensing) and 
-			    (this->testObjectWithinFoV(lit_or,this->halffov)) and
-				(this->uform_rand(this->generator) < probability)
+			    (this->testObjectWithinFoV(lit_or,this->halffov))
 			  )
 			{
-				seen = true;
-				//computing the rotaional distance
-				//double rot_dist = lit_or/(2 * M_PI) * (M_PI * this->chassis_diameter);//original formula
-				double rot_dist = lit_or/2.0 * this->chassis_diameter;//original formula reduces to this
-				dist = dist + abs(rot_dist); //add rotational distance
-				if(dist + 0.01 < this->litter_distance)//if difference between distances is more than 10cm, you can change closest litter
+				this->numseen_pure += 1;
+				if (this->uform_rand(this->generator) < probability)
 				{
-					//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
-					this->litter_pos = m_p;
-					this->LitterName = m->GetName();
-					this->litter_distance = dist;//update closest litter
-					this->litterModel = m;
+					this->numseen_u2s += 1;
+					seen = true;
+					//computing the rotaional distance
+					//double rot_dist = lit_or/(2 * M_PI) * (M_PI * this->chassis_diameter);//original formula
+					double rot_dist = lit_or/2.0 * this->chassis_diameter;//original formula reduces to this
+					dist = dist + abs(rot_dist); //add rotational distance
+					if(dist + 0.01 < this->litter_distance)//if difference between distances is more than 10cm, you can change closest litter
+					{
+						//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
+						this->litter_pos = m_p;
+						this->LitterName = m->GetName();
+						this->litter_distance = dist;//update closest litter
+						this->litterModel = m;
+					}
+					this->seen_litter += 1;
+					if (detections != "")
+					{
+						detections += ";";
+					}
+					detections += (m->GetName()).substr(8);
 				}
-				this->seen_litter += 1;
-				if (detections != "")
-				{
-					detections += ";";
-				}
-				detections += (m->GetName()).substr(8);
 			}
 		}
 		// else{//delete from DB because litter is not within world area

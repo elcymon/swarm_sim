@@ -50,7 +50,7 @@ else
     folder=.
     JOB_ID=123
     SGE_TASK_ID=1
-    gzmode=gzserver
+    gzmode=gazebo
 fi
 
 #execute simulation

@@ -8,6 +8,12 @@ struct RobotInfo {
         std::string seen_litter = "";
         std::string state = "searching";
         std::string robot_name = "";
+
+        double numseen_u2s = 0;
+        double numseen_pure = 0;
+        std::string com_pure = "";
+        std::string com_u2s = "";
+
         void init_info(gazebo::physics::ModelPtr model)
         {
             auto pose = model->GetWorldPose();
@@ -30,6 +36,10 @@ struct RobotInfo {
                 this->litter_db = info.litter_db();
                 this->seen_litter = info.seen_litter();
                 this->state = info.state();
+                this->numseen_pure = info.numseen_pure();
+                this->numseen_u2s = info.numseen_u2s();
+                this->com_pure = info.com_pure();
+                this->com_u2s = info.com_u2s();
             }
             else
             {

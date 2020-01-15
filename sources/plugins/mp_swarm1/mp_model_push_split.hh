@@ -137,6 +137,9 @@ namespace gazebo
 			double detectionDuration;//time taken to perform detection
 			double previousVisionTime;
 			std::set<std::string> prev_seen;
+			////////MISINFORMATION//////////
+			double numseen_u2s,numseen_pure;
+			///////////////////////////////
 			
 			transport::PublisherPtr pub_robot_info;
 			transport::PublisherPtr pub_myDetectedLitterNames;
