@@ -665,7 +665,7 @@ namespace gazebo
 													repulsion_intensity += this->noise_distro(this->generator);
 												
 												}
-												else if(this->com_model.compare("soundv2") == 0){
+												else{//} if(this->com_model.compare("soundv2") == 0){
 													//noise_mean is average of fitError/signalStrength and noise_std is the deviation across experiments
 													std::normal_distribution<double> noise_distro_std(this->noise_mean,this->noise_std);
 													
@@ -682,13 +682,14 @@ namespace gazebo
 													repulsion_intensity = noise_distro_signal(this->generator);
 													
 													
-												}
-												else if(this->com_model.compare("vector") == 0) {
-													//TO DO
-													double rep_x = (r_pos.x - n_pos.x)/dist;
-													double rep_y = (r_pos.y - n_pos.y)/dist;
-													rslt_x += rep_x;
-													rslt_y += rep_y;
+													if(this->com_model.compare("vector") == 0) {
+													//ignore distant communicated signal, by removing ambient noise
+														repulsion_intensity = (repulsion_intensity - this->Ae) < 0 ? 0 : repulsion_intensity - this->Ae;
+														double rep_x = (r_pos.x - n_pos.x) >= 0 ? repulsion_intensity : -repulsion_intensity;
+														double rep_y = (r_pos.y - n_pos.y) >= 0 ? repulsion_intensity : -repulsion_intensity;
+														rslt_x += rep_x;
+														rslt_y += rep_y;
+													}
 												}
 												//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/
@@ -719,7 +720,7 @@ namespace gazebo
 													//add noise
 													attraction_intensity += this->noise_distro(this->generator);
 												}
-												else if(this->com_model.compare("soundv2") == 0){
+												else{//(this->com_model.compare("soundv2") == 0){
 													//noise_mean is average of fitError/signalStrength and noise_std is the deviation across experiments
 													std::normal_distribution<double> noise_distro_std1(this->noise_mean,this->noise_std);
 													
@@ -736,13 +737,14 @@ namespace gazebo
 													attraction_intensity = noise_distro_signal1(this->generator);
 													
 													
-												}
-												else if(this->com_model.compare("vector") == 0) {
-													//TO DO
-													double att_x = (n_pos.x - r_pos.x) / dist;
-													double att_y = (n_pos.y - r_pos.y) / dist;
-													rslt_x += att_x;
-													rslt_y += att_y;
+													if(this->com_model.compare("vector") == 0) {
+														//ignore distant communicated signal, by removing ambient noise
+														attraction_intensity = (attraction_intensity - this->Ae) < 0 ? 0 : attraction_intensity - this->Ae;
+														double att_x = (n_pos.x - r_pos.x) >= 0 ? attraction_intensity : -attraction_intensity;
+														double att_y = (n_pos.y - r_pos.y) >= 0 ? attraction_intensity : -attraction_intensity;
+														rslt_x += att_x;
+														rslt_y += att_y;
+													}
 												}
 												// double attraction_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
 												/*******************************************************/

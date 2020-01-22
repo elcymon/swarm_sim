@@ -548,6 +548,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		if(this->escape > 0 && this->dxy(this->my_pose.pos,this->escape_start) >= this->escape)
 		{//If desired escape distance has been reached/exceeded, set escape to invalide input
 			this->escape = -1.0;
+			this->crashed = false;
 		}
 		if (_info.simTime.Double() - this->previousVisionTime >= this->detectionDuration)
 		{
@@ -620,8 +621,16 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				
 				this->waiting_t = 0;//reset waiting time.
 			}
-			if (this->com_model.compare("vector") == 0){
+			if ((this->com_model.compare("vector") == 0) and (this->escape < 0) ){
 				this->d_heading = this->normalize(this->rslt_theta);
+				double d_eror = this->d_heading - this->my_pose.rot.GetYaw();
+				d_eror = this->normalize(d_eror);
+				if (abs(d_eror) > 0.09)
+				{
+					this->turn_complete = false;
+					this->waiting_t = 0;//reset waiting time.
+				}
+				
 			}
 			
 		}
@@ -699,7 +708,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			
 			
 			//When going home i.e. capacity full.
-			if(this->go_home and not this->at_home)
+			if((this->go_home and not this->at_home) or
+				(not this->go_home and (this->com_model.compare("vector") == 0)))
 			{//when capacity is full and crashed, definitely avoid obstacle.
 				this->escape = this->uform_rand(this->generator)  * this->escape_dist;//or rand()/double(RAND_MAX);
 				this->escape_start = this->my_pose.pos;

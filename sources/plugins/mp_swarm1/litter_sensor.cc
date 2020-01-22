@@ -23,7 +23,8 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 	s = s.substr(div_loc+1);
 	div_loc = s.find(":");
 	this->rslt_theta = std::stod(s.substr(0,div_loc));
-	
+	// if(this->ModelName.compare("m_4wrobot10") == 0)
+	// gzdbg << this->rslt_theta << endl;
 	//Extract attraction neighbours
 	s = s.substr(div_loc+1);
 	div_loc = s.find(":");
