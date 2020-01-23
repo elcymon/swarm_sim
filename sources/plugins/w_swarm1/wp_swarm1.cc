@@ -768,6 +768,8 @@ namespace gazebo
 							}
 							
 							double rslt_theta = atan2(rslt_y,rslt_x);
+							// if (r_name.compare("m_4wrobot10") == 0)
+							// gzdbg << "rslt_y: "<<rslt_y << " rslt_x: " << rslt_x << std::endl;
 							
 							msgs::Any any;
 							any.set_type(msgs::Any::STRING);
