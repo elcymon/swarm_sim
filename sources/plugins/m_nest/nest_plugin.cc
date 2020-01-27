@@ -74,9 +74,12 @@ namespace gazebo
 				// ofstream myfile(this->littersFile,std::ios::app|std::ios::ate);
 				// gzdbg << litterNames <<std::endl;
 				// gzdbg << this->littersFile.str() <<std::endl;
-				this->writeData(this->littersFile.str(),litterNames);
-				this->writeData(this->littersFile.str(),litterx);
-				this->writeData(this->littersFile.str(),littery);
+				if (this->littersFile.str().find("_001_") != std::string::npos)
+				{
+					this->writeData(this->littersFile.str(),litterNames);
+					this->writeData(this->littersFile.str(),litterx);
+					this->writeData(this->littersFile.str(),littery);
+				}
 
 				this->writeData(this->nestFile.str(),"time,litterCount,pickedLitter");
 
@@ -85,9 +88,12 @@ namespace gazebo
 					robotNames += "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first+ ","  + m.first + "," + m.first + "," + m.first + "," + m.first;
 					robotInfo += ",x,y,yaw,litterPicked,seenLitter,state,numseen_u2s,com_u2s,numseen_pure,com_pure";
 				}
-				this->writeData(this->robotsFile.str(),robotNames);
-				this->writeData(this->robotsFile.str(),robotInfo);
-				this->writeData(this->robotsFile.str(),"time");
+				if (this->robotsFile.str().find("_001_") != std::string::npos)
+				{
+					this->writeData(this->robotsFile.str(),robotNames);
+					this->writeData(this->robotsFile.str(),robotInfo);
+					this->writeData(this->robotsFile.str(),"time");
+				}
 			}
 			else {
 				string litterInfo = to_string(t);
@@ -104,21 +110,26 @@ namespace gazebo
 						pickedLitter++;
 					}
 				}
-				this->writeData(this->littersFile.str(),litterInfo);
-
-				for (auto m : this->robots) {
-					robotsInfo += "," + this->setNumDP((m.second).x,3);
-					robotsInfo += "," + this->setNumDP((m.second).y,3);
-					robotsInfo += "," + this->setNumDP((m.second).yaw,3);
-					robotsInfo += "," + (m.second).litter_db;
-					robotsInfo += "," + (m.second).seen_litter;
-					robotsInfo += "," + (m.second).state;
-					robotsInfo += "," + this->setNumDP((m.second).numseen_u2s,0);
-					robotsInfo += "," + (m.second).com_u2s;
-					robotsInfo += "," + this->setNumDP((m.second).numseen_pure,0);
-					robotsInfo += "," + (m.second).com_pure;
+				if (this->littersFile.str().find("_001_") != std::string::npos)
+				{
+					this->writeData(this->littersFile.str(),litterInfo);
 				}
-				this->writeData(this->robotsFile.str(),robotsInfo);
+				if (this->robotsFile.str().find("_001_") != std::string::npos)
+				{
+					for (auto m : this->robots) {
+						robotsInfo += "," + this->setNumDP((m.second).x,3);
+						robotsInfo += "," + this->setNumDP((m.second).y,3);
+						robotsInfo += "," + this->setNumDP((m.second).yaw,3);
+						robotsInfo += "," + (m.second).litter_db;
+						robotsInfo += "," + (m.second).seen_litter;
+						robotsInfo += "," + (m.second).state;
+						robotsInfo += "," + this->setNumDP((m.second).numseen_u2s,0);
+						robotsInfo += "," + (m.second).com_u2s;
+						robotsInfo += "," + this->setNumDP((m.second).numseen_pure,0);
+						robotsInfo += "," + (m.second).com_pure;
+					}
+					this->writeData(this->robotsFile.str(),robotsInfo);
+				}
 				nestInfo += "," + to_string(this->numLitter) + "," + to_string(pickedLitter);
 				this->writeData(this->nestFile.str(),nestInfo);
 
@@ -132,8 +143,11 @@ namespace gazebo
 									return ss.str();
 								}
 		public : void createFileNames(string logPrefix) {
-			this->littersFile << logPrefix << "_littersFile.csv";
-			this->robotsFile << logPrefix << "_robotsFile.csv";
+			if (logPrefix.find("_001_") != std::string::npos)
+			{
+				this->littersFile << logPrefix << "_littersFile.csv";
+				this->robotsFile << logPrefix << "_robotsFile.csv";
+			}
 			this->nestFile << logPrefix << "_nestFile.csv";
 
 
