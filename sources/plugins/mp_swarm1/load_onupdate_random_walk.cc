@@ -230,7 +230,11 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		}
 		else if(param_name.compare("capacity")==0)
 		{
-			this->capacity = std::stod(param_value_str);;
+			this->capacity = std::stoi(param_value_str);;
+		}
+		else if(param_name.compare("lit_threshold")==0)
+		{
+			this->lit_threshold = std::stoi(param_value_str);;
 		}
 		else if(param_name.compare("umin")==0)
 		{
@@ -886,6 +890,19 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		double xc = this->my_pose.pos.x;
 		double yc = this->my_pose.pos.y;
 		
+		//handle delay before switching to search (i.e. repel) state
+		if (!(this->lit_detections_queue.empty()) and (this->lit_threshold == 0))
+		{//only execute this step if queue is non empty
+			double total_detections = std::accumulate(this->lit_detections_queue.begin(),
+											this->lit_detections_queue.end(),0.0);
+			double average_detections = total_detections / (double) this->lit_detections_queue.size();
+			if (average_detections > 0 and this->state.compare("searching") == 0) 	
+			{//something was detected within the previous steps of the queue
+				//refrain from repelling
+				this->state = "go4litter";
+			}
+		}
+
 		//HANDLE DATA OF ROBOT TO BE PUBLISHED
 		string com_u2s = "n";
 		
@@ -893,7 +910,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		{
 			com_u2s = "r";
 		}
-		if((this->numseen_u2s - (this->capacity - this->litter_db.size())) > 0)
+		if((this->numseen_u2s + this->lit_threshold - (this->capacity - this->litter_db.size())) > 0)
 		{
 			com_u2s = "a";
 		}
@@ -912,11 +929,13 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		myInfo.set_x(xc);
 		myInfo.set_y(yc);
 		myInfo.set_yaw(theta);
-		myInfo.set_extra_litter(this->seen_litter - 
+		
+		myInfo.set_extra_litter(this->seen_litter + this->lit_threshold - 
 				(this->capacity - this->litter_db.size()));
 		myInfo.set_litter_count(this->litter_db.size());
 		myInfo.set_litter_db(litterNamesStream.str());
 		myInfo.set_seen_litter(this->detectedLitterNames);
+		
 		myInfo.set_state(this->state);
 		myInfo.set_robot_name(this->ModelName);
 		myInfo.set_numseen_pure(this->numseen_pure);

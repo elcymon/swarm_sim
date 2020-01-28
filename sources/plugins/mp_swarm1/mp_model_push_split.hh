@@ -123,6 +123,10 @@ namespace gazebo
 			double picking_lit_dur;
 			double pick_lit_time;
 			int capacity;
+
+			int lit_threshold;
+			std::deque<int> lit_detections_queue;
+			
 			int litter_count;
 			int litter_collected;// all litter a robot has collected so far
 			int litter_deposited;// all litter dropped by robot at the nest

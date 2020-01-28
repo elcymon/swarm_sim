@@ -131,6 +131,13 @@ void ModelVel::LitterSensor()
 		
 		
 	}
+	//update seen litter queue
+	if (this->lit_detections_queue.size() >= 40)
+	{
+		this->lit_detections_queue.pop_front();
+	}
+	this->lit_detections_queue.push_back(this->seen_litter);
+
 	msgs::Any seen_litter_msg;
 	seen_litter_msg.set_type(msgs::Any::STRING);
 	seen_litter_msg.set_string_value(this->ModelName + ":" + to_string(this->seen_litter - (this->capacity - this->litter_count)));
