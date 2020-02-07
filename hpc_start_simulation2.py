@@ -16,11 +16,11 @@ world_db = {
 	
 }
 
-def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id, port_number, gzmode):
+def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id, job_id, port_number, gzmode):
 	port_number = int(port_number) + 11345
 	folder_name = world_name + '-' + experiment
 
-	print('folder_name: {}\nparamLine: {}\nport_number: {}\nsge_task_id: {}'.format(folder_name,paramLine,port_number,sge_task_id))
+	print('folder_name: {}\nparamLine: {}\nport_number: {}\nsge_task_id: {}\njob_id: {}'.format(folder_name,paramLine,port_number,sge_task_id,job_id))
 	copy_wp=None
 	copy_rp=None
 	copy_np=None
@@ -54,7 +54,7 @@ def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id,
 		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
-			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {} {}'.format(port_number, folder_name, params_file, paramLine, sge_task_id),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {} {} {}'.format(port_number, folder_name, params_file, paramLine, sge_task_id, job_id),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 			if load_logger.returncode==None:
 				print('''
 				\n\n
@@ -86,5 +86,5 @@ def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id,
 
 if __name__=='__main__':
 	# paramLine and port_number vary based on $SGE_TASK_ID value
-	# start_simulation(world_name, experiment, params_file, paramLine,   sge_task_id, port_number, gzmode)
-	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+	# start_simulation(world_name, experiment, params_file, paramLine,   sge_task_id, job_id,       port_number, gzmode)
+	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8])

@@ -171,6 +171,8 @@ int main(int _argc, char **_argv)
 	std::string params = _argv[2];
 	paramLine = std::stoi(_argv[3]);
 	int sge_task_id = std::stoi(_argv[4]);
+	std::string job_id = _argv[5];
+	
 	
 
 	//set up folder name to save results
@@ -252,7 +254,7 @@ int main(int _argc, char **_argv)
 						startTime << std::put_time(&logT,"%Y-%m-%d-%H-%M-%S");
 						std::ostringstream sge_task_id_stream;
 						sge_task_id_stream << std::setfill('0') << std::setw(3) << sge_task_id;
-						param_line += "logPrefix:" + folder_name + algorithmID + "_" + sge_task_id_stream.str() + "_" + startTime.str()+ ",";
+						param_line += "logPrefix:" + folder_name + algorithmID + "_" + sge_task_id_stream.str() + "_" + job_id + "_" + startTime.str()+ ",";
 					}
 				}
 				my_params.push_back(param_line);
