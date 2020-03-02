@@ -14,7 +14,7 @@ swarmsize=$8
 if (( hpc )); then
     for (( paramLine = start; paramLine <= stop; paramLine++)) do
         echo $paramLine # $(( $paramLine + $stop))
-        qsub hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift
+        qsub hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift $swarmsize
 
 #        qsub hpc_qsub.sh $hpc $world N100-Q40  $param_file $paramLine
 # $(( $paramLine + $stop ))

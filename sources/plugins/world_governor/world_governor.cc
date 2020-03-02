@@ -197,7 +197,7 @@ int main(int _argc, char **_argv)
 	else
 	{
 		std::cout<<"something went wrong while creating results folder: "<<folder_name;
-		exit(-1);
+		//exit(-1);
 	}
 	
 	
