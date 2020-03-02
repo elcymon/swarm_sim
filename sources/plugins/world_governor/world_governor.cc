@@ -172,6 +172,7 @@ int main(int _argc, char **_argv)
 	paramLine = std::stoi(_argv[3]);
 	int sge_task_id = std::stoi(_argv[4]);
 	std::string job_id = _argv[5];
+	std::string swarmsize = _argv[6];
 	
 	
 
@@ -184,34 +185,19 @@ int main(int _argc, char **_argv)
 	auto tm = *std::localtime(&t);
 	si1 << std::put_time(&tm,"%Y-%m-%d-");
 	
-	folder_name =  full_path.string() + "/results/" + si1.str()+ simulationFolder + "/";
+	folder_name =  full_path.string() + "/results/" + si1.str()+ simulationFolder + "/r" + swarmsize;
 	
 	const char *mk_dir = folder_name.c_str();
 	
 	int a = mkdir("results", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-	if (a==0 or errno==EEXIST)
+	if (boost::filesystem::create_directories(folder_name))
 	{
-		if(mkdir(mk_dir, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
-		{
-			if(errno==EEXIST){
-				//already exists
-				std::cout<<folder_name<<" already exists"<<endl;
-			}
-			else {
-				std::cout<<"cannot create: "<<folder_name<<" errno: "<<errno<<endl;
-				exit(errno);
-			}
-		}
-		// ofstream myfilex(folder_name + "readme.md",std::ios::app|std::ios::ate);
-		// myfilex <<"\n**************\n"
-		// 		  <<"New Experiment"
-		// 		<<"\n**************\n";
-		// myfilex.close();
+		std::cout << "folder created: "<<folder_name <<std::endl;
 	}
 	else
 	{
-		std::cout<<"something went wrong while creating results folder. Errno = "<<errno<<endl;
-		exit(errno);
+		std::cout<<"something went wrong while creating results folder: "<<folder_name;
+		exit(-1);
 	}
 	
 	
@@ -254,7 +240,7 @@ int main(int _argc, char **_argv)
 						startTime << std::put_time(&logT,"%Y-%m-%d-%H-%M-%S");
 						std::ostringstream sge_task_id_stream;
 						sge_task_id_stream << std::setfill('0') << std::setw(3) << sge_task_id;
-						param_line += "logPrefix:" + folder_name + algorithmID + "_" + sge_task_id_stream.str() + "_" + job_id + "_" + startTime.str()+ ",";
+						param_line += "logPrefix:" + folder_name + "/" + algorithmID + "_" + sge_task_id_stream.str() + "_" + job_id + "_" + startTime.str()+ ",";
 					}
 				}
 				my_params.push_back(param_line);

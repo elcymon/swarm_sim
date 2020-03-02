@@ -9,6 +9,7 @@ world=$4
 experiment=$5
 param_file=$6
 port_shift=$7 #default is 0, but can take a value to prevent gzserver of two separate experiments from overlapping
+swarmsize=$8
 
 if (( hpc )); then
     for (( paramLine = start; paramLine <= stop; paramLine++)) do
@@ -23,5 +24,5 @@ if (( hpc )); then
 else
     # experiment=test
     paramLine=$stop
-    ./hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift
+    ./hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift $swarmsize
 fi

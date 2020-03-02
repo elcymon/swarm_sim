@@ -65,10 +65,11 @@ param_file=$4
 #how many rows of parameters should be ignored use 0 if none
 paramLine=$5
 port_shift=$6 #to prevent overlap with another gzserver of a different experiment submission
+swarmsize=$7
 
 #there should be no repetition of server port or else they will overwrite each other. Adding 1 just to be safe
 port_number=$(( $SGE_TASK_ID + ( $port_shift + $paramLine ) * 32 ))
 echo world_name: $world_name, experiment: $experiment, paramLine: $paramLine, port_number: $port_number
 mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 
-singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $param_file $paramLine $SGE_TASK_ID $JOB_ID $port_number $gzmode
+singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $param_file $paramLine $SGE_TASK_ID $JOB_ID $port_number $gzmode $swarmsize
