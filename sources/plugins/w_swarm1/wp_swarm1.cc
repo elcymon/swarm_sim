@@ -16,6 +16,7 @@
 #include <ctime>
 
 #include "robot_info.pb.h"
+#include "comm_data.pb.h"
 #include "../utils/utils.cc"
 
 using namespace std;
@@ -24,6 +25,7 @@ namespace gazebo
 	typedef const boost::shared_ptr<
   const custom_msgs::msgs::RobotInfo>
     ConstRobotInfoPtr;
+	
 	
 	struct LitterInfo {
 		physics::ModelPtr litterModel;
@@ -176,7 +178,7 @@ namespace gazebo
 					if(model_name.find("m_4wrobot") != std::string::npos)
 					{
 						this->robot_ptr.push_back(m);
-						this->pub_commSignal[model_name] = this->node->Advertise<msgs::Any>("/"+model_name+"/comm_signal");
+						this->pub_commSignal[model_name] = this->node->Advertise<custom_msgs::msgs::CommData>("/"+model_name+"/comm_signal");
 						
 						this->robots[model_name].init_info(m);
 					}
@@ -629,6 +631,7 @@ namespace gazebo
 							std::string att_data = "";
 							
 							double rslt_x=0.0,rslt_y=0.0;
+							double rep_x = 0, rep_y = 0, att_x = 0, att_y = 0;
 							
 							for(auto n : this->robot_ptr)
 							{//Loop through neighbours
@@ -685,10 +688,10 @@ namespace gazebo
 													if(this->com_model.compare("vector") == 0) {
 													//ignore distant communicated signal, by removing ambient noise
 														repulsion_intensity = (repulsion_intensity - this->Ae) < 0 ? 0 : repulsion_intensity - this->Ae;
-														double rep_x = (r_pos.x - n_pos.x) >= 0 ? repulsion_intensity : -repulsion_intensity;
-														double rep_y = (r_pos.y - n_pos.y) >= 0 ? repulsion_intensity : -repulsion_intensity;
-														rslt_x += rep_x;
-														rslt_y += rep_y;
+														rep_x += (r_pos.x - n_pos.x) >= 0 ? repulsion_intensity : -repulsion_intensity;
+														rep_y += (r_pos.y - n_pos.y) >= 0 ? repulsion_intensity : -repulsion_intensity;
+														// rslt_x += rep_x;
+														// rslt_y += rep_y;
 													}
 												}
 												//double repulsion_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
@@ -740,10 +743,10 @@ namespace gazebo
 													if(this->com_model.compare("vector") == 0) {
 														//ignore distant communicated signal, by removing ambient noise
 														attraction_intensity = (attraction_intensity - this->Ae) < 0 ? 0 : attraction_intensity - this->Ae;
-														double att_x = (n_pos.x - r_pos.x) >= 0 ? attraction_intensity : -attraction_intensity;
-														double att_y = (n_pos.y - r_pos.y) >= 0 ? attraction_intensity : -attraction_intensity;
-														rslt_x += att_x;
-														rslt_y += att_y;
+														att_x += (n_pos.x - r_pos.x) >= 0 ? attraction_intensity : -attraction_intensity;
+														att_y += (n_pos.y - r_pos.y) >= 0 ? attraction_intensity : -attraction_intensity;
+														// rslt_x += att_x;
+														// rslt_y += att_y;
 													}
 												}
 												// double attraction_intensity = (this->nei_sensing - dist)/(this->nei_sensing);
@@ -766,18 +769,30 @@ namespace gazebo
 									// }
 								}
 							}
-							
-							double rslt_theta = atan2(rslt_y,rslt_x);
+							// rslt_x = att_x + rep_x;
+							// rslt_y = att_y + rep_y;
+							// double rslt_theta = atan2(rslt_y,rslt_x);
 							// if (r_name.compare("m_4wrobot10") == 0)
 							// gzdbg << "rslt_y: "<<rslt_y << " rslt_x: " << rslt_x << std::endl;
 							
-							msgs::Any any;
-							any.set_type(msgs::Any::STRING);
-							any.set_string_value(to_string(rep_neighbours) + ":" + to_string(rep_signal)
-													+ ":" + to_string(rslt_theta) + ":" + 
-													to_string(att_neighbours) + ":" + to_string(att_signal));
-							this->pub_commSignal[r_name]->Publish(any);
+							// msgs::Any any;
+							// any.set_type(msgs::Any::STRING);
+							// any.set_string_value(to_string(rep_neighbours) + ":" + to_string(rep_signal)
+							// 						+ ":" + to_string(rslt_theta) + ":" + 
+							// 						to_string(att_neighbours) + ":" + to_string(att_signal));
+							custom_msgs::msgs::CommData comm_data;
+							comm_data.set_robot_name(r_name);
+							comm_data.set_rep_neighbours(rep_neighbours);
+							comm_data.set_rep_signal(rep_signal);
+							comm_data.set_att_neighbours(att_neighbours);
+							comm_data.set_att_signal(att_signal);
+							comm_data.set_att_x(att_x);
+							comm_data.set_att_y(att_y);
+							comm_data.set_rep_x(rep_x);
+							comm_data.set_rep_y(rep_y);
+							this->pub_commSignal[r_name]->Publish(comm_data);
 							
+
 							//any.set_string_value(to_string(att_neighbours) + ":" + to_string(att_signal));
 							//this->pub_attraction[r_name]->Publish(any);
 							

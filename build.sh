@@ -4,7 +4,7 @@ cd sources/plugins/build
 cmake ../
 make
 
-cp *.so ../../../compiled_plugins
+cp -f *.so ../../../compiled_plugins
 
 cd ../world_governor
 mkdir -p build
@@ -12,4 +12,4 @@ cd build
 cmake ../
 make
 
-cp world_governor ../../../../
+cp -f world_governor ../../../../

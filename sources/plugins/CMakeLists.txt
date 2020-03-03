@@ -15,6 +15,7 @@ foreach(ITR ${GAZEBO_INCLUDE_DIRS})
 endforeach()
 
 set (msgs
+  custom_msgs/comm_data/comm_data.proto
   custom_msgs/robot_info/robot_info.proto
   ${PROTOBUF_IMPORT_DIRS}/header.proto
   ${PROTOBUF_IMPORT_DIRS}/time.proto

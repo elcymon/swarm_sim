@@ -27,11 +27,14 @@
 #endif
 
 #include "robot_info.pb.h"
+#include "comm_data.pb.h"
 
 using namespace std;
 //using namespace cv;
 using namespace gazebo;
-
+typedef const boost::shared_ptr<
+  const custom_msgs::msgs::CommData>
+    ConstComDataPtr;
 namespace gazebo
 {
 	class ModelVel : public ModelPlugin
@@ -51,7 +54,7 @@ namespace gazebo
 			double avoid_obstacle(double x, double y,math::Pose my_pos);
 			void my_acTion(std::string acTion);
 			double normalize(double angle);
-			void CommSignal(ConstAnyPtr &a);
+			void CommSignal(ConstComDataPtr &a);
 			void my_Init(ConstAnyPtr &any);
 			void start_sim_cb(ConstAnyPtr &any);
 			

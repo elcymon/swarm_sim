@@ -1,42 +1,24 @@
-void ModelVel::CommSignal(ConstAnyPtr &a)
+void ModelVel::CommSignal(ConstComDataPtr &a)
 {
 	std::lock_guard<std::mutex> lock(this->mutex);
-	std::string s = a->string_value();
-	double repel_queue_tot = 0, call_queue_tot = 0;
-	double call_sig,repel_sig;//call and repel signals gotten in the new message
-	int call_neigh,repel_neigh;//call and repel neighbours gotten in the new message
-
-
-
-	size_t div_loc = s.find(":");
-	//Extract repulsion neighbours
-	repel_neigh = std::stoi(s.substr(0,div_loc));
-	this->rep_neighbours = repel_neigh;
+	if (this->ModelName.compare(a->robot_name()) != 0)
+		gzerr << "Expected: " << this->ModelName << "; but got: " << a->robot_name() <<std::endl;
 	
-	//Extract repulsion_signal
-	s = s.substr(div_loc+1);
-	div_loc = s.find(":");
-	repel_sig = std::stod(s.substr(0,div_loc));
-	this->repel_queue.push_back(repel_sig);
 
-	//Extract resultant theta
-	s = s.substr(div_loc+1);
-	div_loc = s.find(":");
-	this->rslt_theta = std::stod(s.substr(0,div_loc));
+
+	this->rep_neighbours = a->rep_neighbours();
+	this->repel_queue.push_back(a->rep_signal());
+	this->call_neighbours = a->att_neighbours();
+	this->call_queue.push_back(a->att_signal());
+
+	double rslt_x = a->att_x() + a->rep_x();
+	double rslt_y = a->att_y() + a->rep_y();
+	this->rslt_theta = atan2(rslt_y,rslt_x);
 	// if(this->ModelName.compare("m_4wrobot10") == 0)
 	// gzdbg << this->rslt_theta << endl;
-	//Extract attraction neighbours
-	s = s.substr(div_loc+1);
-	div_loc = s.find(":");
-	call_neigh = std::stoi(s.substr(0,div_loc));
-	this->call_neighbours = call_neigh;
-	
-	//Extract attraction signal
-	call_sig = std::stod(s.substr(div_loc+1));
-	this->call_queue.push_back(call_sig);
 	
 	//using proposed communication update method
-	this->commModel.update_comm_signals(call_sig,repel_sig,this->timeStamp);
+	this->commModel.update_comm_signals(a->att_signal(),a->rep_signal(),this->timeStamp);
 
 	
 }

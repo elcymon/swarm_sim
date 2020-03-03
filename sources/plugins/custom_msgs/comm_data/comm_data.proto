@@ -1,0 +1,15 @@
+package custom_msgs.msgs;
+
+message CommData
+{
+    required string robot_name = 1;
+    optional int32 rep_neighbours = 2;
+    optional double rep_signal = 3;
+    optional int32 att_neighbours = 4;
+    optional double att_signal = 5;
+
+    optional double rep_x = 6;
+    optional double rep_y = 7;
+    optional double att_x = 8;
+    optional double att_y = 9;
+}
