@@ -50,10 +50,12 @@ void ModelVel::CommSignal(ConstAnyPtr &a)
 void ModelVel::LitterSensor()
 {
 	//std::lock_guard<std::mutex> lock(this->mutex);
-	this->LitterName = "";
-	this->litterModel = nullptr;
-	this->litter_distance = 1000000;
-	this->litter_pos.z=-9000.1;//initialize closest litter at unreasonable distance in z direction
+	
+	//temporary variable for detected litter
+	std::string tempLitterName = "";
+	physics::ModelPtr templitterModel = nullptr;
+	double templitter_distance = 1000000;
+	math::Vector3 templitter_pos= math::Vector3(0,0,-9000.1);//initialize closest litter at unreasonable distance in z direction
 	
 	this->seen_litter = 0;
 	this->numseen_pure = 0;
@@ -98,13 +100,13 @@ void ModelVel::LitterSensor()
 					//double rot_dist = lit_or/(2 * M_PI) * (M_PI * this->chassis_diameter);//original formula
 					double rot_dist = lit_or/2.0 * this->chassis_diameter;//original formula reduces to this
 					dist = dist + abs(rot_dist); //add rotational distance
-					if(dist + 0.01 < this->litter_distance)//if difference between distances is more than 10cm, you can change closest litter
+					if(dist + 0.01 < templitter_distance)//if difference between distances is more than 10cm, you can change closest litter
 					{
 						//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
-						this->litter_pos = m_p;
-						this->LitterName = m->GetName();
-						this->litter_distance = dist;//update closest litter
-						this->litterModel = m;
+						templitter_pos = m_p;
+						tempLitterName = m->GetName();
+						templitter_distance = dist;//update closest litter
+						templitterModel = m;
 					}
 					this->seen_litter += 1;
 					if (detections != "")
@@ -131,6 +133,44 @@ void ModelVel::LitterSensor()
 		
 		
 	}
+
+	//update detected litter information data
+	if(!(this->LitterName.empty()))
+	{
+		this->litter_pos = this->litterModel->GetWorldPose().pos;
+		this->litter_distance = this->dxy(my_p,this->litter_pos);//linear distance
+		double old_lit_or = this->computeObjectOrientation(templitter_pos,my_p,this->my_pose.rot.GetYaw());
+		this->litter_distance += abs(old_lit_or/2.0 * this->chassis_diameter);//original formula reduces to this
+		if((this->litter_distance > 500) or
+			(this->litter_distance + 0.01 > templitter_distance))
+		{//litter distance is beyond world dimension
+		//new litter is closer than target
+			this->litter_pos = templitter_pos;
+			this->LitterName = tempLitterName;
+			this->litter_distance = templitter_distance;//update closest litter
+			this->litterModel = templitterModel;
+		}
+		else
+		{
+			this->seen_litter += 1;
+		}
+		
+		
+	}
+	else {
+		//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
+		this->litter_pos = templitter_pos;
+		this->LitterName = tempLitterName;
+		this->litter_distance = templitter_distance;//update closest litter
+		this->litterModel = templitterModel;
+	}
+	
+
+	// this->LitterName = tempLitterName;
+	// this->litterModel = templitterModel;
+	// this->litter_distance = templitter_distance;
+	// this->litter_pos = templitter_pos;
+
 	msgs::Any seen_litter_msg;
 	seen_litter_msg.set_type(msgs::Any::STRING);
 	seen_litter_msg.set_string_value(this->ModelName + ":" + to_string(this->seen_litter - (this->capacity - this->litter_count)));
