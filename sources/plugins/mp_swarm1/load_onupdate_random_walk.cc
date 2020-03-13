@@ -423,7 +423,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		std::string m_name = m->GetName();
 		if (m_name.find("litter") != std::string::npos)
 		{
-			this->myLitterDB.push_back(m);
+			this->myLitterDB[m_name] = m;
 		}
 	}
 
@@ -723,17 +723,28 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		
 		double dxn_eror = this->d_heading - this->my_pose.rot.GetYaw();
 		dxn_eror = this->normalize(dxn_eror);
-		
+		std::string litter_to_pick = this->LitterName;
+		for (auto name_modelptr : this->myLitterDB)
+		{
+			std::string litname = name_modelptr.first;
+			this->pick_litter = this->litterInPickingRange(litname);
+			if(this->pick_litter)
+			{
+				litter_to_pick = litname;
+				break;
+			}
+			// gzdbg <<this->model->GetName()<<":"<<litname<<std::endl;
+		}
 		if(this->pick_litter and not this->picking_lit_wait  and abs(dxn_eror) < M_PI/6.0)
 		{//pick litter that is within 30 degrees of robot yaw.
 			//cout<<" pick: "<<this->LitterName<<endl;
-			if(this->try_pick(this->LitterName))
+			if(this->try_pick(litter_to_pick))
 			{
 				double dump_x = rand() % 1000 + 1000;
 				double dump_y = rand() % 1000 + 1000;
 				gazebo::math::Pose dump_site = gazebo::math::Pose(dump_x,dump_y, 0.0, 0.0, 0.0, 0.0);
 				//transport::requestNoReply(this->node,"entity_delete",this->LitterName);
-				physics::ModelPtr l = this->world->GetModel(this->LitterName);
+				physics::ModelPtr l = this->myLitterDB[litter_to_pick];
 				//l->SetWorldPose(this->litter_dump_site);
 				
 				l->SetWorldPose(dump_site);
@@ -745,9 +756,13 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				this->picking_lit_wait = true;
 				this->pick_lit_time = _info.simTime.Double();
 			}
-			this->LitterName = "";
-			this->litterModel = nullptr;
-			this->litter_pos.z = -9000.1;
+			if(litter_to_pick.compare(this->LitterName) == 0)
+			{//picked litter that is robot's target
+				this->LitterName = "";
+				this->litterModel = nullptr;
+				this->litter_pos.z = -9000.1;
+
+			}
 			this->pick_litter = false;
 			
 			

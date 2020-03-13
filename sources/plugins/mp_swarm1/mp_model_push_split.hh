@@ -130,7 +130,7 @@ namespace gazebo
 			std::string detectedLitterNames;//names of litters currently within view of robot
 			gazebo::math::Pose litter_dump_site;
 			bool no_litter;
-			physics::Model_V myLitterDB;//list of litter this robot can detect
+			std::map<std::string,physics::ModelPtr> myLitterDB;//list of litter this robot can detect
 			
 			double p_s2s;//probability of seen to seen
 			double p_u2s;//probability of unseen to seen

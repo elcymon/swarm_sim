@@ -68,12 +68,13 @@ void ModelVel::LitterSensor()
 	
 	math::Vector3 my_p = this->my_pose.pos;
 	
-	for(auto m : this->myLitterDB)
+	for(auto name_modelptr : this->myLitterDB)
 	{
-		
+		std::string m_name = name_modelptr.first;
+		physics::ModelPtr m = name_modelptr.second;
 		math::Vector3 m_p = m->GetWorldPose().pos;
 		bool seen = false;
-		auto p_seen = this->prev_seen.find(m->GetName());
+		auto p_seen = this->prev_seen.find(m_name);
 		double probability = this->p_u2s; //assume not previously seen
 		
 		if (p_seen != this->prev_seen.end())
@@ -104,7 +105,7 @@ void ModelVel::LitterSensor()
 					{
 						//cout<<litter_name<<":"<<this->litter_distance<<"replaced by::: "<<m_name<<":"<<dist<<endl;
 						templitter_pos = m_p;
-						tempLitterName = m->GetName();
+						tempLitterName = m_name;
 						templitter_distance = dist;//update closest litter
 						templitterModel = m;
 					}
@@ -113,7 +114,7 @@ void ModelVel::LitterSensor()
 					{
 						detections += ";";
 					}
-					detections += (m->GetName()).substr(8);
+					detections += (m_name).substr(8);
 				}
 			}
 		}
@@ -124,18 +125,18 @@ void ModelVel::LitterSensor()
 
 		if(seen)
 		{//insert litter name to previously seen (data type is set, so it will fail if it already exists)
-			this->prev_seen.insert(m->GetName());
+			this->prev_seen.insert(m_name);
 		}
 		else
 		{//remove litter name from previously seen
-			this->prev_seen.erase(m->GetName());
+			this->prev_seen.erase(m_name);
 		}
 		
 		
 	}
 
 	//update detected litter information data
-	if(!(this->LitterName.empty()))
+	if(!(this->LitterName.empty()) and false)
 	{
 		this->litter_pos = this->litterModel->GetWorldPose().pos;
 		this->litter_distance = this->dxy(my_p,this->litter_pos);//linear distance
