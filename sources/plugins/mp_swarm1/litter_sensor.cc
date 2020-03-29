@@ -11,16 +11,37 @@ void ModelVel::CommSignal(ConstComDataPtr &a)
 	this->call_neighbours = a->att_neighbours();
 	this->call_queue.push_back(a->att_signal());
 
-	double rslt_x = a->att_x() + a->rep_x();
-	double rslt_y = a->att_y() + a->rep_y();
-	this->rslt_theta = atan2(rslt_y,rslt_x);
-	// if(this->ModelName.compare("m_4wrobot10") == 0)
-	// gzdbg << this->rslt_theta << endl;
-	
 	//using proposed communication update method
-	this->commModel.update_comm_signals(a->att_signal(),a->rep_signal(),this->timeStamp);
+	this->commModel.update_comm_signals(a->att_signal(),a->rep_signal(),this->timeStamp,
+					a->att_x(),a->att_y(),a->rep_x(),a->rep_y());
 
-	
+
+	//handle vector based communication computation of resultant values
+	double att_x = 0;
+	double att_y = 0;
+	if (this->call_scale_mult > 0)
+	{
+		att_x = this->call_scale_mult * this->commModel.get_vector_component("att_x");
+		att_y = this->call_scale_mult * this->commModel.get_vector_component("att_y");
+	}
+	double rep_x = 0;
+	double rep_y = 0;
+	if (this->repel_scale_mult > 0)
+	{
+		rep_x = this->repel_scale_mult * this->commModel.get_vector_component("rep_x");
+		rep_y = this->repel_scale_mult * this->commModel.get_vector_component("rep_y");
+	}
+
+	double rslt_x = att_x + rep_x;
+	double rslt_y = att_y + rep_y;
+
+	this->rslt_theta = atan2(rslt_y,rslt_x);
+	if(this->ModelName.compare("m_4wrobot10") == 0)
+		gzdbg << this->rslt_theta << ": nrep="<<this->rep_neighbours
+				<<", natt="<<this->call_neighbours 
+				// << " " <<att_x <<" "<<att_y
+				//<<" "<<rep_x <<" "<<rep_y 
+				<<endl;	
 }
 
 //litter sensing topics

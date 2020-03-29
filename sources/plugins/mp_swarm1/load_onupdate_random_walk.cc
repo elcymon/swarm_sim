@@ -621,15 +621,21 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				
 				this->waiting_t = 0;//reset waiting time.
 			}
-			if ((this->com_model.compare("vector") == 0) and (this->escape < 0) and (abs(this->rslt_theta) > 0)){
-				this->d_heading = this->normalize(this->rslt_theta);
-				double d_eror = this->d_heading - this->my_pose.rot.GetYaw();
-				d_eror = this->normalize(d_eror);
-				if (abs(d_eror) > 0.09)
+			if ((this->com_model.compare("vector") == 0) and (this->escape < 0)){
+				if(((this->repel_scale_mult > 0) and (this->rep_neighbours > 0))//use repulsion multiplier and there are repelling neighbours
+					or ((this->call_scale_mult > 0) and (this->call_neighbours > 0))//use attraction multiplier and there are attracting robots
+				)
 				{
-					this->turn_complete = false;
-					this->waiting_t = 0;//reset waiting time.
+					this->d_heading = this->normalize(this->rslt_theta);
+					double d_eror = this->d_heading - this->my_pose.rot.GetYaw();
+					d_eror = this->normalize(d_eror);
+					if (abs(d_eror) > 0.09)
+					{
+						this->turn_complete = false;
+						this->waiting_t = 0;//reset waiting time.
+					}
 				}
+				
 				
 			}
 			

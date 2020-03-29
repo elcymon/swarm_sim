@@ -25,6 +25,8 @@ class CommModels {
         double delta_call_signal;
         double delta_repel_signal;
 
+        std::deque<double> attraction_x, attraction_y, repulsion_x, repulsion_y;
+        std::map<std::string,double> resultant_vectors;
         /*
         Declare methods to handing different filtering approaches as private
         they should be used to update desired values based on user's choice
@@ -49,6 +51,9 @@ class CommModels {
         */
        void linear_regression_eqn(std::deque<double> *signal,std::deque<double> *tStamp,
                                     double *prev, double *curr);
+        //general filter implementation (used for including vector based communication noise filtering)
+        double filter(std::deque<double> *signal, std::string *filter_type);
+        
     public:
         CommModels();
         CommModels(int qSize, std::string filterType);
@@ -56,7 +61,9 @@ class CommModels {
         double get_value(std::string desired_value);//used to access signals and gradients
         
         //accept communicated information and time stamp
-        void update_comm_signals(double call_comm, double repel_comm, double t);
+        void update_comm_signals(double call_comm, double repel_comm, double t, double att_x, double att_y, double rep_x, double rep_y);
+
+        double get_vector_component(std::string name);
 
 
 };

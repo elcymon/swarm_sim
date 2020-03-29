@@ -16,6 +16,11 @@ CommModels::CommModels() {
 
     this->delta_call_signal = 0;
     this->delta_repel_signal = 0;
+
+    this->resultant_vectors["att_x"] = 0;
+    this->resultant_vectors["att_y"] = 0;
+    this->resultant_vectors["rep_x"] = 0;
+    this->resultant_vectors["rep_y"] = 0;
 }
 CommModels::CommModels(int qSize, std::string filterType) {
 //:queue_size(qSize), filter_type(filterType) {
@@ -33,10 +38,17 @@ CommModels::CommModels(int qSize, std::string filterType) {
     this->delta_call_signal = 0;
     this->delta_repel_signal = 0;
 
+    this->resultant_vectors["att_x"] = 0;
+    this->resultant_vectors["att_y"] = 0;
+    this->resultant_vectors["rep_x"] = 0;
+    this->resultant_vectors["rep_y"] = 0;
+
     // std::cout<<"queue_size: "<<queue_size<<std::endl
     //             <<"filter type "<<filter_type<<std::endl;   
 }
-
+double CommModels::get_vector_component(std::string name) {
+    return this->resultant_vectors[name];
+}
 double CommModels::get_value(std::string desired_value) {
     //use if statements to select the right parameter to return
     if(desired_value.compare("prev_call_signal") == 0) {
@@ -66,7 +78,8 @@ double CommModels::get_value(std::string desired_value) {
 
 }
 
-void CommModels::update_comm_signals(double call_comm, double repel_comm, double t) {
+void CommModels::update_comm_signals(double call_comm, double repel_comm,
+                 double t, double att_x, double att_y, double rep_x, double rep_y) {
     /*
     Adds elements at the end of the queue. This means that the last element added 
     is the most recent element (i.e. it.end() is most current) and 
@@ -77,12 +90,25 @@ void CommModels::update_comm_signals(double call_comm, double repel_comm, double
     this->repel_queue.push_back(repel_comm);
     this->time_stamp.push_back(t);
 
+    //vector-based communication
+    this->attraction_x.push_back(att_x);
+    this->attraction_y.push_back(att_y);
+    this->repulsion_x.push_back(rep_x);
+    this->repulsion_y.push_back(rep_y);
+
     if( (int) this->time_stamp.size() >= this->queue_size ) {
+        //vector-based communication.
+        this->resultant_vectors["att_x"] = this->filter(&(this->attraction_x), &(this->filter_type));
+        this->resultant_vectors["att_y"] = this->filter(&(this->attraction_y), &(this->filter_type));
+        this->resultant_vectors["rep_x"] = this->filter(&(this->repulsion_x), &(this->filter_type));
+        this->resultant_vectors["rep_y"] = this->filter(&(this->repulsion_y), &(this->filter_type));
+
         //compute signal intensitites
         if ((this->filter_type).compare("average_filter") == 0){
             this->average_filter(&(this->call_queue), &(this->prev_call_signal), &(this->curr_call_signal));
             this->average_filter(&(this->repel_queue), &(this->prev_repel_signal), &(this->curr_repel_signal));
             this->time_stamp.clear();//clear time (done for average filter only)
+
         }
         else if ((this->filter_type).compare("sliding_window_filter") == 0) {
             this->sliding_window_filter(&(this->call_queue), &(this->prev_call_signal), &(this->curr_call_signal));
@@ -92,10 +118,9 @@ void CommModels::update_comm_signals(double call_comm, double repel_comm, double
         //compute gradients
         this->delta_call_signal = this->curr_call_signal - this->prev_call_signal;
         this->delta_repel_signal = this->curr_repel_signal - this->prev_repel_signal;
-
-
     }
 }
+
 
 //functions to handle different communication filters
 void CommModels::average_filter(std::deque<double> *signal, double *prev, double *curr){
@@ -120,6 +145,27 @@ void CommModels::average_filter(std::deque<double> *signal, double *prev, double
     
 
 
+}
+double CommModels::filter(std::deque<double> *signal, std::string *filter_type)
+{
+    //compute average
+    double total_magnitude = std::accumulate(signal->begin(), signal->end(), 0);//computes sum
+    double n = std::distance(signal->begin(), signal->end());
+    //update average magnitude
+    double average_magnitude = total_magnitude / n;
+    // std::cerr << n << ": " << total_magnitude
+    //             << " "<< signal->front() <<std::endl;
+    //clear contents
+    if(filter_type->compare("average_filter") == 0)
+        signal->clear();
+    else if (filter_type->compare("sliding_window_filter") == 0)
+        signal->pop_front();
+    else
+    {
+        std::cerr<<"Unknown Filter type: " << *filter_type << std::endl;
+    }
+    
+    return average_magnitude;
 }
 
 void CommModels::sliding_window_filter(std::deque<double> *signal, double *prev, double *curr){
