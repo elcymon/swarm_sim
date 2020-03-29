@@ -1,0 +1,229 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+	
+	<!--size of swarm-->
+	<!--length of boundary-->
+	<!--width of boundary-->
+	<!--boundary thickness-->
+	<!--boundary height-->
+	<world name='default'>
+	
+	<!-- Ground Plane -->
+	<include>
+		<uri>model://ground_plane</uri>
+	</include>
+	
+	<include>
+		<uri>model://sun</uri>
+	</include>
+	<!--start: insert nest model
+	<include>
+		<uri>model://m_nest</uri>
+	</include>-->
+	<!--end: insert home model-->
+	<!--Set GUI pose-->
+	<gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose frame=''>0 0 100 1.57079 1.57079 -1.57079</pose>
+        <view_controller>ortho</view_controller>
+        <projection_type>orthographic</projection_type>
+      </camera>
+    </gui>
+
+	<!-- start: generate robots that start from home-->
+ 
+
+	<%start_r = 0.80
+	r = start_r
+	dist = 0.5
+	angle = 0
+	angle_step = 0
+	x_start = 0
+	y_starrt = 0
+	id = 1
+	rb = rb.to_i
+	while id <= rb
+		x = r * Math.cos(angle)
+		y = r * Math.sin(angle)
+		
+		if angle == 0
+			x_start = x
+			y_start = y
+			
+			angle_step = 2 * Math.asin(dist / (2.0 * r))
+		end
+				%>
+				
+				<include>
+					<name>m_4wrobot<%=id%></name><%id += 1%>
+					<pose><%=x%> <%=y%> 0.005 0 0 <%=angle%></pose><%angle = angle + angle_step%>
+					<uri>model://m_4wrobot</uri>
+				</include>
+				
+			<%
+			
+			x_temp = r * Math.cos(angle)
+			y_temp = r * Math.sin(angle)
+			
+			d_temp = ((x_temp - x_start)**2 + (y_temp - y_start)**2)**(0.5)
+			
+			if (d_temp + 0.05) < dist
+				r = r + dist
+				angle = 0
+			end
+			
+			if id > rb
+				break
+			end
+	end
+		
+			
+			%>
+			
+	<!--end: generate robots that start from home -->
+	
+	<!--start: generate litter locations-->
+	<% lx = 1
+		ly = 1
+		l = 1
+	while l <= 100 %>
+		<include>
+			<name>m_litter<%=l%></name><%l += 1%>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter<%=l%></name><%l += 1%>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter<%=l%></name><%l += 1%>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter<%=l%></name><%l += 1%>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	<%
+	lx += 1
+	ly += 1
+	end%>
+	
+	<!--end: generate litter locations-->
+	
+	<!--start: create boundary-->
+	<!--<model name='boundary1'>
+		<static>1</static>
+		<pose>0 0 0 0 0 0</pose>
+		<link name='link'>
+			<collision name='collision1'>
+				<pose>-25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual1'>
+				<pose>-25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+			
+			<collision name='collision2'>
+				<pose>25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual2'>
+				<pose>25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+			
+			<collision name='collision3'>
+				<pose>0 -25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual3'>
+				<pose>0 -25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+			
+			<collision name='collision4'>
+				<pose>0 25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual4'>
+				<pose>0 25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+		</link>
+	</model>-->
+
+	<!--end: create boundary-->
+	
+	
+	
+	
+	
+	<!--
+	
+	
+	<include>
+		<name>m_litter2</name>
+		<pose>1.2 0.2 0.025 0 0 0</pose>
+		<uri>model://m_litter</uri>
+	</include>
+	
+	 Populating world with Litter objects 
+	<population name='litter_population1'>
+		<model name='m_litter1'>
+			<include>
+				<uri>model://m_litter</uri>
+			</include>
+		</model>
+		<pose>4 0 0 0 0 0</pose><! 9.5 9.5 0.05>
+		<box>
+			<size>3 3 0.05</size>
+		</box>
+		<model_count>10</model_count>
+		<distribution>
+			<type>uniform</type>
+		</distribution>
+	</population>-->
+		<plugin name="wp_swarm1" filename="libwp_swarm1.so"/>
+	</world>
+</sdf>

@@ -1,0 +1,690 @@
+<?xml version='1.0'?>
+<sdf version='1.6'>
+	
+	<!--size of swarm-->
+	<!--length of boundary-->
+	<!--width of boundary-->
+	<!--boundary thickness-->
+	<!--boundary height-->
+	<world name='default'>
+	
+	<!-- Ground Plane -->
+	<include>
+		<uri>model://ground_plane</uri>
+	</include>
+	
+	<include>
+		<uri>model://sun</uri>
+	</include>
+	<!--start: insert nest model
+	<include>
+		<uri>model://m_nest</uri>
+	</include>-->
+	<!--end: insert home model-->
+	<!--Set GUI pose-->
+	<gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose frame=''>0 0 100 1.57079 1.57079 -1.57079</pose>
+        <view_controller>ortho</view_controller>
+        <projection_type>orthographic</projection_type>
+      </camera>
+    </gui>
+
+	<!-- start: generate robots that start from home-->
+ 
+
+	
+				
+				<include>
+					<name>m_4wrobot1</name>
+					<pose>0.8 0.0 0.005 0 0 0</pose>
+					<uri>model://m_4wrobot</uri>
+				</include>
+				
+			
+			
+	<!--end: generate robots that start from home -->
+	
+	<!--start: generate litter locations-->
+	
+		<include>
+			<name>m_litter1</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter2</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter3</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter4</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter5</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter6</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter7</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter8</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter9</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter10</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter11</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter12</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter13</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter14</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter15</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter16</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter17</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter18</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter19</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter20</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter21</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter22</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter23</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter24</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter25</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter26</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter27</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter28</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter29</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter30</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter31</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter32</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter33</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter34</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter35</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter36</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter37</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter38</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter39</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter40</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter41</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter42</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter43</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter44</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter45</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter46</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter47</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter48</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter49</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter50</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter51</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter52</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter53</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter54</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter55</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter56</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter57</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter58</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter59</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter60</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter61</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter62</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter63</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter64</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter65</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter66</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter67</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter68</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter69</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter70</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter71</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter72</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter73</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter74</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter75</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter76</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter77</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter78</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter79</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter80</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter81</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter82</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter83</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter84</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter85</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter86</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter87</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter88</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter89</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter90</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter91</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter92</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter93</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter94</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter95</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter96</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+		<include>
+			<name>m_litter97</name>
+			<pose>lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter98</name>
+			<pose>-lx ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter99</name>
+			<pose>lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+		<include>
+			<name>m_litter100</name>
+			<pose>-lx -ly 0.025 0 0 0</pose>
+			<uri>model://m_litter</uri>
+		</include>
+	
+	
+	<!--end: generate litter locations-->
+	
+	<!--start: create boundary-->
+	<!--<model name='boundary1'>
+		<static>1</static>
+		<pose>0 0 0 0 0 0</pose>
+		<link name='link'>
+			<collision name='collision1'>
+				<pose>-25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual1'>
+				<pose>-25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+			
+			<collision name='collision2'>
+				<pose>25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual2'>
+				<pose>25.05 0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>0.1 50.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+			
+			<collision name='collision3'>
+				<pose>0 -25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual3'>
+				<pose>0 -25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+			
+			<collision name='collision4'>
+				<pose>0 25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</collision>
+			
+			<visual name='visual4'>
+				<pose>0 25.0 0.0 0 0 0</pose>
+				<geometry>
+					<box>
+						<size>50.0 0.1 1.919</size>
+					</box>
+				</geometry>
+			</visual>
+		</link>
+	</model>-->
+
+	<!--end: create boundary-->
+	
+	
+	
+	
+	
+	<!--
+	
+	
+	<include>
+		<name>m_litter2</name>
+		<pose>1.2 0.2 0.025 0 0 0</pose>
+		<uri>model://m_litter</uri>
+	</include>
+	
+	 Populating world with Litter objects 
+	<population name='litter_population1'>
+		<model name='m_litter1'>
+			<include>
+				<uri>model://m_litter</uri>
+			</include>
+		</model>
+		<pose>4 0 0 0 0 0</pose><! 9.5 9.5 0.05>
+		<box>
+			<size>3 3 0.05</size>
+		</box>
+		<model_count>10</model_count>
+		<distribution>
+			<type>uniform</type>
+		</distribution>
+	</population>-->
+		<plugin name="wp_swarm1" filename="libwp_swarm1.so"/>
+	</world>
+</sdf>
