@@ -116,10 +116,10 @@ void ModelVel::LitterSensor()
 					}
 					detections += (m->GetName()).substr(8);
 
-					double dump_x = rand() % 1000 + 1000;
-					double dump_y = rand() % 1000 + 1000;
-					gazebo::math::Pose dump_site = gazebo::math::Pose(dump_x,dump_y, 0.0, 0.0, 0.0, 0.0);
-					m->SetWorldPose(dump_site);
+					// double dump_x = rand() % 1000 + 1000;
+					// double dump_y = rand() % 1000 + 1000;
+					// gazebo::math::Pose dump_site = gazebo::math::Pose(dump_x,dump_y, 0.0, 0.0, 0.0, 0.0);
+					// m->SetWorldPose(dump_site);
 				}
 			}
 			else
@@ -160,5 +160,11 @@ void ModelVel::LitterSensor()
 	// gzdbg << this->model->GetName() <<": "<<detections <<endl;
 
 	this->pick_litter = this->litterInPickingRange(this->LitterName);
-	
+	if(this->litterModel)
+	{
+		double dump_x = rand() % 1000 + 1000;
+		double dump_y = rand() % 1000 + 1000;
+		gazebo::math::Pose dump_site = gazebo::math::Pose(dump_x,dump_y, 0.0, 0.0, 0.0, 0.0);
+		this->litterModel->SetWorldPose(dump_site);
+	}
 }
