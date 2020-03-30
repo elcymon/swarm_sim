@@ -51,6 +51,7 @@ void ModelVel::LitterSensor()
 {
 	//std::lock_guard<std::mutex> lock(this->mutex);
 	this->LitterName = "";
+	this->detectedLitterNames = "";
 	this->litterModel = nullptr;
 	this->litter_distance = 1000000;
 	this->litter_pos.z=-9000.1;//initialize closest litter at unreasonable distance in z direction
@@ -115,10 +116,10 @@ void ModelVel::LitterSensor()
 					}
 					detections += (m->GetName()).substr(8);
 
-					// double dump_x = rand() % 1000 + 1000;
-					// double dump_y = rand() % 1000 + 1000;
-					// gazebo::math::Pose dump_site = gazebo::math::Pose(dump_x,dump_y, 0.0, 0.0, 0.0, 0.0);
-					// m->SetWorldPose(dump_site);
+					double dump_x = rand() % 1000 + 1000;
+					double dump_y = rand() % 1000 + 1000;
+					gazebo::math::Pose dump_site = gazebo::math::Pose(dump_x,dump_y, 0.0, 0.0, 0.0, 0.0);
+					m->SetWorldPose(dump_site);
 				}
 			}
 			else

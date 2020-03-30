@@ -100,7 +100,7 @@ namespace gazebo
 				string litterInfo = to_string(t);
 				string robotsInfo = to_string(t);
 				string nestInfo = to_string(t);
-				// int pickedLitter = 0;
+				this->pickedLitter = 0;
 
 				for (auto m : this->litters) {
 					if (m->GetWorldPose().pos.x < 100 and abs(m->GetWorldPose().pos.y) < 100) {//yet to pick this litter
@@ -277,7 +277,7 @@ namespace gazebo
 			this->log_timer += this->max_step_size;
 			
 			gazebo::common::Time st = _info.simTime;
-			if(st.Double() >= 100) exit(0); //terminate after 100 seconds
+			// if(st.Double() >= 100) exit(0); //terminate after 100 seconds
 			
 			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
 			{
