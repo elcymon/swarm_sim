@@ -51,6 +51,7 @@ void ModelVel::LitterSensor()
 {
 	//std::lock_guard<std::mutex> lock(this->mutex);
 	this->LitterName = "";
+	this->detectedLitterNames = "";
 	this->litterModel = nullptr;
 	this->litter_distance = 1000000;
 	this->litter_pos.z=-9000.1;//initialize closest litter at unreasonable distance in z direction
