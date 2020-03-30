@@ -32,6 +32,7 @@ namespace gazebo
 		private:
 			std::vector<std::string> litter_count;
 			int numLitter;
+			int pickedLitter;
 			transport::NodePtr node;
 			transport::SubscriberPtr sub;
 			transport::PublisherPtr pub;
@@ -62,7 +63,7 @@ namespace gazebo
 			myfile.close();
 		}
 
-		public : void logDetails(bool header,int t) {
+		public : void logDetails(bool header,double t) {
 			ostringstream timeStepData;
 			if (header) {
 				string litterNames = "name",litterx = "x",littery = "y";
@@ -99,7 +100,7 @@ namespace gazebo
 				string litterInfo = to_string(t);
 				string robotsInfo = to_string(t);
 				string nestInfo = to_string(t);
-				int pickedLitter = 0;
+				// int pickedLitter = 0;
 
 				for (auto m : this->litters) {
 					if (m->GetWorldPose().pos.x < 100 and abs(m->GetWorldPose().pos.y) < 100) {//yet to pick this litter
@@ -107,7 +108,7 @@ namespace gazebo
 					}
 					else {//litter has been picked
 						litterInfo += "," + to_string(0);
-						pickedLitter++;
+						this->pickedLitter++;
 					}
 				}
 				if (this->littersFile.str().find("_001_") != std::string::npos)
@@ -130,7 +131,7 @@ namespace gazebo
 					}
 					this->writeData(this->robotsFile.str(),robotsInfo);
 				}
-				nestInfo += "," + to_string(this->numLitter) + "," + to_string(pickedLitter);
+				nestInfo += "," + to_string(this->numLitter) + "," + to_string(this->pickedLitter);
 				this->writeData(this->nestFile.str(),nestInfo);
 
 			}
@@ -172,6 +173,7 @@ namespace gazebo
 			
 			// this->logDetails(false,0);
 			this->numLitter = 0;
+			this->pickedLitter = 0;
 			//Initialize the litter vector
 			
 			//create a subscriber to subscribe to the litter topic
@@ -275,19 +277,20 @@ namespace gazebo
 			this->log_timer += this->max_step_size;
 			
 			gazebo::common::Time st = _info.simTime;
+			if(st.Double() >= 100) exit(0); //terminate after 100 seconds
 			
 			if(/*st.nsec==0 and this->start_sim)//or */(this->log_timer >= this->log_rate and this->start_sim))//rate of 100Hz
 			{
 				
 				this->log_timer = 0;
 				std::string log_litter_count(to_string(_info.simTime.Double()));
-				log_litter_count += "," + to_string(this->litter_count.size());
+				log_litter_count += "," + to_string(this->pickedLitter);//to_string(this->litter_count.size());
 				this->numLitter =  (int) this->litter_count.size();
 				msgs::Any b;
 				b.set_type(msgs::Any::STRING);
 				b.set_string_value(log_litter_count);
 				this->pub->Publish(b);
-				this->logDetails(false,st.sec);
+				this->logDetails(false,st.Double());
 			}
 			
 			if(this->log_timer > this->log_rate)

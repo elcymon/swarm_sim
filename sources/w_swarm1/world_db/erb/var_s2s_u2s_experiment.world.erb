@@ -16,10 +16,11 @@
 	<include>
 		<uri>model://sun</uri>
 	</include>
-	<!--start: insert nest model
+	<!--start: insert nest model-->
 	<include>
+		<pose>0 0 -10 0 0 0</pose>
 		<uri>model://m_nest</uri>
-	</include>-->
+	</include>
 	<!--end: insert home model-->
 	<!--Set GUI pose-->
 	<gui fullscreen='0'>
@@ -83,115 +84,136 @@
 	<!--end: generate robots that start from home -->
 	
 	<!--start: generate litter locations-->
-	<% lx = 1
-		ly = 1
+	<% ly = 3
+	lx = -ly
 		l = 1
-	while l <= 100 %>
-		<include>
-			<name>m_litter<%=l%></name><%l += 1%>
-			<pose>lx ly 0.025 0 0 0</pose>
-			<uri>model://m_litter</uri>
-		</include>
-		<include>
-			<name>m_litter<%=l%></name><%l += 1%>
-			<pose>-lx ly 0.025 0 0 0</pose>
-			<uri>model://m_litter</uri>
-		</include>
-		<include>
-			<name>m_litter<%=l%></name><%l += 1%>
-			<pose>lx -ly 0.025 0 0 0</pose>
-			<uri>model://m_litter</uri>
-		</include>
-		<include>
-			<name>m_litter<%=l%></name><%l += 1%>
-			<pose>-lx -ly 0.025 0 0 0</pose>
-			<uri>model://m_litter</uri>
-		</include>
-	<%
-	lx += 1
-	ly += 1
+	while l <= 100
+		if lx.abs != ly %>
+		
+			<include>
+				<name>m_litter<%=l%></name>
+				<pose><%=lx%> <%=ly%> 0.025 0 0 0</pose>
+				<uri>model://m_litter</uri>
+			</include><%l += 1; if l > 100 then break end%>
+			<include>
+				<name>m_litter<%=l%></name>
+				<pose><%=lx%> -<%=ly%> 0.025 0 0 0</pose>
+				<uri>model://m_litter</uri>
+			</include><%l += 1; if l > 100 then break end%>
+
+			<include>
+				<name>m_litter<%=l%></name>
+				<pose><%=ly%> <%=lx%> 0.025 0 0 0</pose>
+				<uri>model://m_litter</uri>
+			</include><%l += 1; if l > 100 then break end%>
+			<include>
+				<name>m_litter<%=l%></name>
+				<pose>-<%=ly%> <%=lx%> 0.025 0 0 0</pose>
+				<uri>model://m_litter</uri>
+			</include><%l += 1; if l > 100 then break end%>
+
+		<%else%>
+			<include>
+				<name>m_litter<%=l%></name>
+				<pose><%=lx%> <%=ly%> 0.025 0 0 0</pose>
+				<uri>model://m_litter</uri>
+			</include><%l += 1; if l > 100 then break end%>
+			<include>
+				<name>m_litter<%=l%></name>
+				<pose><%=lx%> -<%=ly%> 0.025 0 0 0</pose>
+				<uri>model://m_litter</uri>
+			</include><%l += 1; if l > 100 then break end%>
+		<%end
+	
+	if lx == ly
+		ly += 1
+		lx = -ly
+		
+	else
+		lx += 1
+	end
 	end%>
 	
 	<!--end: generate litter locations-->
 	
 	<!--start: create boundary-->
-	<!--<model name='boundary1'>
+	<model name='boundary1'>
 		<static>1</static>
 		<pose>0 0 0 0 0 0</pose>
 		<link name='link'>
 			<collision name='collision1'>
-				<pose>-25.05 0 0.0 0 0 0</pose>
+				<pose>-7.05 0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.1 50.1 1.919</size>
+						<size>0.1 14.1 1.919</size>
 					</box>
 				</geometry>
 			</collision>
 			
 			<visual name='visual1'>
-				<pose>-25.05 0 0.0 0 0 0</pose>
+				<pose>-7.05 0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.1 50.1 1.919</size>
+						<size>0.1 14.1 1.919</size>
 					</box>
 				</geometry>
 			</visual>
 			
 			<collision name='collision2'>
-				<pose>25.05 0 0.0 0 0 0</pose>
+				<pose>7.05 0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.1 50.1 1.919</size>
+						<size>0.1 14.1 1.919</size>
 					</box>
 				</geometry>
 			</collision>
 			
 			<visual name='visual2'>
-				<pose>25.05 0 0.0 0 0 0</pose>
+				<pose>7.05 0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>0.1 50.1 1.919</size>
+						<size>0.1 14.1 1.919</size>
 					</box>
 				</geometry>
 			</visual>
 			
 			<collision name='collision3'>
-				<pose>0 -25.0 0.0 0 0 0</pose>
+				<pose>0 -7.0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>50.0 0.1 1.919</size>
+						<size>14.0 0.1 1.919</size>
 					</box>
 				</geometry>
 			</collision>
 			
 			<visual name='visual3'>
-				<pose>0 -25.0 0.0 0 0 0</pose>
+				<pose>0 -7.0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>50.0 0.1 1.919</size>
+						<size>14.0 0.1 1.919</size>
 					</box>
 				</geometry>
 			</visual>
 			
 			<collision name='collision4'>
-				<pose>0 25.0 0.0 0 0 0</pose>
+				<pose>0 7.0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>50.0 0.1 1.919</size>
+						<size>14.0 0.1 1.919</size>
 					</box>
 				</geometry>
 			</collision>
 			
 			<visual name='visual4'>
-				<pose>0 25.0 0.0 0 0 0</pose>
+				<pose>0 7.0 0.0 0 0 0</pose>
 				<geometry>
 					<box>
-						<size>50.0 0.1 1.919</size>
+						<size>14.0 0.1 1.919</size>
 					</box>
 				</geometry>
 			</visual>
 		</link>
-	</model>-->
+	</model>
 
 	<!--end: create boundary-->
 	

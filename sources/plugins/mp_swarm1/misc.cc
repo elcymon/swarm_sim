@@ -21,7 +21,7 @@ double ModelVel::normalize(double angle)
 }
 double ModelVel::computeObjectOrientation(math::Vector3 objectPos, math::Vector3 myPos, double myYaw)
 {
-	return this->normalize(atan2(objectPos.y - myPos.y,objectPos.x - myPos.x)) - myYaw;
+	return this->normalize(atan2(objectPos.y - myPos.y,objectPos.x - myPos.x) - myYaw);
 }
 bool ModelVel::testObjectWithinFoV(double objectOrientation, double halffov)
 {

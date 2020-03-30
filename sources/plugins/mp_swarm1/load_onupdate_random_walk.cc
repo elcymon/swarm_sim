@@ -426,7 +426,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 			this->myLitterDB.push_back(m);
 		}
 	}
-
+	// gzdbg << this->model->GetName() <<": " << this->myLitterDB.size() <<std::endl;
 	//*********************************************************************************//
 	this->detectedLitterNames = "";//initially no litters were detected
 
@@ -808,7 +808,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			}
 			this->acTion = "turning";
 			//cout<<this->acTion<<" "<<dxn_eror<<endl;
-		}
+		}this->stop();
 		
 		
 		if(this->picking_lit_wait and (_info.simTime.Double() - this->pick_lit_time) < this->picking_lit_dur)

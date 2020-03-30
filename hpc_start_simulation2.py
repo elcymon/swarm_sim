@@ -3,23 +3,14 @@ import sys
 import os.path
 root_dir = '$PWD/sources/w_swarm1/world_db/'
 world_db = {
-	'OneCluster':'20180208_w_swarm1_circular_one_region_cluster.world',
-	'TwoClusters':'20180208_w_swarm1_circular_two_region_cluster.world',
-	'FourClusters':'20180209_w_swarm1_circular_four_clusters.world',
-	'HalfCluster':'20180209_w_swarm1_circular_half_cluster_half_uniform.world',
-	'Uniform':'20180209_w_swarm1_circular_uniform_litter.world',
-	'OneCluster100m':'20180208_w_swarm1_circular_one_region_cluster_100m.world',
-	'TwoClusters100m':'20180208_w_swarm1_circular_two_region_cluster_100m.world',
-	'FourClusters100m':'20180209_w_swarm1_circular_four_clusters_100m.world',
-	'HalfCluster100m':'20180209_w_swarm1_circular_half_cluster_half_uniform_100m.world',
-	'Uniform100m':'20180209_w_swarm1_circular_uniform_litter_100m.world',
-	
-	
+	'var_r1':'var_s2s_u2s_experiment_r1.world',
+	'var_r2':'var_s2s_u2s_experiment_r2.world',
+	'var_r10':'var_s2s_u2s_experiment_r10.world',
 }
 
 def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id, job_id, port_number, gzmode, swarmsize):
 	port_number = int(port_number) + 11345
-	folder_name = world_name + '-' + experiment
+	folder_name = experiment
 
 	print('folder_name: {}\nparamLine: {}\nport_number: {}\nsge_task_id: {}\njob_id: {}'.format(folder_name,paramLine,port_number,sge_task_id,job_id))
 	copy_wp=None
@@ -51,7 +42,8 @@ def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id,
 
 	#start up gazebo if all processes are successful
 	if(all_set == 0):
-		world = root_dir + 'r{}/'.format(swarmsize) + world_db[world_name]
+		world_name = world_name + str(swarmsize)
+		world = root_dir + 'var_s2s_u2s/' + world_db[world_name]
 		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};{} --verbose {}'.format(port_number,gzmode,world)
 		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		

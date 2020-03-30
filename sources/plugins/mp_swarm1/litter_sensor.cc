@@ -94,6 +94,8 @@ void ModelVel::LitterSensor()
 				{
 					this->numseen_u2s += 1;
 					seen = true;
+					
+				
 					//computing the rotaional distance
 					//double rot_dist = lit_or/(2 * M_PI) * (M_PI * this->chassis_diameter);//original formula
 					double rot_dist = lit_or/2.0 * this->chassis_diameter;//original formula reduces to this
@@ -112,8 +114,19 @@ void ModelVel::LitterSensor()
 						detections += ";";
 					}
 					detections += (m->GetName()).substr(8);
+
+					// double dump_x = rand() % 1000 + 1000;
+					// double dump_y = rand() % 1000 + 1000;
+					// gazebo::math::Pose dump_site = gazebo::math::Pose(dump_x,dump_y, 0.0, 0.0, 0.0, 0.0);
+					// m->SetWorldPose(dump_site);
 				}
 			}
+			else
+			{
+				gzdbg << this->model->GetName()<<":"<<m->GetName()<<":: ("<<dist<<" <= "<<this->lit_sensing<<") and "
+			    <<"(this->testObjectWithinFoV("<<lit_or<<","<<this->halffov<<"))\n";
+			}
+			
 		}
 		// else{//delete from DB because litter is not within world area
 		// this->myLitterDB.erase(m);
@@ -143,6 +156,7 @@ void ModelVel::LitterSensor()
 	
 
 	this->detectedLitterNames = detections;
+	// gzdbg << this->model->GetName() <<": "<<detections <<endl;
 
 	this->pick_litter = this->litterInPickingRange(this->LitterName);
 	

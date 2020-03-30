@@ -43,6 +43,14 @@
 				</include>
 				
 			
+				
+				<include>
+					<name>m_4wrobot2</name>
+					<pose>0.64375 0.4749588797990832 0.005 0 0 0.6356474078557615</pose>
+					<uri>model://m_4wrobot</uri>
+				</include>
+				
+			
 			
 	<!--end: generate robots that start from home -->
 	
