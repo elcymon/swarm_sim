@@ -23,13 +23,13 @@
 #$ -pe smp 3
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=0:05:0
+#$ -l h_rt=0:10:0
 
 #Iterations
-#$ -t 1-1
+#$ -t 1-30
 
 #Iterations in batch of
-#$ -tc 1
+#$ -tc 30
 
 
 #e-mail

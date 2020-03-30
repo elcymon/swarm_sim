@@ -100,7 +100,7 @@ namespace gazebo
 				string litterInfo = to_string(t);
 				string robotsInfo = to_string(t);
 				string nestInfo = to_string(t);
-				this->pickedLitter = 0;
+				int picked_litter = 0;
 
 				for (auto m : this->litters) {
 					if (m->GetWorldPose().pos.x < 100 and abs(m->GetWorldPose().pos.y) < 100) {//yet to pick this litter
@@ -108,31 +108,36 @@ namespace gazebo
 					}
 					else {//litter has been picked
 						litterInfo += "," + to_string(0);
-						this->pickedLitter++;
+						picked_litter++;
 					}
 				}
-				if (this->littersFile.str().find("_001_") != std::string::npos)
-				{
-					this->writeData(this->littersFile.str(),litterInfo);
-				}
-				if (this->robotsFile.str().find("_001_") != std::string::npos)
-				{
-					for (auto m : this->robots) {
-						robotsInfo += "," + this->setNumDP((m.second).x,3);
-						robotsInfo += "," + this->setNumDP((m.second).y,3);
-						robotsInfo += "," + this->setNumDP((m.second).yaw,3);
-						robotsInfo += "," + (m.second).litter_db;
-						robotsInfo += "," + (m.second).seen_litter;
-						robotsInfo += "," + (m.second).state;
-						robotsInfo += "," + this->setNumDP((m.second).numseen_u2s,0);
-						robotsInfo += "," + (m.second).com_u2s;
-						robotsInfo += "," + this->setNumDP((m.second).numseen_pure,0);
-						robotsInfo += "," + (m.second).com_pure;
+				if(picked_litter > this->pickedLitter)
+				{//save data only when new litter is picked.
+					this->pickedLitter = picked_litter;
+				
+					if (this->littersFile.str().find("_001_") != std::string::npos)
+					{
+						this->writeData(this->littersFile.str(),litterInfo);
 					}
-					this->writeData(this->robotsFile.str(),robotsInfo);
+					if (this->robotsFile.str().find("_001_") != std::string::npos)
+					{
+						for (auto m : this->robots) {
+							robotsInfo += "," + this->setNumDP((m.second).x,3);
+							robotsInfo += "," + this->setNumDP((m.second).y,3);
+							robotsInfo += "," + this->setNumDP((m.second).yaw,3);
+							robotsInfo += "," + (m.second).litter_db;
+							robotsInfo += "," + (m.second).seen_litter;
+							robotsInfo += "," + (m.second).state;
+							robotsInfo += "," + this->setNumDP((m.second).numseen_u2s,0);
+							robotsInfo += "," + (m.second).com_u2s;
+							robotsInfo += "," + this->setNumDP((m.second).numseen_pure,0);
+							robotsInfo += "," + (m.second).com_pure;
+						}
+						this->writeData(this->robotsFile.str(),robotsInfo);
+					}
+					nestInfo += "," + to_string(this->numLitter) + "," + to_string(this->pickedLitter);
+					this->writeData(this->nestFile.str(),nestInfo);
 				}
-				nestInfo += "," + to_string(this->numLitter) + "," + to_string(this->pickedLitter);
-				this->writeData(this->nestFile.str(),nestInfo);
 
 			}
 		}
