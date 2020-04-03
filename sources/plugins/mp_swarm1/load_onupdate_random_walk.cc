@@ -316,6 +316,13 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		{
 			this->detectionDuration = std::stod(param_value_str);
 		}
+		else if(param_name.compare("logPrefix") == 0){
+			this->log_filename = param_value_str + "_" + this->ModelName + ".csv";
+			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
+			myfile << "time,seenLitter,detectableLitter\n";
+			myfile.close();
+			
+		}
 		else
 		{
 			//std::cout<<temp<<"::"<<value<<std::endl;
@@ -926,8 +933,16 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		
 		this->pub_robot_info->Publish(myInfo);
 		
-		if(_info.simTime.nsec==0 or (this->log_timer >= this->log_rate))//rate of 100Hz
+		if(/*info.simTime.nsec==0 or */(this->log_timer >= this->log_rate))//rate of 100Hz
 		{
+			/////////////////////////////////////
+			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
+			myfile <<_info.simTime.Double() <<","<< this->detectedLitterNames <<","<<this->detectableLitterNames << std::endl;
+			myfile.close();
+			////////////////////////////////////
+
+
+
 			
 			msgs::Any litterNamesMsg;
 

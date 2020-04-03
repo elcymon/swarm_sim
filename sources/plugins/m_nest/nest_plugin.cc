@@ -45,6 +45,8 @@ namespace gazebo
 			bool start_sim;
 
 			physics::Model_V litters;
+			physics::Model_V robotsptr;
+			double lit_sensing;
 			
 			transport::SubscriberPtr sub_robot_info;
 			std::map<std::string,RobotInfo> robots;
@@ -62,7 +64,7 @@ namespace gazebo
 			myfile.close();
 		}
 
-		public : void logDetails(bool header,int t) {
+		public : void logDetails(bool header,double t) {
 			ostringstream timeStepData;
 			if (header) {
 				string litterNames = "name",litterx = "x",littery = "y";
@@ -102,11 +104,26 @@ namespace gazebo
 				int pickedLitter = 0;
 
 				for (auto m : this->litters) {
-					if (m->GetWorldPose().pos.x < 100 and abs(m->GetWorldPose().pos.y) < 100) {//yet to pick this litter
-						litterInfo += "," + to_string(1);
+					if (abs(m->GetWorldPose().pos.x) < 500 and abs(m->GetWorldPose().pos.y) < 500) {//yet to pick this litter
+						int near_robots = 0;
+						for (auto r : this->robotsptr)
+						{
+							//check if within litter sensing distance.
+							auto mpos = m->GetWorldPose().pos;
+							auto rpos = r->GetWorldPose().pos;
+							mpos.z = 0;rpos.z = 0;
+							double dist = mpos.Distance(rpos);
+							// gzdbg << m->GetName() << ":" << r->GetName() << "=" << dist <<std::endl;
+							if(dist <= this->lit_sensing)
+							{
+								near_robots += 1;
+							}
+						}
+						// if(near_robots > 0) gzdbg <<m->GetName() <<":"<<near_robots<<std::endl;
+						litterInfo += "," + to_string(near_robots);
 					}
 					else {//litter has been picked
-						litterInfo += "," + to_string(0);
+						litterInfo += ",";
 						pickedLitter++;
 					}
 				}
@@ -158,6 +175,7 @@ namespace gazebo
 				string m_name = m->GetName();
 				if (m_name.find("m_4wrobot") != string::npos) {
 					this->robots[m->GetName()].init_info(m);
+					this->robotsptr.push_back(m);
 				}
 				else if (m_name.find("litter") != string::npos) {
 					this->litters.push_back(m);
@@ -221,6 +239,10 @@ namespace gazebo
 				if(param_name.compare("log_rate") == 0)
 				{
 					this->log_rate = std::stod(param_value_str);;
+				}
+				else if(param_name.compare("lit_sensing")==0)
+				{
+					this->lit_sensing = std::stod(param_value_str);;
 				}
 				else if(param_name.compare("max_step_size") == 0)
 				{
@@ -287,7 +309,7 @@ namespace gazebo
 				b.set_type(msgs::Any::STRING);
 				b.set_string_value(log_litter_count);
 				this->pub->Publish(b);
-				this->logDetails(false,st.sec);
+				this->logDetails(false,st.Double());
 			}
 			
 			if(this->log_timer > this->log_rate)

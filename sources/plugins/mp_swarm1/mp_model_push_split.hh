@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h> // absolute value computation i.e. abs
 #include <iostream> //needed in order to use cout
+#include <fstream>
 #include <math.h> //for trig ratios
 #include <random> //for generating random numbers.
 //#include <gazebo/gui/viewers/TopicView.hh>
@@ -65,7 +66,7 @@ namespace gazebo
 			
 	
 		private:
-			
+			std::string log_filename;
 			bool start_sim;
 			gazebo::transport::SubscriberPtr sub_start_sim;
 			gazebo::transport::SubscriberPtr sub_my_Init;
@@ -128,6 +129,7 @@ namespace gazebo
 			int litter_deposited;// all litter dropped by robot at the nest
 			std::set<std::string> litter_db;
 			std::string detectedLitterNames;//names of litters currently within view of robot
+			std::string detectableLitterNames;//names of litters within sensing distance of robot
 			gazebo::math::Pose litter_dump_site;
 			bool no_litter;
 			physics::Model_V myLitterDB;//list of litter this robot can detect

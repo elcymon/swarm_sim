@@ -60,7 +60,7 @@ void ModelVel::LitterSensor()
 	this->numseen_pure = 0;
 	this->numseen_u2s = 0;
 	this->no_litter = true;
-	std::string detections = "";
+	std::string detections = "",detectables = "";
 	//this->neighbours = 0;
 	double lit_or = M_PI;
 	//math::Vector3 litter_pos;
@@ -91,6 +91,12 @@ void ModelVel::LitterSensor()
 			  )
 			{
 				this->numseen_pure += 1;
+				if (detectables != "")
+				{
+					detectables += ";";
+				}
+				detectables += (m->GetName()).substr(8);
+
 				if (this->uform_rand(this->generator) < probability)
 				{
 					this->numseen_u2s += 1;
@@ -144,6 +150,7 @@ void ModelVel::LitterSensor()
 	
 
 	this->detectedLitterNames = detections;
+	this->detectableLitterNames = detectables;
 
 	this->pick_litter = this->litterInPickingRange(this->LitterName);
 	
