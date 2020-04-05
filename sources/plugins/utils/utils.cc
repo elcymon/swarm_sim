@@ -8,6 +8,7 @@ struct RobotInfo {
         std::string seen_litter = "";
         std::string state = "searching";
         std::string robot_name = "";
+        std::string detectable_pure = "";
 
         double numseen_u2s = 0;
         double numseen_pure = 0;
@@ -40,6 +41,7 @@ struct RobotInfo {
                 this->numseen_u2s = info.numseen_u2s();
                 this->com_pure = info.com_pure();
                 this->com_u2s = info.com_u2s();
+                this->detectable_pure = info.detectable_pure();
             }
             else
             {

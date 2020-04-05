@@ -26,10 +26,10 @@
 #$ -l h_rt=2:0:0
 
 #Iterations
-#$ -t 1-30
+#$ -t 1-1
 
 #Iterations in batch of
-#$ -tc 30
+##$ -tc 30
 
 
 #e-mail
@@ -68,7 +68,7 @@ port_shift=$6 #to prevent overlap with another gzserver of a different experimen
 swarmsize=$7
 
 #there should be no repetition of server port or else they will overwrite each other. Adding 1 just to be safe
-port_number=$(( $SGE_TASK_ID + ( $port_shift + $paramLine ) * 32 ))
+port_number=$(( $SGE_TASK_ID + ( $port_shift + $paramLine ) * 1 ))
 echo world_name: $world_name, experiment: $experiment, paramLine: $paramLine, port_number: $port_number
 mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 

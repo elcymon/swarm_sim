@@ -87,8 +87,8 @@ namespace gazebo
 
 				string robotNames="names",robotInfo="info";
 				for (auto m : this->robots) {
-					robotNames += "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first+ ","  + m.first + "," + m.first + "," + m.first + "," + m.first;
-					robotInfo += ",x,y,yaw,litterPicked,seenLitter,state,numseen_u2s,com_u2s,numseen_pure,com_pure";
+					robotNames += "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first + "," + m.first+ ","  + m.first + "," + m.first + "," + m.first + "," + m.first;
+					robotInfo += ",x,y,yaw,litterPicked,seenLitter,state,numseen_u2s,com_u2s,detectable_pure,numseen_pure,com_pure";
 				}
 				if (this->robotsFile.str().find("_001_") != std::string::npos)
 				{
@@ -142,6 +142,7 @@ namespace gazebo
 						robotsInfo += "," + (m.second).state;
 						robotsInfo += "," + this->setNumDP((m.second).numseen_u2s,0);
 						robotsInfo += "," + (m.second).com_u2s;
+						robotsInfo += "," + (m.second).detectable_pure;
 						robotsInfo += "," + this->setNumDP((m.second).numseen_pure,0);
 						robotsInfo += "," + (m.second).com_pure;
 					}

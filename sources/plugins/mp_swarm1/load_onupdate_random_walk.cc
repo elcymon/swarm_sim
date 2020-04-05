@@ -318,9 +318,9 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		}
 		else if(param_name.compare("logPrefix") == 0){
 			this->log_filename = param_value_str + "_" + this->ModelName + ".csv";
-			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
-			myfile << "time,seenLitter,detectableLitter\n";
-			myfile.close();
+			// ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
+			// myfile << "time,seenLitter,detectableLitter\n";
+			// myfile.close();
 			
 		}
 		else
@@ -926,6 +926,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		myInfo.set_seen_litter(this->detectedLitterNames);
 		myInfo.set_state(this->state);
 		myInfo.set_robot_name(this->ModelName);
+		myInfo.set_detectable_pure(this->detectableLitterNames);
 		myInfo.set_numseen_pure(this->numseen_pure);
 		myInfo.set_numseen_u2s(this->numseen_u2s);
 		myInfo.set_com_pure(com_pure);
@@ -936,9 +937,9 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		if(/*info.simTime.nsec==0 or */(this->log_timer >= this->log_rate))//rate of 100Hz
 		{
 			/////////////////////////////////////
-			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
-			myfile <<_info.simTime.Double() <<","<< this->detectedLitterNames <<","<<this->detectableLitterNames << std::endl;
-			myfile.close();
+			// ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
+			// myfile <<_info.simTime.Double() <<","<< this->detectedLitterNames <<","<<this->detectableLitterNames << std::endl;
+			// myfile.close();
 			////////////////////////////////////
 
 
