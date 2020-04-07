@@ -1,26 +1,26 @@
 import subprocess
 import sys
 import os.path
-
+root_dir = '$PWD/sources/w_swarm1/world_db/'
 world_db = {
-	'OneCluster':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster.world',
-	'TwoClusters':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster.world',
-	'FourClusters':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters.world',
-	'HalfCluster':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform.world',
-	'Uniform':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter.world',
-	'OneCluster100m':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_one_region_cluster_100m.world',
-	'TwoClusters100m':'$PWD/sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster_100m.world',
-	'FourClusters100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_four_clusters_100m.world',
-	'HalfCluster100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_half_cluster_half_uniform_100m.world',
-	'Uniform100m':'$PWD/sources/w_swarm1/world_db/20180209_w_swarm1_circular_uniform_litter_100m.world',
+	'OneCluster':'20180208_w_swarm1_circular_one_region_cluster.world',
+	'TwoClusters':'20180208_w_swarm1_circular_two_region_cluster.world',
+	'FourClusters':'20180209_w_swarm1_circular_four_clusters.world',
+	'HalfCluster':'20180209_w_swarm1_circular_half_cluster_half_uniform.world',
+	'Uniform':'20180209_w_swarm1_circular_uniform_litter.world',
+	'OneCluster100m':'20180208_w_swarm1_circular_one_region_cluster_100m.world',
+	'TwoClusters100m':'20180208_w_swarm1_circular_two_region_cluster_100m.world',
+	'FourClusters100m':'20180209_w_swarm1_circular_four_clusters_100m.world',
+	'HalfCluster100m':'20180209_w_swarm1_circular_half_cluster_half_uniform_100m.world',
+	'Uniform100m':'20180209_w_swarm1_circular_uniform_litter_100m.world',
 	
 }
 
-def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,gzmode):
+def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id, job_id, port_number, gzmode, swarmsize):
 	port_number = int(port_number) + 11345
 	folder_name = world_name + '-' + experiment
 
-	print('folder_name: {}\nparamLine: {}\nport_number: {}\nsge_task_id: {}'.format(folder_name,paramLine,port_number,sge_task_id))
+	print('folder_name: {}\nparamLine: {}\nport_number: {}\nsge_task_id: {}\njob_id: {}'.format(folder_name,paramLine,port_number,sge_task_id,job_id))
 	copy_wp=None
 	copy_rp=None
 	copy_np=None
@@ -50,11 +50,12 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,
 
 	#start up gazebo if all processes are successful
 	if(all_set == 0):
-		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};{} --verbose {}'.format(port_number,gzmode,world_db[world_name])
+		world = root_dir + 'r{}/'.format(swarmsize) + world_db[world_name]
+		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};{} --verbose {}'.format(port_number,gzmode,world)
 		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
 		if load_world.returncode==None:
-			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {}'.format(port_number, folder_name, paramLine, sge_task_id),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {} {} {} {}'.format(port_number, folder_name, params_file, paramLine, sge_task_id, job_id,swarmsize),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 			if load_logger.returncode==None:
 				print('''
 				\n\n
@@ -86,5 +87,5 @@ def start_simulation(world_name,experiment, paramLine, sge_task_id, port_number,
 
 if __name__=='__main__':
 	# paramLine and port_number vary based on $SGE_TASK_ID value
-	# start_simulation(world_name, experiment, paramLine,   sge_task_id, port_number)
-	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],sys.argv[6])
+	# start_simulation(world_name, experiment, params_file, paramLine,   sge_task_id, job_id,       port_number, gzmode,   swarmsize)
+	start_simulation(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9])

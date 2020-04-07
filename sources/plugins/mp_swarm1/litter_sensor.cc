@@ -36,12 +36,12 @@ void ModelVel::CommSignal(ConstComDataPtr &a)
 	double rslt_y = att_y + rep_y;
 
 	this->rslt_theta = atan2(rslt_y,rslt_x);
-	if(this->ModelName.compare("m_4wrobot10") == 0)
-		gzdbg << this->rslt_theta << ": nrep="<<this->rep_neighbours
-				<<", natt="<<this->call_neighbours 
-				// << " " <<att_x <<" "<<att_y
-				//<<" "<<rep_x <<" "<<rep_y 
-				<<endl;	
+	// if(this->ModelName.compare("m_4wrobot10") == 0)
+	// 	gzdbg << this->rslt_theta << ": nrep="<<this->rep_neighbours
+	// 			<<", natt="<<this->call_neighbours 
+	// 			// << " " <<att_x <<" "<<att_y
+	// 			//<<" "<<rep_x <<" "<<rep_y 
+	// 			<<endl;	
 }
 
 //litter sensing topics

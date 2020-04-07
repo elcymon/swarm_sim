@@ -10,7 +10,7 @@
 #$ -o /nobackup/scsoo/logs/outputs
 
 # Request a full node (24 cores and 128 GB or 768 GB on ARC3)
-# -l nodes=1
+# -l nodes=0.25
 # -l node_type=24core-128G
 
 # To request for x cores on a single machine, with around y memory per core
@@ -23,25 +23,26 @@
 #$ -pe smp 3
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=5:0:0
+#$ -l h_rt=2:0:0
 
 #Iterations
 #$ -t 1-30
 
 #Iterations in batch of
-#$ -tc 2
+#$ -tc 30
 
 
 #e-mail
-##$ -m ae
-##$ -M scsoo@leeds.ac.uk
+#$ -m a
+#$ -M scsoo@leeds.ac.uk
 
 #Run the job
 #You can add cd to program directory to be sure
 # environment variable SGE_TASK_ID varies based on range in -t option
 #load singularity
+echo $@
 hpc=$1 # true if working on hpc false otherwise
-if ((hpc)); then
+if (( hpc )); then
     module load singularity
     folder=$PWD
     gzmode=gzserver
@@ -60,12 +61,15 @@ local_loc=$folder/local
 world_name=$2
 #experiment is used to know which parameter you are investigating
 experiment=$3
-#how many rows of parameters should be ignored us 0 if none
-paramLine=$4
+param_file=$4
+#how many rows of parameters should be ignored use 0 if none
+paramLine=$5
+port_shift=$6 #to prevent overlap with another gzserver of a different experiment submission
+swarmsize=$7
 
 #there should be no repetition of server port or else they will overwrite each other. Adding 1 just to be safe
-port_number=$(($SGE_TASK_ID + $5 + 1))
-echo world_name: $world_name, experiment: $experiment, row_shift: $row_shift, paramLine: $paramLine, port_number: $port_number
+port_number=$(( $SGE_TASK_ID + ( $port_shift + $paramLine ) * 32 ))
+echo world_name: $world_name, experiment: $experiment, paramLine: $paramLine, port_number: $port_number
 mkdir -p $local_loc/$JOB_ID.$SGE_TASK_ID.24core-128G.q $folder/results
 
-singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $paramLine $SGE_TASK_ID $port_number $gzmode
+singularity exec --bind $folder:$PWD,$local_loc:/local $folder/20190708-libgazebo7-xenial.simg python3 hpc_start_simulation2.py $world_name $experiment $param_file $paramLine $SGE_TASK_ID $JOB_ID $port_number $gzmode $swarmsize
