@@ -51,6 +51,7 @@ else
     JOB_ID=123
     SGE_TASK_ID=1
     gzmode=gazebo
+    QUEUE=mypc
 fi
 
 #execute simulation
