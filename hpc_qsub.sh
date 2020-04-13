@@ -23,7 +23,7 @@
 #$ -pe smp 3
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=0:30:0
+#$ -l h_rt=01:0:0
 
 #Iterations
 #$ -t 1-30
