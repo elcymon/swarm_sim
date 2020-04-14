@@ -13,6 +13,7 @@ world_db = {
 	'FourClusters100m':'20180209_w_swarm1_circular_four_clusters_100m.world',
 	'HalfCluster100m':'20180209_w_swarm1_circular_half_cluster_half_uniform_100m.world',
 	'Uniform100m':'20180209_w_swarm1_circular_uniform_litter_100m.world',
+	'OneCluster28m':'20180208_w_swarm1_circular_one_region_cluster_28m.world',
 	
 }
 
