@@ -688,8 +688,10 @@ namespace gazebo
 													if(this->com_model.compare("vector") == 0) {
 													//ignore distant communicated signal, by removing ambient noise
 														repulsion_intensity = (repulsion_intensity - this->Ae) < 0 ? 0 : repulsion_intensity - this->Ae;
-														rep_x += (r_pos.x - n_pos.x) >= 0 ? repulsion_intensity : -repulsion_intensity;
-														rep_y += (r_pos.y - n_pos.y) >= 0 ? repulsion_intensity : -repulsion_intensity;
+														// rep_x += (r_pos.x - n_pos.x) >= 0 ? repulsion_intensity : -repulsion_intensity;
+														// rep_y += (r_pos.y - n_pos.y) >= 0 ? repulsion_intensity : -repulsion_intensity;
+														rep_x += (r_pos.x - n_pos.x)/(dist)* repulsion_intensity;
+														rep_y += (r_pos.y - n_pos.y)/(dist)* repulsion_intensity;
 														// rslt_x += rep_x;
 														// rslt_y += rep_y;
 													}
@@ -743,8 +745,10 @@ namespace gazebo
 													if(this->com_model.compare("vector") == 0) {
 														//ignore distant communicated signal, by removing ambient noise
 														attraction_intensity = (attraction_intensity - this->Ae) < 0 ? 0 : attraction_intensity - this->Ae;
-														att_x += (n_pos.x - r_pos.x) >= 0 ? attraction_intensity : -attraction_intensity;
-														att_y += (n_pos.y - r_pos.y) >= 0 ? attraction_intensity : -attraction_intensity;
+														// att_x += (n_pos.x - r_pos.x) >= 0 ? attraction_intensity : -attraction_intensity;
+														// att_y += (n_pos.y - r_pos.y) >= 0 ? attraction_intensity : -attraction_intensity;
+														att_x += (n_pos.x - r_pos.x)/(dist) * attraction_intensity;
+														att_y += (n_pos.y - r_pos.y)/(dist) * attraction_intensity;
 														// rslt_x += att_x;
 														// rslt_y += att_y;
 													}

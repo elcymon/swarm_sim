@@ -10,7 +10,7 @@
 #$ -o /nobackup/scsoo/logs/outputs
 
 # Request a full node (24 cores and 128 GB or 768 GB on ARC3)
-# -l nodes=0.25
+#$ -l nodes=0.1
 # -l node_type=24core-128G
 
 # To request for x cores on a single machine, with around y memory per core
