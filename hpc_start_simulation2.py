@@ -1,6 +1,8 @@
 import subprocess
 import sys
 import os.path
+from concurrent.futures import ThreadPoolExecutor
+
 root_dir = '$PWD/sources/w_swarm1/world_db/'
 world_db = {
 	'OneCluster':'20180208_w_swarm1_circular_one_region_cluster.world',
@@ -53,36 +55,46 @@ def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id,
 	if(all_set == 0):
 		world = root_dir + 'r{}/'.format(swarmsize) + world_db[world_name]
 		loadWorldStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};{} --verbose {}'.format(port_number,gzmode,world)
-		load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
-		
-		if load_world.returncode==None:
-			load_logger = subprocess.Popen('export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {} {} {} {}'.format(port_number, folder_name, params_file, paramLine, sge_task_id, job_id,swarmsize),shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
-			if load_logger.returncode==None:
-				print('''
-				\n\n
-				***********************************************
-				All set: Simulation started and Logger loaded
-				***********************************************
-				\n\n''')
+		world_governorStr = 'export GAZEBO_MASTER_URI=http://127.0.0.1:{};./world_governor {} {} {} {} {} {}'.format(port_number, folder_name, params_file, paramLine, sge_task_id, job_id,swarmsize)
 
-		while True:
-			load_logger.poll()
-			load_world.poll()
-			#print(load_logger.returncode ,load_world.returncode)
-			if load_logger.returncode != None or load_world.returncode != None:
-				load_logger.kill()
-				load_world.kill()
-				print('''
-				********************************
-					Simulation Terminated
-					World logger = {}
-					World Status   = {}
-				Process killed because of non "None"
-				value.
-				********************************
-				'''.format(load_logger.returncode,load_world.returncode))
-				#print('world logger status: ',load_logger.returncode,'world status: ',load_world.returncode)
-				break
+		with ThreadPoolExecutor(max_workers=2) as executor:
+			gzsimulation = executor.submit(os.system,loadWorldStr)
+			gzgovernor = executor.submit(os.system,world_governorStr)
+			if gzsimulation.done():
+				sys.stderr('Simulation Ended\n')
+				gzgovernor.cancel()
+				sys.stderr('World Governor thread killed\n')
+		
+		# load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
+		
+		# if load_world.returncode==None:
+		# 	load_logger = subprocess.Popen(world_governorStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+		# 	if load_logger.returncode==None:
+		# 		print('''
+		# 		\n\n
+		# 		***********************************************
+		# 		All set: Simulation started and Logger loaded
+		# 		***********************************************
+		# 		\n\n''')
+
+		# while True:
+		# 	load_logger.poll()
+		# 	load_world.poll()
+		# 	#print(load_logger.returncode ,load_world.returncode)
+		# 	if load_logger.returncode != None or load_world.returncode != None:
+		# 		load_logger.kill()
+		# 		load_world.kill()
+		# 		print('''
+		# 		********************************
+		# 			Simulation Terminated
+		# 			World logger = {}
+		# 			World Status   = {}
+		# 		Process killed because of non "None"
+		# 		value.
+		# 		********************************
+		# 		'''.format(load_logger.returncode,load_world.returncode))
+		# 		#print('world logger status: ',load_logger.returncode,'world status: ',load_world.returncode)
+		# 		break
 	else:
 		print(all_set)
 
