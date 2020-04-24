@@ -1,5 +1,10 @@
+#USAGE
+#./hpc_qsub world_name experiment row_shift prev_ID_end
+#WHERE
+#world_name is Uniform, OneCluster, TwoClusters, FourClusters, or HalfCluster
+
 # Use current working directory and current modules
-# -cwd -V
+#$ -cwd -V
 
 #$ -e /nobackup/scsoo/logs/errors
 #$ -o /nobackup/scsoo/logs/outputs
@@ -18,13 +23,13 @@
 #$ -pe smp 3
 
 # Request Wallclock time of hh:mm:ss
-#$ -l h_rt=0:30:0
+#$ -l h_rt=2:0:0
 
 #Iterations
-# -t 1-30
+#$ -t 1-1
 
 #Iterations in batch of
-# -tc 30
+#$ -tc 1
 
 
 #e-mail
@@ -41,7 +46,6 @@ if (( hpc )); then
     module load singularity
     folder=$PWD
     gzmode=gzserver
-    SGE_TASK_ID=1
 else
     folder=.
     JOB_ID=123
@@ -55,12 +59,12 @@ local_loc=$folder/local
 
 #set python script input arguments
 #name of the world to simulate on
-world_name=Uniform
+world_name=Uniform100m
 #experiment is used to know which parameter you are investigating
 experiment=qrsh
 param_file=params/params_var_s2s_u2s_5m_1fps.csv
 #how many rows of parameters should be ignored use 0 if none
-paramLine=588
+paramLine=1
 port_shift=0 #to prevent overlap with another gzserver of a different experiment submission
 swarmsize=36
 
