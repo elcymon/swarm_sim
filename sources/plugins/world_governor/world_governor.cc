@@ -59,6 +59,7 @@ int paramLine = 0;//index entered by the user from terminal
 double sim_time = 1000000;
 //bool prefix_set = false;
 bool start_sim;
+bool simulation_ended = false;
 
 bool world_loaded = false;
 
@@ -130,6 +131,12 @@ void sub_world_loaded_cb(ConstAnyPtr &any){
 	//check for when world has been loaded
 	std::lock_guard<std::mutex> lock(mutex1);
 	world_loaded = any->bool_value();
+}
+
+void end_experiment_cb(ConstAnyPtr &any){
+	//check for when world has been loaded
+	std::lock_guard<std::mutex> lock(mutex1);
+	simulation_ended = any->bool_value();
 }
 
 void experiment_control_cb(ConstAnyPtr &any)
@@ -304,6 +311,8 @@ int main(int _argc, char **_argv)
 	gazebo::transport::SubscriberPtr sub_experiment_control;//readme file subscriber for start and end of simulation and simulation parameters used
 	sub_experiment_control = node->Subscribe("/experiment_control",experiment_control_cb);
 	
+	gazebo::transport::SubscriberPtr sub_end_experiment;//readme file subscriber for start and end of simulation and simulation parameters used
+	sub_end_experiment = node->Subscribe("/end_experiment",end_experiment_cb);
 	//Publisher to indicate start of new simulation
 	gazebo::transport::PublisherPtr pub_world_gov_experiment_control = node->Advertise<gazebo::msgs::Any>("/world_gov_experiment_control");
 
@@ -335,13 +344,13 @@ int main(int _argc, char **_argv)
 	// double max_step_size_value = 0.025;
 	// gazebo::transport::PublisherPtr physicsPub = node->Advertise<gazebo::msgs::Physics>("~/physics");
 	
-	while(true){//busy wait
+	while(!simulation_ended){//busy wait
 		gazebo::common::Time::MSleep(100);
 		time_t now = time(nullptr);
 		double time_duration = difftime(now,message_time);
 		anyGov.set_string_value(to_string(time_duration));
 		pub_debug_governor->Publish(anyGov);
-
+		// std::cerr << now << std::endl;
 		if(world_loaded){
 			if (time_duration > 10.0 and !world_gov_control_bool){
 				//if world is idle for 10 seconds and world gov control value is false

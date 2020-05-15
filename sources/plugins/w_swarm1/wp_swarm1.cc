@@ -53,6 +53,8 @@ namespace gazebo
 			physics::WorldPtr world;
 			std::mutex mutex;
 			transport::NodePtr node;
+			// Publisher to the server control.
+  			gazebo::transport::PublisherPtr pub_end_experiment;
 			transport::PublisherPtr pub_litter_pose;
 			std::string world_info_string;//should state when simulation starts and ends per world
 			bool world_info_bool;//used to indicate the world is loaded and ready to go
@@ -141,6 +143,7 @@ namespace gazebo
 				this->world_info_bool = true;//default value is true when world is loaded
 				this->pub_world_loaded = this->node->Advertise<msgs::Any>("/world_loaded");
 				
+				this->pub_end_experiment = this->node->Advertise<msgs::Any>("/end_experiment");
 
 				this->world_gov_experiment_control = false;//default value is false. Set to true from subscribed topic
 				this->sub_world_gov_experiment_control = this->node->Subscribe("/world_gov_experiment_control",&WP_Swarm1::world_gov_experiment_control_cb,this);
@@ -611,9 +614,11 @@ namespace gazebo
 						// exp_control.set_string_value("end");
 						// this->pub_experiment_control->Publish(exp_control);
 						this->world->Reset();
-							
-						
-				
+						msgs::Any stop_sim;
+						stop_sim.set_type(msgs::Any::BOOLEAN);
+						stop_sim.set_bool_value(true);
+						this->pub_end_experiment->Publish(stop_sim);
+						exit(0);
 					}
 					else
 					{

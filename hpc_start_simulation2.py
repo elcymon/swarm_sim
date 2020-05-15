@@ -60,10 +60,11 @@ def start_simulation(world_name,experiment, params_file, paramLine, sge_task_id,
 		with ThreadPoolExecutor(max_workers=2) as executor:
 			gzsimulation = executor.submit(os.system,loadWorldStr)
 			gzgovernor = executor.submit(os.system,world_governorStr)
-			if gzsimulation.done():
-				sys.stderr('Simulation Ended\n')
-				gzgovernor.cancel()
-				sys.stderr('World Governor thread killed\n')
+			
+			# if gzsimulation.done():
+			# 	sys.stderr('Simulation Ended\n')
+			# 	gzgovernor.cancel()
+			# 	sys.stderr('World Governor thread killed\n')
 		
 		# load_world = subprocess.Popen(loadWorldStr,shell=True)#,stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPEw_swarm1.world
 		
