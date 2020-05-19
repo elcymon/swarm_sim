@@ -350,7 +350,7 @@ int main(int _argc, char **_argv)
 		double time_duration = difftime(now,message_time);
 		anyGov.set_string_value(to_string(time_duration));
 		pub_debug_governor->Publish(anyGov);
-		// std::cerr << now << std::endl;
+		//  std::cerr << now << std::endl;
 		if(world_loaded){
 			if (time_duration > 10.0 and !world_gov_control_bool){
 				//if world is idle for 10 seconds and world gov control value is false
