@@ -12,17 +12,17 @@
 
 
 
-# ./mult_div_submission_loop.sh 1 1 6 Uniform v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 OneCluster v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 TwoClusters v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 FourClusters v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 HalfCluster v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 Uniform v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 OneCluster v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 TwoClusters v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 FourClusters v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 HalfCluster v5m_50fps params/params_50fps.csv 0 36
 
-# ./mult_div_submission_loop.sh 1 1 6 Uniform100m v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 OneCluster100m v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 TwoClusters100m v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 FourClusters100m v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 6 HalfCluster100m v5m_erlebrain_pure params/params_erlebrain_pure.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 Uniform100m v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 OneCluster100m v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 TwoClusters100m v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 FourClusters100m v5m_50fps params/params_50fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 6 HalfCluster100m v5m_50fps params/params_50fps.csv 0 36
 
 # ./mult_div_submission_loop.sh 1 1 6 Uniform v5m_pi4_pure params/params_pi4_pure.csv 0 36
 # ./mult_div_submission_loop.sh 1 1 6 OneCluster v5m_pi4_pure params/params_pi4_pure.csv 0 36
