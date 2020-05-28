@@ -146,6 +146,7 @@ namespace gazebo
 			transport::PublisherPtr pub_robot_info;
 			transport::PublisherPtr pub_myDetectedLitterNames;
 			transport::PublisherPtr pub_myDetectableLitters;
+			transport::PublisherPtr pub_end_experiment;
 			transport::PublisherPtr pub_myLitter_DB;//publisher of names of litter picked by robot
 			physics::ModelPtr litterModel;
 			
@@ -155,9 +156,11 @@ namespace gazebo
 			transport::PublisherPtr pub_litter;
 			
 			int waiting_t;
+			int turn_count;
+			double total_travel_distance;
 			
 			
-			gazebo::math::Pose my_pose;
+			gazebo::math::Pose my_pose,stop_pose;
 			math::Angle turn_amt;
 			double d_heading;
 			

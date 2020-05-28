@@ -24,5 +24,7 @@ if (( hpc )); then
 else
     # experiment=test
     paramLine=$stop
-    ./hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift $swarmsize
+    # for (( paramLine = start; paramLine <= stop; paramLine++)) do
+        ./hpc_qsub.sh $hpc $world $experiment $param_file $paramLine $port_shift $swarmsize
+    # done
 fi

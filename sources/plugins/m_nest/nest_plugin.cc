@@ -252,7 +252,7 @@ namespace gazebo
 				else if(param_name.compare("logPrefix") == 0){
 					// gzdbg << param_value_str;
 					this->createFileNames(param_value_str);
-					this->logDetails(true,0);
+					//this->logDetails(true,0);
 				}
 				else
 				{
@@ -310,7 +310,7 @@ namespace gazebo
 				b.set_type(msgs::Any::STRING);
 				b.set_string_value(log_litter_count);
 				this->pub->Publish(b);
-				this->logDetails(false,st.Double());
+				//this->logDetails(false,st.Double());
 			}
 			
 			if(this->log_timer > this->log_rate)

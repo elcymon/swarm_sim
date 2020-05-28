@@ -3,6 +3,7 @@ void ModelVel::stop()
 	this->lwheel->SetVelocity(0,0);
 	this->rwheel->SetVelocity(0,0);
 	this->acTion = "stop";
+	this->model->SetWorldPose(this->stop_pose);
 	//cout<<"stopping"<<endl;
 	//return this->model->GetName()+": "+"stop \n";
 }
@@ -72,7 +73,7 @@ void ModelVel::straight()
 {//Straight motion
 	this->rwheel->SetVelocity(0,this->rVel);
 	this->lwheel->SetVelocity(0,this->rVel);
-	this->acTion = "straight";
+	this->acTion = (this->rVel > 0) ? "forward" : "reverse";
 	//return this->model->GetName()+": "+"straight";
 }
 
