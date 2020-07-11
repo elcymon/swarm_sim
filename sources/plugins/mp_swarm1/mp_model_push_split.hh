@@ -35,6 +35,39 @@ using namespace gazebo;
 
 namespace gazebo
 {
+	struct Signal {
+		std::string type;
+		double level;
+		Signal(){
+			this->type = "ssh";
+			this->level = 0;
+		}
+		void update_type(std::string sigchange)
+		{
+			if (this->type.compare(sigchange) != 0)
+			{//if type changed, reset level
+				this->level = 0;
+			}
+			this->type = sigchange;
+		}
+		void update_level(double direction)
+		{
+			if (this->type.compare("ssh") == 0)
+			{
+				this->level = 0;
+				return;
+			}
+			if(direction > 0)
+			{
+				this->level++;
+			}
+			else if (direction < 0)
+			{
+				this->level--;
+			}
+
+		}
+	};
 	class ModelVel : public ModelPlugin
 	{
 		public: 
@@ -252,17 +285,9 @@ namespace gazebo
 			double linear_dist;
 			double rot_dist;
 
-
-			//logging activity times variables
-			double t_obstacle_avoidance;
-			double t_litter_processing;
-			double t_go4litter;
-			double t_oa_go4litter;
-			double t_searching;
-			double t_oa_searching;
-			double t_homing;
-			double t_oa_homing;
-
+			double forward_distance, forward_duration, reverse_distance, reverse_duration;
+			double attract_steps, repel_steps;
+			std::vector<Signal> signal;
 			
 			event::ConnectionPtr updateConnection;//pointer to the update event connection
 

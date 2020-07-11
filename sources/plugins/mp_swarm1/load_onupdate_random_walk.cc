@@ -320,7 +320,8 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 		else if(param_name.compare("logPrefix") == 0){
 			this->log_filename = param_value_str + "_" + this->ModelName + ".csv";
 			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
-			myfile << "time,distance,turncount,direction,velocity\n";
+			myfile << "time,turncount,total_distance,forward_distance,forward_duration,"
+				<<"reverse_distance,reverse_duration,attract_steps,repel_steps\n";
 			myfile.close();
 			
 		}
@@ -413,15 +414,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->wall_bounces = 0;
 	this->neighbour_bounces = 0;//reset collision with other robots
 
-	//reset activity times used for logging
-	this->t_obstacle_avoidance = 0;
-	this->t_litter_processing = 0;
-	this->t_go4litter = 0;
-	this->t_oa_go4litter = 0;
-	this->t_searching = 0;
-	this->t_oa_searching = 0;
-	this->t_homing = 0;
-	this->t_oa_homing = 0;
+	
 
 	this->timeStamp = 0;//initialize time stamp to zero
 
@@ -445,6 +438,11 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->stop_pose = gazebo::math::Pose(this->my_pose);
 	this->turn_count = 0;
 	this->total_travel_distance = 0;
+	this->forward_distance = 0, this->forward_duration = 0;
+	this->reverse_distance = 0, this->reverse_duration = 0;
+	this->signal.push_back(Signal());
+	this->attract_steps = 0; this->repel_steps = 0;
+	
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)
@@ -480,81 +478,132 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 	
 	this->prev_state = this->state;//set previous state value to state in last iteration
 	
-	this->waiting_t += 1;
-	if (this->waiting_t < 10){
-		this->stop();
-		this->log_timer = 0;
-	}
 	
-	if(this->start_sim and this->waiting_t >= 10)
+	if(this->start_sim)
 	{
+		this->previousVisionTime += this->max_step_size;
 		this->log_timer += this->max_step_size;
+		
+		double alevel = 0,rlevel = 0;
+		for (int sig = 0; sig < this->signal.size(); sig++)
+		{
+			if(this->previousVisionTime >= this->detectionDuration)//modify to be based on detection update rate
+			{
+				this->previousVisionTime = 0;
+				double probability = this->p_u2s;
+				if (this->signal[sig].type.compare("attract") == 0)//use p_s2s
+				{
+					probability = this->p_s2s;
+				}
+
+				if(this->uform_rand(this->generator) < probability)
+				{
+					this->signal[sig].update_type("attract");
+				}
+				else
+				{
+					this->signal[sig].update_type("repel");
+				}
+			}
+
+			//this->signal[sig].update_type("attract");
+			this->signal[sig].update_level(this->rVel);
+			if (this->signal[sig].type.compare("attract") == 0)
+			{
+				alevel += this->signal[sig].level;
+				this->attract_steps += 1;
+			}
+			if (this->signal[sig].type.compare("repel") == 0)
+			{
+				rlevel += this->signal[sig].level;
+				this->repel_steps += 1;
+			}
+
+		}
+		this->repel_signal = rlevel;
+		this->call_signal = alevel;
+		
+		
 		//update repulsion and attraction signals
-		this->repel_signal = this->commModel.get_value("curr_repel_signal");
-		this->prev_repel_signal = this->commModel.get_value("prev_repel_signal");
-		this->call_signal = this->commModel.get_value("curr_call_signal");
-		this->prev_call_signal = this->commModel.get_value("prev_call_signal");
+		// this->repel_signal = this->commModel.get_value("curr_repel_signal");
+		// this->prev_repel_signal = this->commModel.get_value("prev_repel_signal");
+		// this->call_signal = this->commModel.get_value("curr_call_signal");
+		// this->prev_call_signal = this->commModel.get_value("prev_call_signal");
 
 
 		//start: modify turn probability based on comm signal
 		//this section handles repulsion signals
-		
-		// this->new_comm_signal = false;//turn to false and wait till there is new signal.
-		this->turn_prob = this->turn_prob_min;
+		// if(this->acTion.compare("straight") == 0)
+		// {
+			// this->new_comm_signal = false;//turn to false and wait till there is new signal.
+			this->turn_prob = this->turn_prob_min;
 
-		if(this->rVel < 0)
-		{
-			//this->turn_prob -= this->repel_scale;
-			this->turn_prob = this->turn_prob_min / this->repel_scale_div;
-		}
-		else if (this->rVel > 0)
-		{
-			this->turn_prob = this->turn_prob_min * this->repel_scale_mult;
-		}
-		
-	//This section handles attraction signals
-		
-		if(this->rVel < 0)
-		{
-			this->turn_prob = this->turn_prob * this->call_scale_mult;
-		}
-		else if(this->rVel > 0)
-		{
-			this->turn_prob = this->turn_prob / this->call_scale_div;
-		}
+			if(this->repel_signal < this->prev_repel_signal)
+			{
+				//this->turn_prob -= this->repel_scale;
+				this->turn_prob = this->turn_prob_min / this->repel_scale_div;
+			}
+			else if (this->repel_signal > this->prev_repel_signal)
+			{
+				this->turn_prob = this->turn_prob_min * this->repel_scale_mult;
+			}
+			
+		//This section handles attraction signals
+			
+			if(this->call_signal < this->prev_call_signal)
+			{
+				this->turn_prob = this->turn_prob * this->call_scale_mult;
+			}
+			else if(this->call_signal > this->prev_call_signal)
+			{
+				this->turn_prob = this->turn_prob / this->call_scale_div;
+			}
+		// }
+			this->prev_call_signal = this->call_signal;
+			this->prev_repel_signal = this->repel_signal;
 
-		if(this->turn_prob >= this->turn_prob_max)
+			if(this->turn_prob >= this->turn_prob_max)
+			{
+				this->turn_prob = this->turn_prob_max;
+			}
+		
+		
+		if (this->rVel > 0)
 		{
-			this->turn_prob = this->turn_prob_max;
+			this->forward_distance += this->dxy(this->my_pose.pos,this->model->GetWorldPose().pos);
+			this->forward_duration += this->max_step_size;
+		}
+		else if (this->rVel < 0)
+		{
+			this->reverse_distance += this->dxy(this->my_pose.pos,this->model->GetWorldPose().pos);
+			this->reverse_duration += this->max_step_size;
 		}
 		
-		
-		
-		if (this->total_travel_distance >= 1000) {
+		this->total_travel_distance += this->dxy(this->my_pose.pos,this->model->GetWorldPose().pos);
+		if (this->timeStamp > 10000) {
+			//log data
+			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
+			myfile << this->timeStamp << ","  << this->turn_count << ","
+					<< this->total_travel_distance << "," 
+					<< this->forward_distance << "," << this->forward_duration << "," 
+					 << this->reverse_distance << "," << this->reverse_duration << ","
+					 << this->attract_steps << "," << this->repel_steps << "\n";
+			myfile.close();
+			//end experiment
 			msgs::Any any;
 			any.set_type(msgs::Any::BOOLEAN);
 			any.set_bool_value(true);
 			this->pub_end_experiment->Publish(any);
-		
 		}
 
 		
-		double travel_distance = this->dxy(this->my_pose.pos,this->model->GetWorldPose().pos);
-		ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
-		double velocity = (this->acTion.compare("stop") == 0) ? 0 : this->rVel;
-		myfile << this->timeStamp << "," << travel_distance << "," 
-				<< this->turn_count << "," << this->acTion << "," << velocity << "\n";
-
-		myfile.close();
-		this->total_travel_distance += travel_distance;
 		this->my_pose = this->model->GetWorldPose();	
 		if((this->uform_rand(this->generator) < this->turn_prob))
 		{//Make a random turn
 			//log data before changing direction
 			this->turn_count += 1;
-			std::cerr << this->turn_count << ": distance = " << travel_distance
-					<< ", duration = " << this->log_timer
-					<< " velocity = " << velocity << std::endl;
+			std::cerr << this->turn_count << ": distance = " << this->total_travel_distance
+					<< " velocity = " << this->rVel << std::endl;
 
 			//When making random turn, reset turn_prob
 			
@@ -563,19 +612,22 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			//reset time or duration of travel
 			this->log_timer = 0;
 			//this->my_pose = this->model->GetWorldPose();	
-			this->stop_pose.pos.x = this->my_pose.pos.x;
+			// this->stop_pose.pos.x = this->my_pose.pos.x;
 			// this->my_pose = this->stop_pose;
 			
 			
 
 		}
-		if (this->waiting_t < 10){
-			this->stop();
-			this->log_timer = 0;
+		gazebo::math::Pose p = this->model->GetWorldPose();
+		if(this->rVel > 0)
+		{
+			p.pos.x += 0.00025;
 		}
-		else {
-			this->straight();
+		else
+		{
+			p.pos.x -= 0.00025;
 		}
+		this->model->SetWorldPose(p);
 		
 		
 		
