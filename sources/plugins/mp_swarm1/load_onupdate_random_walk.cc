@@ -321,7 +321,7 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 			this->log_filename = param_value_str + "_" + this->ModelName + ".csv";
 			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
 			myfile << "time,turncount,total_distance,forward_distance,forward_duration,"
-				<<"reverse_distance,reverse_duration,attract_steps,repel_steps\n";
+				<<"reverse_distance,reverse_duration,attract_steps,repel_steps,turn_prob\n";
 			myfile.close();
 			
 		}
@@ -580,15 +580,25 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		}
 		
 		this->total_travel_distance += this->dxy(this->my_pose.pos,this->model->GetWorldPose().pos);
-		if (this->timeStamp > 10000) {
+		if (this->timeStamp > 1000) {
 			//log data
 			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
 			myfile << this->timeStamp << ","  << this->turn_count << ","
 					<< this->total_travel_distance << "," 
 					<< this->forward_distance << "," << this->forward_duration << "," 
 					 << this->reverse_distance << "," << this->reverse_duration << ","
-					 << this->attract_steps << "," << this->repel_steps << "\n";
+					 << this->attract_steps << "," << this->repel_steps << "," 
+					 << this->turn_prob << "\n";
 			myfile.close();
+			this->turn_count = 0;
+			this->total_travel_distance = 0;
+			this->forward_distance = 0;
+			this->forward_duration = 0;
+			this->reverse_distance = 0;
+			this->reverse_duration = 0;
+			this->attract_steps = 0;
+			this->repel_steps = 0;
+			
 			//end experiment
 			msgs::Any any;
 			any.set_type(msgs::Any::BOOLEAN);
@@ -602,7 +612,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		{//Make a random turn
 			//log data before changing direction
 			this->turn_count += 1;
-			std::cerr << this->turn_count << ": distance = " << this->total_travel_distance
+			std::cerr << this->timeStamp <<"," << this->turn_count << ": distance = " << this->total_travel_distance
 					<< " velocity = " << this->rVel << std::endl;
 
 			//When making random turn, reset turn_prob
@@ -611,10 +621,24 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->waiting_t = 0;
 			//reset time or duration of travel
 			this->log_timer = 0;
-			//this->my_pose = this->model->GetWorldPose();	
-			// this->stop_pose.pos.x = this->my_pose.pos.x;
-			// this->my_pose = this->stop_pose;
-			
+
+			//log data
+			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
+			myfile << this->timeStamp << ","  << this->turn_count << ","
+					<< this->total_travel_distance << "," 
+					<< this->forward_distance << "," << this->forward_duration << "," 
+					 << this->reverse_distance << "," << this->reverse_duration << ","
+					 << this->attract_steps << "," << this->repel_steps << "," 
+					 << this->turn_prob << "\n";
+			myfile.close();
+			this->turn_count = 0;
+			this->total_travel_distance = 0;
+			this->forward_distance = 0;
+			this->forward_duration = 0;
+			this->reverse_distance = 0;
+			this->reverse_duration = 0;
+			this->attract_steps = 0;
+			this->repel_steps = 0;
 			
 
 		}
