@@ -580,7 +580,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		}
 		
 		this->total_travel_distance += this->dxy(this->my_pose.pos,this->model->GetWorldPose().pos);
-		if (this->timeStamp > 1000) {
+		if (this->timeStamp > 5000) {
 			//log data
 			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
 			myfile << this->timeStamp << ","  << this->turn_count << ","
@@ -598,7 +598,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->reverse_duration = 0;
 			this->attract_steps = 0;
 			this->repel_steps = 0;
-			
+
 			//end experiment
 			msgs::Any any;
 			any.set_type(msgs::Any::BOOLEAN);
