@@ -37,6 +37,7 @@ namespace gazebo
 {
 	struct Signal {
 		std::string type;
+		std::string prev_type;
 		double level;
 		Signal(){
 			this->type = "ssh";
@@ -44,6 +45,7 @@ namespace gazebo
 		}
 		void update_type(std::string sigchange)
 		{
+			this->prev_type = this->type;
 			if (this->type.compare(sigchange) != 0)
 			{//if type changed, reset level
 				this->level = 0;
@@ -288,6 +290,8 @@ namespace gazebo
 			double forward_distance, forward_duration, reverse_distance, reverse_duration;
 			double attract_steps, repel_steps;
 			std::vector<Signal> signal;
+
+			double num_aa,num_ar,num_ra,num_rr;
 			
 			event::ConnectionPtr updateConnection;//pointer to the update event connection
 

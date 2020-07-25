@@ -321,7 +321,8 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 			this->log_filename = param_value_str + "_" + this->ModelName + ".csv";
 			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
 			myfile << "time,turncount,total_distance,forward_distance,forward_duration,"
-				<<"reverse_distance,reverse_duration,attract_steps,repel_steps,turn_prob\n";
+				<<"reverse_distance,reverse_duration,attract_steps,repel_steps,"
+				<<"turn_prob,num_aa,num_ar,num_ra,num_rr\n";
 			myfile.close();
 			
 		}
@@ -443,6 +444,10 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->signal.push_back(Signal());
 	this->attract_steps = 0; this->repel_steps = 0;
 	
+	this->num_aa = 0;
+	this->num_ar = 0;
+	this->num_ra = 0;
+	this->num_rr = 0;
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)
@@ -518,6 +523,22 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				rlevel += this->signal[sig].level;
 				this->repel_steps += 1;
 			}
+			if ((this->signal[sig].prev_type.compare("attract") == 0) and (this->signal[sig].type.compare("attract") == 0))
+			{
+				this->num_aa += 1;
+			}
+			else if ((this->signal[sig].prev_type.compare("attract") == 0) and (this->signal[sig].type.compare("repel") == 0))
+			{
+				this->num_ar += 1;
+			}
+			else if ((this->signal[sig].prev_type.compare("repel") == 0) and (this->signal[sig].type.compare("attract") == 0))
+			{
+				this->num_ra += 1;
+			}
+			else if ((this->signal[sig].prev_type.compare("repel") == 0) and (this->signal[sig].type.compare("repel") == 0))
+			{
+				this->num_rr += 1;
+			}
 
 		}
 		this->repel_signal = rlevel;
@@ -580,6 +601,7 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 		}
 		
 		this->total_travel_distance += this->dxy(this->my_pose.pos,this->model->GetWorldPose().pos);
+		
 		if (this->timeStamp > 5000) {
 			//log data
 			ofstream myfile(this->log_filename,std::ios::app|std::ios::ate);
@@ -588,7 +610,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 					<< this->forward_distance << "," << this->forward_duration << "," 
 					 << this->reverse_distance << "," << this->reverse_duration << ","
 					 << this->attract_steps << "," << this->repel_steps << "," 
-					 << this->turn_prob << "\n";
+					 << this->turn_prob << "," << this->num_aa<< "," << this->num_ar
+					 << "," << this->num_ra<< "," << this->num_rr << "\n";
 			myfile.close();
 			this->turn_count = 0;
 			this->total_travel_distance = 0;
@@ -598,7 +621,10 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->reverse_duration = 0;
 			this->attract_steps = 0;
 			this->repel_steps = 0;
-
+			this->num_aa = 0;
+			this->num_ar = 0;
+			this->num_ra = 0;
+			this->num_rr = 0;
 			//end experiment
 			msgs::Any any;
 			any.set_type(msgs::Any::BOOLEAN);
@@ -629,7 +655,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 					<< this->forward_distance << "," << this->forward_duration << "," 
 					 << this->reverse_distance << "," << this->reverse_duration << ","
 					 << this->attract_steps << "," << this->repel_steps << "," 
-					 << this->turn_prob << "\n";
+					 << this->turn_prob << "," << this->num_aa<< "," << this->num_ar
+					 << "," << this->num_ra<< "," << this->num_rr << "\n";
 			myfile.close();
 			this->turn_count = 0;
 			this->total_travel_distance = 0;
@@ -639,7 +666,10 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			this->reverse_duration = 0;
 			this->attract_steps = 0;
 			this->repel_steps = 0;
-			
+			this->num_aa = 0;
+			this->num_ar = 0;
+			this->num_ra = 0;
+			this->num_rr = 0;
 
 		}
 		gazebo::math::Pose p = this->model->GetWorldPose();
