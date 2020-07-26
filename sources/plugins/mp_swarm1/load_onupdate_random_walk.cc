@@ -510,6 +510,9 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 					this->signal[sig].update_type("repel");
 				}
 			}
+			else {
+				this->signal[sig].update_previous();
+			}
 
 			//this->signal[sig].update_type("attract");
 			this->signal[sig].update_level(this->rVel);

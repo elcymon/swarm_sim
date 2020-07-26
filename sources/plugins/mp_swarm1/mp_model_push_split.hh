@@ -45,7 +45,7 @@ namespace gazebo
 		}
 		void update_type(std::string sigchange)
 		{
-			this->prev_type = this->type;
+			this->update_previous();
 			if (this->type.compare(sigchange) != 0)
 			{//if type changed, reset level
 				this->level = 0;
@@ -68,6 +68,10 @@ namespace gazebo
 				this->level--;
 			}
 
+		}
+		void update_previous()
+		{
+			this->prev_type = this->type;
 		}
 	};
 	class ModelVel : public ModelPlugin
