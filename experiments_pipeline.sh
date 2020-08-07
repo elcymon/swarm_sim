@@ -1,8 +1,13 @@
-# ./mult_div_submission_loop.sh 1 1 588 Uniform v5m_s2s_u2s_4fps params/params_var_s2s_u2s_5m_1fps.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 588 OneCluster v5m_s2s_u2s_4fps params/params_var_s2s_u2s_5m_1fps.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 588 TwoClusters v5m_s2s_u2s_4fps params/params_var_s2s_u2s_5m_1fps.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 588 FourClusters v5m_s2s_u2s_4fps params/params_var_s2s_u2s_5m_1fps.csv 0 36
-# ./mult_div_submission_loop.sh 1 1 588 HalfCluster v5m_s2s_u2s_4fps params/params_var_s2s_u2s_5m_1fps.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 Uniform var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 OneCluster var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 TwoClusters var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 FourClusters var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 HalfCluster var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 Uniform100m var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 OneCluster100m var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 TwoClusters100m var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 FourClusters100m var_qsize params/var_qsize.csv 0 36
+# ./mult_div_submission_loop.sh 1 1 8 HalfCluster100m var_qsize params/var_qsize.csv 0 36
 
 # ./mult_div_submission_loop.sh 1 1 588 Uniform100m v5m_s2s_u2s_4fps params/params_var_s2s_u2s_5m_1fps.csv 0 36
 # ./mult_div_submission_loop.sh 1 1 588 OneCluster100m v5m_s2s_u2s_4fps params/params_var_s2s_u2s_5m_1fps.csv 0 36
