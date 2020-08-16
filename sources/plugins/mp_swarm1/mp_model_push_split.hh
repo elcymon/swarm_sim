@@ -270,7 +270,8 @@ namespace gazebo
 			double prev_call_signal;
 			std::deque<double> repel_queue;
 			std::deque<double> call_queue;
-			double queue_size;
+			double queue_size,q_count;
+			double total_repel_q,total_call_q;
 		//***********************CommModels********************************//
 			CommModels commModel;//a communication handler that also has inbuild filter processing
 			std::string filter_type;

@@ -448,6 +448,10 @@ void ModelVel::my_Init(ConstAnyPtr &any)
 	this->num_ar = 0;
 	this->num_ra = 0;
 	this->num_rr = 0;
+
+	this->q_count = 0;
+	this->total_call_q = 0;
+	this->total_repel_q = 0;
 }
 		
 void ModelVel::OnUpdate(const common::UpdateInfo & _info)
@@ -544,8 +548,19 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 			}
 
 		}
-		this->repel_signal = rlevel;
-		this->call_signal = alevel;
+		this->total_call_q += alevel;
+		this->total_repel_q += rlevel;
+		this->q_count += 1;
+		if (this->q_count >= this->queue_size)
+		{
+			this->prev_call_signal = this->call_signal;
+			this->prev_repel_signal = this->repel_signal;
+			
+			this->repel_signal = this->total_repel_q / this->q_count;
+			this->call_signal = this->total_call_q / this->q_count;
+			this->q_count = 0;
+		}
+		
 		
 		
 		//update repulsion and attraction signals
@@ -583,8 +598,8 @@ void ModelVel::OnUpdate(const common::UpdateInfo & _info)
 				this->turn_prob = this->turn_prob / this->call_scale_div;
 			}
 		// }
-			this->prev_call_signal = this->call_signal;
-			this->prev_repel_signal = this->repel_signal;
+			
+			
 
 			if(this->turn_prob >= this->turn_prob_max)
 			{
