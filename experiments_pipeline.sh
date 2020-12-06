@@ -1,5 +1,10 @@
-./mult_div_submission_loop.sh 1 1 242 Uniform vector params/params.csv 0 36
-./mult_div_submission_loop.sh 1 1 242 OneCluster vector params/params.csv 300 36
-./mult_div_submission_loop.sh 1 1 242 TwoClusters vector params/params.csv 600 36
-./mult_div_submission_loop.sh 1 1 242 FourClusters vector params/params.csv 900 36
-./mult_div_submission_loop.sh 1 1 242 HalfCluster vector params/params.csv 1200 36
+./mult_div_submission_loop.sh 1 1 8 Uniform vector params/params_var_qsize.csv 0 36
+./mult_div_submission_loop.sh 1 1 8 OneCluster vector params/params_var_qsize.csv 10 36
+./mult_div_submission_loop.sh 1 1 8 TwoClusters vector params/params_var_qsize.csv 20 36
+./mult_div_submission_loop.sh 1 1 8 FourClusters vector params/params_var_qsize.csv 30 36
+./mult_div_submission_loop.sh 1 1 8 HalfCluster vector params/params_var_qsize.csv 40 36
+./mult_div_submission_loop.sh 1 1 8 Uniform100m vector params/params_var_qsize.csv 0 36
+./mult_div_submission_loop.sh 1 1 8 OneCluster100m vector params/params_var_qsize.csv 10 36
+./mult_div_submission_loop.sh 1 1 8 TwoClusters100m vector params/params_var_qsize.csv 20 36
+./mult_div_submission_loop.sh 1 1 8 FourClusters100m vector params/params_var_qsize.csv 30 36
+./mult_div_submission_loop.sh 1 1 8 HalfCluster100m vector params/params_var_qsize.csv 40 36
