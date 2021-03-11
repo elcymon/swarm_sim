@@ -13,3 +13,4 @@ This repository contains all files necessary for running the RepAtt and Random W
 1. `cd swarm_sim`
 1. `sudo singularity build 20190708-libgazebo7-xenial.simg Singularity` This will create a singularity image with for the Gazebo simulator and the required environment for building the project.
 1. To run a sample simulation use: `./mult_div_submission_loop.sh 0 1 1 Uniform var_qsize params/var_qsize.csv 0 36`
+1. To (re)build the project, run `singularity exec 20190708-libgazebo7-xenial.simg ./build.sh`
