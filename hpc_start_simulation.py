@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-def start_simulation(folder_name):
+def start_simulation(folder_name,line_number):
 	copy_wp=None
 	copy_rp=None
 	copy_np=None
@@ -59,7 +59,7 @@ def start_simulation(folder_name):
 		load_world = subprocess.Popen("gzserver sources/w_swarm1/world_db/20180208_w_swarm1_circular_two_region_cluster.world",stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)#w_swarm1.world
 		
 		if load_world.returncode==None:
-			load_logger = subprocess.Popen("./world_governor {}".format(folder_name),stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
+			load_logger = subprocess.Popen("./world_governor {} {}".format(folder_name,line_number),stdin=subprocess.PIPE,stderr=subprocess.PIPE,stdout=subprocess.PIPE,shell=True)
 			if load_logger.returncode==None:
 				print('''
 				\n\n
@@ -90,4 +90,4 @@ def start_simulation(folder_name):
 		print(all_set)
 
 if __name__=='__main__':
-	start_simulation(sys.argv[1])
+	start_simulation(sys.argv[1], sys.argv[2])
